@@ -11,6 +11,10 @@ import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class HelloWorld {
   private static final long NULL = 0L;
@@ -89,10 +93,71 @@ public class HelloWorld {
     // bindings available for use.
     createCapabilities();
 
-    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+    // Geometry
+    float[] vertices = {
+            -0.5f, -0.5f, 0.0f,
+             0.0f,  0.5f, 0.0f,
+             0.5f, -0.5f, 0.0f
+    };
+
+    int vao = glGenVertexArrays();
+    glBindVertexArray(vao);
+
+    int vbo = glGenBuffers();
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0L);
+
+    // Shader
+    String vert =
+            "#version 330 core\n" +
+            "layout (location = 0) in vec3 pos;\n" +
+            "void main() {\n" +
+            "gl_Position = vec4(pos, 1.0);\n" +
+            "}\n";
+
+    String frag =
+            "#version 330 core\n" +
+            "out vec4 FragColor;\n" +
+            "void main() {\n" +
+            "FragColor = vec4(1.0, 0.5, 0.2, 1.0);\n" +
+            "}";
+
+    int vertShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertShader, vert);
+    glCompileShader(vertShader);
+    if (glGetShaderi(vertShader, GL_COMPILE_STATUS) == GL_FALSE) {
+      System.err.println(glGetShaderInfoLog(vertShader, vert.length()));
+      System.exit(-1);
+    }
+
+    int fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragShader, frag);
+    glCompileShader(fragShader);
+    if (glGetShaderi(fragShader, GL_COMPILE_STATUS) == GL_FALSE) {
+      System.err.println(glGetShaderInfoLog(fragShader, frag.length()));
+      System.exit(-1);
+    }
+
+    int shader = glCreateProgram();
+    glAttachShader(shader, vertShader);
+    glAttachShader(shader, fragShader);
+    glLinkProgram(shader);
+    glDeleteShader(vertShader);
+    glDeleteShader(fragShader);
+
+    glUseProgram(shader);
 
     while (!glfwWindowShouldClose(window)) {
+      glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
+
+      glBindVertexArray(vao);
+      glDrawArrays(GL_TRIANGLES, 0, 3);
+      glBindVertexArray(0);
+
       glfwSwapBuffers(window);
       glfwPollEvents();
     }
