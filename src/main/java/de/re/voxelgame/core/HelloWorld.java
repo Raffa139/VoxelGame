@@ -1,4 +1,4 @@
-package de.re.application.core;
+package de.re.voxelgame.core;
 
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -120,40 +120,20 @@ public class HelloWorld {
 
     String frag =
             "#version 330 core\n" +
+            "uniform float time;\n" +
             "out vec4 FragColor;\n" +
             "void main() {\n" +
-            "FragColor = vec4(1.0, 0.5, 0.2, 1.0);\n" +
+            "FragColor = vec4((sin(time/2.0)+1.0) / 2.0, (sin(time*2.0)+1.0) / 2.0, (sin(time)+1.0) / 2.0, 1.0);\n" +
             "}";
 
-    int vertShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertShader, vert);
-    glCompileShader(vertShader);
-    if (glGetShaderi(vertShader, GL_COMPILE_STATUS) == GL_FALSE) {
-      System.err.println(glGetShaderInfoLog(vertShader, vert.length()));
-      System.exit(-1);
-    }
-
-    int fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragShader, frag);
-    glCompileShader(fragShader);
-    if (glGetShaderi(fragShader, GL_COMPILE_STATUS) == GL_FALSE) {
-      System.err.println(glGetShaderInfoLog(fragShader, frag.length()));
-      System.exit(-1);
-    }
-
-    int shader = glCreateProgram();
-    glAttachShader(shader, vertShader);
-    glAttachShader(shader, fragShader);
-    glLinkProgram(shader);
-    glDeleteShader(vertShader);
-    glDeleteShader(fragShader);
-
-    glUseProgram(shader);
+    Shader shader = new Shader(vert, frag);
 
     while (!glfwWindowShouldClose(window)) {
       glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
+      shader.use();
+      shader.setFloat("time", (float)glfwGetTime());
       glBindVertexArray(vao);
       glDrawArrays(GL_TRIANGLES, 0, 3);
       glBindVertexArray(0);
