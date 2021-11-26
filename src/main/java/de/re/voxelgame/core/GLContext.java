@@ -10,6 +10,7 @@ import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwShowWindow;
 import static org.lwjgl.opengl.GL.createCapabilities;
+import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class GLContext {
@@ -39,8 +40,13 @@ public class GLContext {
       throw new IllegalStateException("Failed to create GLFW window!");
     }
 
-    // Setup key callback
+    // Setup input callback
     glfwSetKeyCallback(window, KeyListener::keyCallback);
+    glfwSetCursorPosCallback(window, MouseListener::cursorPosCallback);
+    glfwSetMouseButtonCallback(window, MouseListener::mouseButtonCallback);
+    glfwSetScrollCallback(window, MouseListener::scrollCallback);
+
+    glfwSetFramebufferSizeCallback(window, GLContext::framebufferSizeCallback);
 
     // Get thread stack & push a new frame
     try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -92,5 +98,9 @@ public class GLContext {
 
   public long getWindow() {
     return window;
+  }
+
+  private static void framebufferSizeCallback(long window, int width, int height) {
+    glViewport(0, 0, width, height);
   }
 }
