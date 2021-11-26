@@ -51,7 +51,7 @@ public class Shader {
     glUseProgram(id);
   }
 
-  public void cleanup() {
+  public void terminate() {
     glDeleteProgram(id);
   }
 

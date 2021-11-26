@@ -6,7 +6,6 @@ import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
 
-import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwShowWindow;
 import static org.lwjgl.opengl.GL.createCapabilities;
@@ -18,7 +17,7 @@ public class GLContext {
 
   public GLContext(int width, int height, String title) {
     // Setup error callback. Default implementation will print error messages in System.err
-    GLFWErrorCallback.createPrint(System.err).set();
+    glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
 
     // Init GLFW
     if (!glfwInit()) {
@@ -89,11 +88,12 @@ public class GLContext {
   }
 
   public void terminate() {
-    glfwFreeCallbacks(window);
-    glfwDestroyWindow(window);
+    // Produces GLFW error
+    //glfwFreeCallbacks(window);
+    //glfwDestroyWindow(window);
 
     glfwTerminate();
-    glfwSetErrorCallback(null).free(); // Free error callback
+    //glfwSetErrorCallback(null).free(); // Produces null pointer
   }
 
   public long getWindow() {

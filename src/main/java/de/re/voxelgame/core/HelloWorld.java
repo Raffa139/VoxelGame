@@ -2,6 +2,9 @@ package de.re.voxelgame.core;
 
 import org.lwjgl.Version;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
@@ -10,11 +13,11 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class HelloWorld {
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException, URISyntaxException {
     new HelloWorld().run();
   }
 
-  public void run() {
+  public void run() throws IOException, URISyntaxException {
     System.out.println("LWJGL " + Version.getVersion());
 
     GLContext context = new GLContext(1080, 720, "OpenGL");
@@ -23,7 +26,7 @@ public class HelloWorld {
     context.terminate();
   }
 
-  private void loop(GLContext context) {
+  private void loop(GLContext context) throws IOException, URISyntaxException {
     // Geometry
     float[] vertices = {
             -0.5f, -0.5f, 0.0f,
@@ -42,29 +45,16 @@ public class HelloWorld {
     glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0L);
 
     // Shader
-    String vert =
-            "#version 330 core\n" +
-            "layout (location = 0) in vec3 pos;\n" +
-            "void main() {\n" +
-            "gl_Position = vec4(pos, 1.0);\n" +
-            "}\n";
-
-    String frag =
-            "#version 330 core\n" +
-            "uniform float time;\n" +
-            "out vec4 FragColor;\n" +
-            "void main() {\n" +
-            "FragColor = vec4((sin(time/2.0)+1.0) / 2.0, (sin(time*2.0)+1.0) / 2.0, (sin(time)+1.0) / 2.0, 1.0);\n" +
-            "}";
-
-    Shader shader = new Shader(vert, frag);
+    ResourceLoader.Resource vert = ResourceLoader.locateResource("shader/basic.vert", HelloWorld.class);
+    ResourceLoader.Resource frag = ResourceLoader.locateResource("shader/basic.frag", HelloWorld.class);
+    Shader basicShader = new Shader(vert.toPath(), frag.toPath());
 
     while (!context.isCloseRequested()) {
       glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
-      shader.use();
-      shader.setFloat("time", (float)glfwGetTime());
+      basicShader.use();
+      basicShader.setFloat("iTime", (float)glfwGetTime());
       glBindVertexArray(vao);
       glDrawArrays(GL_TRIANGLES, 0, 3);
       glBindVertexArray(0);
@@ -75,5 +65,8 @@ public class HelloWorld {
 
       context.update();
     }
+
+    basicShader.terminate();
+    context.terminate();
   }
 }
