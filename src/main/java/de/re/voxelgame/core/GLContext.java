@@ -10,10 +10,9 @@ import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwShowWindow;
 import static org.lwjgl.opengl.GL.createCapabilities;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class GLContext {
-  public static final long NULL = 0L;
-
   private final long window;
 
   public GLContext(int width, int height, String title) {
@@ -41,11 +40,7 @@ public class GLContext {
     }
 
     // Setup key callback
-    glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-      if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-        glfwSetWindowShouldClose(window, true);
-      }
-    });
+    glfwSetKeyCallback(window, KeyListener::keyCallback);
 
     // Get thread stack & push a new frame
     try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -81,6 +76,10 @@ public class GLContext {
 
   public boolean isCloseRequested() {
     return glfwWindowShouldClose(window);
+  }
+
+  public void requestClose() {
+    glfwSetWindowShouldClose(window, true);
   }
 
   public void terminate() {

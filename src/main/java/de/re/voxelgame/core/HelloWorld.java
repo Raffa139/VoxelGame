@@ -69,6 +69,10 @@ public class HelloWorld {
       glDrawArrays(GL_TRIANGLES, 0, 3);
       glBindVertexArray(0);
 
+      if (KeyListener.keyPressed(GLFW_KEY_ESCAPE)) {
+        context.requestClose();
+      }
+
       context.update();
     }
   }
