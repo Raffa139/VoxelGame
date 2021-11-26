@@ -1,6 +1,10 @@
 package de.re.voxelgame.core;
 
+import org.joml.Matrix4f;
+import org.lwjgl.system.MemoryStack;
+
 import java.io.IOException;
+import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -67,8 +71,11 @@ public class Shader {
     glUniform1f(glGetUniformLocation(id, name), value);
   }
 
-  public void setMatrix4(String name, int value) {
-    throw new UnsupportedOperationException("Not yet implemented!");
+  public void setMatrix4(String name, Matrix4f value) {
+    try (MemoryStack stack = MemoryStack.stackPush()) {
+      FloatBuffer buffer = value.get(stack.mallocFloat(16));
+      glUniformMatrix4fv(glGetUniformLocation(id, name), false, buffer);
+    }
   }
 
   public void setVec3(String name, int value) {

@@ -1,5 +1,6 @@
 package de.re.voxelgame.core;
 
+import org.joml.Matrix4f;
 import org.lwjgl.Version;
 
 import java.io.IOException;
@@ -53,7 +54,18 @@ public class HelloWorld {
       glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
+      Matrix4f model = new Matrix4f();
+      Matrix4f view = new Matrix4f()
+              .lookAt(1.0f, 1.0f, 2.0f,
+                      0.0f, 0.0f, 0.0f,
+                      0.0f, 1.0f, 0.0f);
+      Matrix4f projection = new Matrix4f()
+              .perspective((float) Math.toRadians(45.0f), 1080.0f / 720.0f, 0.01f, 1000.0f);
+
       basicShader.use();
+      basicShader.setMatrix4("iModel", model);
+      basicShader.setMatrix4("iView", view);
+      basicShader.setMatrix4("iProjection", projection);
       basicShader.setFloat("iTime", (float)glfwGetTime());
       glBindVertexArray(vao);
       glDrawArrays(GL_TRIANGLES, 0, 3);
