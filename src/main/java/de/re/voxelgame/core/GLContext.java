@@ -68,7 +68,7 @@ public class GLContext {
     }
 
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1); // 1: V-Sync, 0: Remove fps cap
+    glfwSwapInterval(0); // 1: V-Sync, 0: Remove fps cap
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwShowWindow(window);
 
