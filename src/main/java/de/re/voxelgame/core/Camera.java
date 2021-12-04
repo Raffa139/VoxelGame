@@ -25,11 +25,11 @@ public class Camera {
     this.yaw = -90.0f;
   }
 
-  public void update () {
+  public void update (float deltaTime) {
     float speed = 0.075f;
     turn(MouseListener.getLastPosX() * speed, MouseListener.getLastPosY() * speed);
 
-    move();
+    move(deltaTime);
   }
 
   public Matrix4f getViewMatrix() {
@@ -71,8 +71,8 @@ public class Camera {
     front = new Vector3f(dir);
   }
 
-  private void move() {
-    float speed = 0.025f;
+  private void move(float deltaTime) {
+    float speed = 5.0f * deltaTime;
 
     if (KeyListener.keyPressed(GLFW_KEY_W)) {
       pos.add(mul(new Vector3f(front.x, 0.0f, front.z), speed));

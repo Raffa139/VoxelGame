@@ -76,7 +76,7 @@ public class HelloWorld {
         context.requestClose();
       }
 
-      camera.update();
+      camera.update(context.getDeltaTime());
 
       context.update();
     }

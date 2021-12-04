@@ -15,6 +15,11 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 public class GLContext {
   private final long window;
 
+  int frames;
+  float deltaTime;
+  float lastFrame;
+  float last;
+
   public GLContext(int width, int height, String title) {
     // Setup error callback. Default implementation will print error messages in System.err
     glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
@@ -76,6 +81,17 @@ public class GLContext {
   }
 
   public void update() {
+    float currentFrame = (float)glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+    frames++;
+
+    if ((currentFrame - last) >= 1.0f) {
+      glfwSetWindowTitle(window, "FPS: " + frames);
+      frames = 0;
+      last = currentFrame;
+    }
+
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
@@ -99,6 +115,14 @@ public class GLContext {
 
   public long getWindow() {
     return window;
+  }
+
+  public int getFrames() {
+    return frames;
+  }
+
+  public float getDeltaTime() {
+    return deltaTime;
   }
 
   private static void framebufferSizeCallback(long window, int width, int height) {
