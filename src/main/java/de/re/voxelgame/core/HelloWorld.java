@@ -1,6 +1,7 @@
 package de.re.voxelgame.core;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.Version;
 
 import java.io.IOException;
@@ -50,15 +51,14 @@ public class HelloWorld {
     ResourceLoader.Resource frag = ResourceLoader.locateResource("shader/basic.frag", HelloWorld.class);
     Shader basicShader = new Shader(vert.toPath(), frag.toPath());
 
+    Camera camera = new Camera(new Vector3f(0.0f, 0.0f, 2.0f));
+
     while (!context.isCloseRequested()) {
       glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
       Matrix4f model = new Matrix4f();
-      Matrix4f view = new Matrix4f()
-              .lookAt(1.0f, 1.0f, 2.0f,
-                      0.0f, 0.0f, 0.0f,
-                      0.0f, 1.0f, 0.0f);
+      Matrix4f view = camera.getViewMatrix();
       Matrix4f projection = new Matrix4f()
               .perspective((float) Math.toRadians(45.0f), 1080.0f / 720.0f, 0.01f, 1000.0f);
 
@@ -67,6 +67,7 @@ public class HelloWorld {
       basicShader.setMatrix4("iView", view);
       basicShader.setMatrix4("iProjection", projection);
       basicShader.setFloat("iTime", (float)glfwGetTime());
+
       glBindVertexArray(vao);
       glDrawArrays(GL_TRIANGLES, 0, 3);
       glBindVertexArray(0);
@@ -74,6 +75,8 @@ public class HelloWorld {
       if (KeyListener.keyPressed(GLFW_KEY_ESCAPE)) {
         context.requestClose();
       }
+
+      camera.update();
 
       context.update();
     }

@@ -64,6 +64,7 @@ public class GLContext {
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // 1: V-Sync, 0: Remove fps cap
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwShowWindow(window);
 
     // This line is critical for LWJGL's interoperation with GLFW's
