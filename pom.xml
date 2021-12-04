@@ -28,6 +28,7 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- LWJGL -->
         <dependency>
             <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl</artifactId>
@@ -53,6 +54,7 @@
             <artifactId>lwjgl-stb</artifactId>
         </dependency>
 
+        <!-- LWJGL natives -->
         <dependency>
             <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl</artifactId>
@@ -84,10 +86,17 @@
             <classifier>${lwjgl.natives}</classifier>
         </dependency>
 
+        <!-- Utils -->
         <dependency>
             <groupId>org.joml</groupId>
             <artifactId>joml</artifactId>
             <version>1.10.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.l33tlabs.twl</groupId>
+            <artifactId>pngdecoder</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 </project>
