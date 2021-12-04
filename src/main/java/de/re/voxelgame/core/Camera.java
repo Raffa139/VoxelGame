@@ -2,6 +2,8 @@ package de.re.voxelgame.core;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+
+import static de.re.voxelgame.core.Vectors.*;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Camera {
@@ -31,11 +33,7 @@ public class Camera {
   }
 
   public Matrix4f getViewMatrix() {
-    Vector3f dir = new Vector3f();
-    pos.add(front, dir);
-
-    return new Matrix4f()
-            .lookAt(pos, dir, up);
+    return new Matrix4f().lookAt(pos, add(pos, front), up);
   }
 
   public Vector3f getPos() {
@@ -74,38 +72,26 @@ public class Camera {
   }
 
   private void move() {
-    float speed = 0.01f;
+    float speed = 0.025f;
 
     if (KeyListener.keyPressed(GLFW_KEY_W)) {
-      Vector3f move = new Vector3f();
-      front.mul(speed, move);
-      pos.add(move);
+      pos.add(mul(new Vector3f(front.x, 0.0f, front.z), speed));
     } else if (KeyListener.keyPressed(GLFW_KEY_S)) {
-      Vector3f move = new Vector3f();
-      front.mul(speed, move);
-      pos.sub(move);
+      pos.sub(mul(new Vector3f(front.x, 0.0f, front.z), speed));
     }
 
     if (KeyListener.keyPressed(GLFW_KEY_A)) {
-      Vector3f move = new Vector3f();
-      front.mul(speed, move);
-      move.cross(up);
-      pos.sub(move);
+      Vector3f move = cross(front, up).normalize();
+      pos.sub(mul(move, speed));
     } else if (KeyListener.keyPressed(GLFW_KEY_D)) {
-      Vector3f move = new Vector3f();
-      front.mul(speed, move);
-      move.cross(up);
-      pos.add(move);
+      Vector3f move = cross(front, up).normalize();
+      pos.add(mul(move, speed));
     }
 
     if (KeyListener.keyPressed(GLFW_KEY_SPACE)) {
-      Vector3f move = new Vector3f();
-      up.mul(speed, move);
-      pos.add(move);
+      pos.add(mul(up, speed));
     } else if (KeyListener.keyPressed(GLFW_KEY_LEFT_CONTROL)) {
-      Vector3f move = new Vector3f();
-      up.mul(speed, move);
-      pos.sub(move);
+      pos.sub(mul(up, speed));
     }
   }
 }
