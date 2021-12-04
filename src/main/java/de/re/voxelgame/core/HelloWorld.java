@@ -32,7 +32,10 @@ public class HelloWorld {
     // Geometry
     float[] vertices = {
             -0.5f, -0.5f, 0.0f,
-             0.0f,  0.5f, 0.0f,
+            -0.5f,  0.5f, 0.0f,
+             0.5f, -0.5f, 0.0f,
+            -0.5f,  0.5f, 0.0f,
+             0.5f,  0.5f, 0.0f,
              0.5f, -0.5f, 0.0f
     };
 
@@ -69,7 +72,7 @@ public class HelloWorld {
       basicShader.setFloat("iTime", (float)glfwGetTime());
 
       glBindVertexArray(vao);
-      glDrawArrays(GL_TRIANGLES, 0, 3);
+      glDrawArrays(GL_TRIANGLES, 0, 6);
       glBindVertexArray(0);
 
       if (KeyListener.keyPressed(GLFW_KEY_ESCAPE)) {
