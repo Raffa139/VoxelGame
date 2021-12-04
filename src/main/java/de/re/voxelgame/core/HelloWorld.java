@@ -31,12 +31,53 @@ public class HelloWorld {
   private void loop(GLContext context) throws IOException, URISyntaxException {
     // Geometry
     float[] vertices = {
-            -0.5f, -0.5f, 0.0f,
-            -0.5f,  0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-            -0.5f,  0.5f, 0.0f,
-             0.5f,  0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f
+            // Front
+            -1.0f,  1.0f, 1.0f,
+            -1.0f, -1.0f, 1.0f,
+             1.0f, -1.0f, 1.0f,
+             1.0f, -1.0f, 1.0f,
+             1.0f,  1.0f, 1.0f,
+            -1.0f,  1.0f, 1.0f,
+
+            // Back
+             1.0f,  1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+             1.0f,  1.0f, -1.0f,
+
+            // Left
+            -1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+
+            // Right
+            1.0f, -1.0f,  1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f,  1.0f, -1.0f,
+            1.0f,  1.0f, -1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f, -1.0f,  1.0f,
+
+            // Top
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+
+            // Bottom
+            -1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,
     };
 
     int vao = glGenVertexArrays();
@@ -49,16 +90,19 @@ public class HelloWorld {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0L);
 
+    glBindVertexArray(0);
+
     // Shader
     ResourceLoader.Resource vert = ResourceLoader.locateResource("shader/basic.vert", HelloWorld.class);
     ResourceLoader.Resource frag = ResourceLoader.locateResource("shader/basic.frag", HelloWorld.class);
     Shader basicShader = new Shader(vert.toPath(), frag.toPath());
 
-    Camera camera = new Camera(new Vector3f(0.0f, 0.0f, 2.0f));
+    Camera camera = new Camera(new Vector3f(0.0f, 0.0f, 5.0f));
 
     while (!context.isCloseRequested()) {
       glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-      glClear(GL_COLOR_BUFFER_BIT);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      glEnable(GL_CULL_FACE);
 
       Matrix4f model = new Matrix4f();
       Matrix4f view = camera.getViewMatrix();
@@ -72,7 +116,7 @@ public class HelloWorld {
       basicShader.setFloat("iTime", (float)glfwGetTime());
 
       glBindVertexArray(vao);
-      glDrawArrays(GL_TRIANGLES, 0, 6);
+      glDrawArrays(GL_TRIANGLES, 0, vertices.length);
       glBindVertexArray(0);
 
       if (KeyListener.keyPressed(GLFW_KEY_ESCAPE)) {
@@ -85,6 +129,5 @@ public class HelloWorld {
     }
 
     basicShader.terminate();
-    context.terminate();
   }
 }
