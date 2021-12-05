@@ -1,13 +1,11 @@
 package de.re.voxelgame.core;
 
-import de.matthiasmann.twl.utils.PNGDecoder;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.Version;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -101,22 +99,7 @@ public class HelloWorld {
     Shader basicShader = new Shader(vert.toPath(), frag.toPath());
 
     // Texture
-    PNGDecoder decoder =
-            new PNGDecoder(ResourceLoader.locateResource("images/grass.png", HelloWorld.class).toFileInputStream());
-    ByteBuffer buffer = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
-    decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
-    buffer.flip();
-
-    int texture = glGenTextures();
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    Texture texture = new Texture("images/grass.png");
 
     Camera camera = new Camera(new Vector3f(0.0f, 0.0f, 5.0f));
 
@@ -131,7 +114,7 @@ public class HelloWorld {
               .perspective((float) Math.toRadians(45.0f), 1080.0f / 720.0f, 0.01f, 1000.0f);
 
       glActiveTexture(GL_TEXTURE0);
-      glBindTexture(GL_TEXTURE_2D, texture);
+      glBindTexture(GL_TEXTURE_2D, texture.getId());
 
       basicShader.use();
       basicShader.setMatrix4("iModel", model);
