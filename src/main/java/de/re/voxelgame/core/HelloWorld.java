@@ -1,11 +1,14 @@
 package de.re.voxelgame.core;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.Version;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -103,13 +106,21 @@ public class HelloWorld {
 
     Camera camera = new Camera(new Vector3f(0.0f, 0.0f, 5.0f));
 
-    int chunkSize = 16;
-    int chunks = 3;
+    int chunkCount = 1;
+    List<Chunk> chunks = new ArrayList<>();
+    for (int i = 0; i < chunkCount; i++) {
+      for (int j = 0; j < chunkCount; j++) {
+        Chunk chunk = new Chunk(new Vector2f(i, j));
+        chunk.prepare();
+        chunks.add(chunk);
+      }
+    }
+
     float lastPressed = 0.0f;
     while (!context.isCloseRequested()) {
       glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glEnable(GL_CULL_FACE);
+      //glEnable(GL_CULL_FACE);
       glEnable(GL_DEPTH_TEST);
 
       Matrix4f view = camera.getViewMatrix();
@@ -124,40 +135,15 @@ public class HelloWorld {
       basicShader.setMatrix4("iProjection", projection);
       basicShader.setFloat("iTime", (float)glfwGetTime());
 
-      glBindVertexArray(vao);
-      for (int i = 0; i < chunks; i++) {
-        for (int j = 0; j < chunks; j++) {
-          for (int x = 0; x < chunkSize; x++) {
-            for (int z = 0; z < chunkSize; z++) {
-              // Position in world
-              int X = x + i * chunkSize;
-              int Z = z + j * chunkSize;
+      for (Chunk chunk : chunks) {
+        Matrix4f model = new Matrix4f();
+        //model.translate(chunk.getPosition().x, 0.0f, chunk.getPosition().y);
+        basicShader.setMatrix4("iModel", model);
 
-              // Max. size in x/z direction
-              int SX = (chunkSize-1) + (chunks-1) * chunkSize;
-              int SZ = (chunkSize-1) + (chunks-1) * chunkSize;
-
-              Matrix4f model = new Matrix4f();
-              model.translate(X, 0.0f, Z);
-              basicShader.setMatrix4("iModel", model);
-
-              if ((X == 0 && Z == 0) || (X == 0 && Z == SZ) || (X == SX && Z == 0) || (X == SX && Z == SZ)) { // One of 4 corner cases
-                // Corner
-                basicShader.setVec3("iColor", new Vector3f(1.0f, 0.0f, 0.0f));
-              } else if (((X == 0 || X == SX) && (Z > 0 && Z < SZ)) || ((Z == 0 || Z == SZ) && (X > 0 && X < SX))) { // One of 2x2 edge cases
-                // Edge
-                basicShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 1.0f));
-              } else if ((X > 0 && X < SX) && (Z > 0 && Z < SZ)) { // Remaining middle cases
-                // Middle
-                basicShader.setVec3("iColor", new Vector3f(0.0f, 1.0f, 0.0f));
-              }
-
-              glDrawArrays(GL_TRIANGLES, 0, vertices.length);
-            }
-          }
-        }
+        glBindVertexArray(chunk.getVaoId());
+        glDrawArrays(GL_TRIANGLES, 0, chunk.getVertexCount());
+        glBindVertexArray(0);
       }
-      glBindVertexArray(0);
 
       if (KeyListener.keyPressed(GLFW_KEY_ESCAPE)) {
         context.requestClose();
@@ -169,49 +155,49 @@ public class HelloWorld {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       }
 
-      if (KeyListener.keyPressed(GLFW_KEY_UP) && glfwGetTime() > lastPressed + 0.25f) {
-        chunks++;
+      /*if (KeyListener.keyPressed(GLFW_KEY_UP) && glfwGetTime() > lastPressed + 0.25f) {
+        chunkCount++;
         lastPressed = (float) glfwGetTime();
 
-        System.out.println("Chunks: " + chunks*chunks);
+        System.out.println("Chunks: " + chunkCount*chunkCount);
         System.out.println("Chunk size: " + chunkSize);
         System.out.println("Blocks/Chunk: " + chunkSize*chunkSize);
-        System.out.println("Blocks: " + chunks * chunkSize*chunkSize);
-        System.out.println("Faces: " + 6 * chunks * chunkSize*chunkSize);
-        System.out.println("Triangles: " + 2 * 6 * chunks * chunkSize*chunkSize);
+        System.out.println("Blocks: " + chunkCount * chunkSize*chunkSize);
+        System.out.println("Faces: " + 6 * chunkCount * chunkSize*chunkSize);
+        System.out.println("Triangles: " + 2 * 6 * chunkCount * chunkSize*chunkSize);
       } else if (KeyListener.keyPressed(GLFW_KEY_DOWN) && glfwGetTime() > lastPressed + 0.25f) {
-        chunks = chunks == 1 ? 1 : chunks-1;
+        chunkCount = chunkCount == 1 ? 1 : chunkCount-1;
         lastPressed = (float) glfwGetTime();
 
-        System.out.println("Chunks: " + chunks*chunks);
+        System.out.println("Chunks: " + chunkCount*chunkCount);
         System.out.println("Chunk size: " + chunkSize);
         System.out.println("Blocks/Chunk: " + chunkSize*chunkSize);
-        System.out.println("Blocks: " + chunks * chunkSize*chunkSize);
-        System.out.println("Faces: " + 6 * chunks * chunkSize*chunkSize);
-        System.out.println("Triangles: " + 2 * 6 * chunks * chunkSize*chunkSize);
+        System.out.println("Blocks: " + chunkCount * chunkSize*chunkSize);
+        System.out.println("Faces: " + 6 * chunkCount * chunkSize*chunkSize);
+        System.out.println("Triangles: " + 2 * 6 * chunkCount * chunkSize*chunkSize);
       }
 
       if (KeyListener.keyPressed(GLFW_KEY_RIGHT) && glfwGetTime() > lastPressed + 0.25f) {
         chunkSize++;
         lastPressed = (float) glfwGetTime();
 
-        System.out.println("Chunks: " + chunks*chunks);
+        System.out.println("Chunks: " + chunkCount*chunkCount);
         System.out.println("Chunk size: " + chunkSize);
         System.out.println("Blocks/Chunk: " + chunkSize*chunkSize);
-        System.out.println("Blocks: " + chunks * chunkSize*chunkSize);
-        System.out.println("Faces: " + 6 * chunks * chunkSize*chunkSize);
-        System.out.println("Triangles: " + 2 * 6 * chunks * chunkSize*chunkSize);
+        System.out.println("Blocks: " + chunkCount * chunkSize*chunkSize);
+        System.out.println("Faces: " + 6 * chunkCount * chunkSize*chunkSize);
+        System.out.println("Triangles: " + 2 * 6 * chunkCount * chunkSize*chunkSize);
       } else if (KeyListener.keyPressed(GLFW_KEY_LEFT) && glfwGetTime() > lastPressed + 0.25f) {
         chunkSize = chunkSize == 1 ? 1 : chunkSize-1;
         lastPressed = (float) glfwGetTime();
 
-        System.out.println("Chunks: " + chunks*chunks);
+        System.out.println("Chunks: " + chunkCount*chunkCount);
         System.out.println("Chunk size: " + chunkSize);
         System.out.println("Blocks/Chunk: " + chunkSize*chunkSize);
-        System.out.println("Blocks: " + chunks * chunkSize*chunkSize);
-        System.out.println("Faces: " + 6 * chunks * chunkSize*chunkSize);
-        System.out.println("Triangles: " + 2 * 6 * chunks * chunkSize*chunkSize);
-      }
+        System.out.println("Blocks: " + chunkCount * chunkSize*chunkSize);
+        System.out.println("Faces: " + 6 * chunkCount * chunkSize*chunkSize);
+        System.out.println("Triangles: " + 2 * 6 * chunkCount * chunkSize*chunkSize);
+      }*/
 
       camera.update(context.getDeltaTime());
 
