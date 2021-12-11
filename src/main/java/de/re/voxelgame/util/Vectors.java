@@ -1,4 +1,4 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.util;
 
 import org.joml.Vector3f;
 

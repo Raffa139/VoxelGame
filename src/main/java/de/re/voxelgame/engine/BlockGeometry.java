@@ -1,4 +1,4 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.engine;
 
 public final class BlockGeometry {
   // Visual: https://www.math3d.org/OdaojzOmz

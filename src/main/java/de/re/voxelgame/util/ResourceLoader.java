@@ -1,4 +1,4 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.util;
 
 import java.io.File;
 import java.io.FileInputStream;

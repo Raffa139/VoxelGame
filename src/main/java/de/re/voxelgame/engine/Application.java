@@ -1,5 +1,7 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.engine;
 
+import de.re.voxelgame.core.*;
+import de.re.voxelgame.util.ResourceLoader;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -15,9 +17,9 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL30.*;
 
-public class HelloWorld {
+public class Application {
   public static void main(String[] args) throws IOException, URISyntaxException {
-    new HelloWorld().run();
+    new Application().run();
   }
 
   public void run() throws IOException, URISyntaxException {
@@ -31,14 +33,14 @@ public class HelloWorld {
 
   private void loop(GLContext context) throws IOException, URISyntaxException {
     // Shader
-    ResourceLoader.Resource vert = ResourceLoader.locateResource("shader/basic.vert", HelloWorld.class);
-    ResourceLoader.Resource frag = ResourceLoader.locateResource("shader/basic.frag", HelloWorld.class);
+    ResourceLoader.Resource vert = ResourceLoader.locateResource("shader/basic.vert", Application.class);
+    ResourceLoader.Resource frag = ResourceLoader.locateResource("shader/basic.frag", Application.class);
     Shader basicShader = new Shader(vert.toPath(), frag.toPath());
 
     // Texture
     Texture texture = new Texture("images/grass.png");
 
-    Camera camera = new Camera(new Vector3f(0.0f, 0.0f, 5.0f));
+    Camera camera = new Camera(new Vector3f(0.0f, 10.0f, 0.0f));
 
     int chunkCount = 10;
     List<Chunk> chunks = new ArrayList<>();

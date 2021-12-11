@@ -3,7 +3,7 @@ package de.re.voxelgame.core;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import static de.re.voxelgame.core.Vectors.*;
+import static de.re.voxelgame.util.Vectors.*;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Camera {
