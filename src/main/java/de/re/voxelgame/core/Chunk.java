@@ -16,61 +16,6 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 public class Chunk {
     public static final int CHUNK_SIZE = 16;
 
-    // Visual: https://www.math3d.org/OdaojzOmz
-    private final Vertex[] front = {
-            new Vertex(-0.5f,  0.5f, 0.5f, 0.5f, 0.0f),
-            new Vertex(-0.5f, -0.5f, 0.5f, 0.5f, 0.5f),
-            new Vertex(0.5f, -0.5f, 0.5f, 0.0f, 0.5f),
-            new Vertex(0.5f, -0.5f, 0.5f, 0.0f, 0.5f),
-            new Vertex(0.5f,  0.5f, 0.5f, 0.0f, 0.0f),
-            new Vertex(-0.5f,  0.5f, 0.5f, 0.5f, 0.0f)
-    };
-
-    private final Vertex[] back = {
-            new Vertex(0.5f,  0.5f, -0.5f, 0.5f, 0.0f),
-            new Vertex(0.5f, -0.5f, -0.5f, 0.5f, 0.5f),
-            new Vertex(-0.5f, -0.5f, -0.5f, 0.0f, 0.5f),
-            new Vertex(-0.5f, -0.5f, -0.5f, 0.0f, 0.5f),
-            new Vertex(-0.5f,  0.5f, -0.5f, 0.0f, 0.0f),
-            new Vertex(0.5f,  0.5f, -0.5f, 0.5f, 0.0f)
-    };
-
-    private final Vertex[] left = {
-            new Vertex(-0.5f,  0.5f, -0.5f, 0.5f, 0.0f),
-            new Vertex(-0.5f, -0.5f, -0.5f, 0.5f, 0.5f),
-            new Vertex(-0.5f, -0.5f,  0.5f, 0.0f, 0.5f),
-            new Vertex(-0.5f, -0.5f,  0.5f, 0.0f, 0.5f),
-            new Vertex(-0.5f,  0.5f,  0.5f, 0.0f, 0.0f),
-            new Vertex(-0.5f,  0.5f, -0.5f, 0.5f, 0.0f)
-    };
-
-    private final Vertex[] right = {
-            new Vertex(0.5f,  0.5f,  0.5f, 0.5f, 0.0f),
-            new Vertex(0.5f, -0.5f,  0.5f, 0.5f, 0.5f),
-            new Vertex(0.5f, -0.5f, -0.5f, 0.0f, 0.5f),
-            new Vertex(0.5f, -0.5f, -0.5f, 0.0f, 0.5f),
-            new Vertex(0.5f,  0.5f, -0.5f, 0.0f, 0.0f),
-            new Vertex(0.5f,  0.5f,  0.5f, 0.5f, 0.0f)
-    };
-
-    private final Vertex[] top = {
-            new Vertex(0.5f,  0.5f,  0.5f, 0.5f, 0.0f),
-            new Vertex(0.5f,  0.5f, -0.5f, 0.5f, 0.5f),
-            new Vertex(-0.5f,  0.5f, -0.5f, 0.0f, 0.5f),
-            new Vertex(-0.5f,  0.5f, -0.5f, 0.0f, 0.5f),
-            new Vertex(-0.5f,  0.5f,  0.5f, 0.0f, 0.0f),
-            new Vertex(0.5f,  0.5f,  0.5f, 0.5f, 0.0f)
-    };
-
-    private final Vertex[] bottom = {
-            new Vertex(-0.5f, -0.5f,  0.5f, 0.5f, 0.0f),
-            new Vertex(-0.5f, -0.5f, -0.5f, 0.5f, 0.5f),
-            new Vertex(0.5f, -0.5f, -0.5f, 0.0f, 0.5f),
-            new Vertex(0.5f, -0.5f, -0.5f, 0.0f, 0.5f),
-            new Vertex(0.5f, -0.5f,  0.5f, 0.0f, 0.0f),
-            new Vertex(-0.5f, -0.5f,  0.5f, 0.5f, 0.0f)
-    };
-
     private int vaoId;
 
     private int vertexCount;
@@ -159,25 +104,12 @@ public class Chunk {
         glBindVertexArray(0);
     }
 
-    private List<Vertex> translateFullBlock(int x, int z) {
-        List<Vertex> translated = new ArrayList<>();
-
-        translated.addAll(translateVertices(front, x, z));
-        translated.addAll(translateVertices(back, x, z));
-        translated.addAll(translateVertices(left, x, z));
-        translated.addAll(translateVertices(right, x, z));
-        translated.addAll(translateVertices(top, x, z));
-        translated.addAll(translateVertices(bottom, x, z));
-
-        return translated;
-    }
-
     private List<Vertex> translateLeftEdge(int x, int z) {
         List<Vertex> translated = new ArrayList<>();
 
-        translated.addAll(translateVertices(left, x, z));
-        translated.addAll(translateVertices(top, x, z));
-        translated.addAll(translateVertices(bottom, x, z));
+        translated.addAll(translateVertices(BlockGeometry.LEFT, x, z));
+        translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
+        translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
 
         return translated;
     }
@@ -185,9 +117,9 @@ public class Chunk {
     private List<Vertex> translateRightEdge(int x, int z) {
         List<Vertex> translated = new ArrayList<>();
 
-        translated.addAll(translateVertices(right, x, z));
-        translated.addAll(translateVertices(top, x, z));
-        translated.addAll(translateVertices(bottom, x, z));
+        translated.addAll(translateVertices(BlockGeometry.RIGHT, x, z));
+        translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
+        translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
 
         return translated;
     }
@@ -195,9 +127,9 @@ public class Chunk {
     private List<Vertex> translateFrontEdge(int x, int z) {
         List<Vertex> translated = new ArrayList<>();
 
-        translated.addAll(translateVertices(front, x, z));
-        translated.addAll(translateVertices(top, x, z));
-        translated.addAll(translateVertices(bottom, x, z));
+        translated.addAll(translateVertices(BlockGeometry.FRONT, x, z));
+        translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
+        translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
 
         return translated;
     }
@@ -205,9 +137,9 @@ public class Chunk {
     private List<Vertex> translateBackEdge(int x, int z) {
         List<Vertex> translated = new ArrayList<>();
 
-        translated.addAll(translateVertices(back, x, z));
-        translated.addAll(translateVertices(top, x, z));
-        translated.addAll(translateVertices(bottom, x, z));
+        translated.addAll(translateVertices(BlockGeometry.BACK, x, z));
+        translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
+        translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
 
         return translated;
     }
@@ -215,10 +147,10 @@ public class Chunk {
     private List<Vertex> translateBackLeftCorner(int x, int z) {
         List<Vertex> translated = new ArrayList<>();
 
-        translated.addAll(translateVertices(back, x, z));
-        translated.addAll(translateVertices(left, x, z));
-        translated.addAll(translateVertices(top, x, z));
-        translated.addAll(translateVertices(bottom, x, z));
+        translated.addAll(translateVertices(BlockGeometry.BACK, x, z));
+        translated.addAll(translateVertices(BlockGeometry.LEFT, x, z));
+        translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
+        translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
 
         return translated;
     }
@@ -226,10 +158,10 @@ public class Chunk {
     private List<Vertex> translateFrontLeftCorner(int x, int z) {
         List<Vertex> translated = new ArrayList<>();
 
-        translated.addAll(translateVertices(front, x, z));
-        translated.addAll(translateVertices(left, x, z));
-        translated.addAll(translateVertices(top, x, z));
-        translated.addAll(translateVertices(bottom, x, z));
+        translated.addAll(translateVertices(BlockGeometry.FRONT, x, z));
+        translated.addAll(translateVertices(BlockGeometry.LEFT, x, z));
+        translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
+        translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
 
         return translated;
     }
@@ -237,10 +169,10 @@ public class Chunk {
     private List<Vertex> translateBackRightCorner(int x, int z) {
         List<Vertex> translated = new ArrayList<>();
 
-        translated.addAll(translateVertices(back, x, z));
-        translated.addAll(translateVertices(right, x, z));
-        translated.addAll(translateVertices(top, x, z));
-        translated.addAll(translateVertices(bottom, x, z));
+        translated.addAll(translateVertices(BlockGeometry.BACK, x, z));
+        translated.addAll(translateVertices(BlockGeometry.RIGHT, x, z));
+        translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
+        translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
 
         return translated;
     }
@@ -248,10 +180,10 @@ public class Chunk {
     private List<Vertex> translateFrontRightCorner(int x, int z) {
         List<Vertex> translated = new ArrayList<>();
 
-        translated.addAll(translateVertices(front, x, z));
-        translated.addAll(translateVertices(right, x, z));
-        translated.addAll(translateVertices(top, x, z));
-        translated.addAll(translateVertices(bottom, x, z));
+        translated.addAll(translateVertices(BlockGeometry.FRONT, x, z));
+        translated.addAll(translateVertices(BlockGeometry.RIGHT, x, z));
+        translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
+        translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
 
         return translated;
     }
@@ -259,8 +191,8 @@ public class Chunk {
     private List<Vertex> translateMiddleBlock(int x, int z) {
         List<Vertex> translated = new ArrayList<>();
 
-        translated.addAll(translateVertices(top, x, z));
-        translated.addAll(translateVertices(bottom, x, z));
+        translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
+        translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
 
         return translated;
     }

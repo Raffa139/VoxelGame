@@ -3,9 +3,6 @@ package de.re.voxelgame.core;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Vertex {
     private final Vector3f position;
 

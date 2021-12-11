@@ -13,7 +13,6 @@ import java.util.List;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
 public class HelloWorld {
@@ -31,71 +30,6 @@ public class HelloWorld {
   }
 
   private void loop(GLContext context) throws IOException, URISyntaxException {
-    // Geometry
-    float[] vertices = {
-            // Front
-            -0.5f,  0.5f, 0.5f, 0.5f, 0.0f,
-            -0.5f, -0.5f, 0.5f, 0.5f, 0.5f,
-             0.5f, -0.5f, 0.5f, 0.0f, 0.5f,
-             0.5f, -0.5f, 0.5f, 0.0f, 0.5f,
-             0.5f,  0.5f, 0.5f, 0.0f, 0.0f,
-            -0.5f,  0.5f, 0.5f, 0.5f, 0.0f,
-
-            // Back
-             0.5f,  0.5f, -0.5f, 0.5f, 0.0f,
-             0.5f, -0.5f, -0.5f, 0.5f, 0.5f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.5f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.5f,
-            -0.5f,  0.5f, -0.5f, 0.0f, 0.0f,
-             0.5f,  0.5f, -0.5f, 0.5f, 0.0f,
-
-            // Left
-            -0.5f,  0.5f, -0.5f, 0.5f, 0.0f,
-            -0.5f, -0.5f, -0.5f, 0.5f, 0.5f,
-            -0.5f, -0.5f,  0.5f, 0.0f, 0.5f,
-            -0.5f, -0.5f,  0.5f, 0.0f, 0.5f,
-            -0.5f,  0.5f,  0.5f, 0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f, 0.5f, 0.0f,
-
-            // Right
-            0.5f,  0.5f,  0.5f, 0.5f, 0.0f,
-            0.5f, -0.5f,  0.5f, 0.5f, 0.5f,
-            0.5f, -0.5f, -0.5f, 0.0f, 0.5f,
-            0.5f, -0.5f, -0.5f, 0.0f, 0.5f,
-            0.5f,  0.5f, -0.5f, 0.0f, 0.0f,
-            0.5f,  0.5f,  0.5f, 0.5f, 0.0f,
-
-            // Top
-             0.5f,  0.5f,  0.5f, 0.5f, 0.0f,
-             0.5f,  0.5f, -0.5f, 0.5f, 0.5f,
-            -0.5f,  0.5f, -0.5f, 0.0f, 0.5f,
-            -0.5f,  0.5f, -0.5f, 0.0f, 0.5f,
-            -0.5f,  0.5f,  0.5f, 0.0f, 0.0f,
-             0.5f,  0.5f,  0.5f, 0.5f, 0.0f,
-
-            // Bottom
-            -0.5f, -0.5f,  0.5f, 0.5f, 0.0f,
-            -0.5f, -0.5f, -0.5f, 0.5f, 0.5f,
-             0.5f, -0.5f, -0.5f, 0.0f, 0.5f,
-             0.5f, -0.5f, -0.5f, 0.0f, 0.5f,
-             0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f, 0.5f, 0.0f
-    };
-
-    int vao = glGenVertexArrays();
-    glBindVertexArray(vao);
-
-    int vbo = glGenBuffers();
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * 4, 0L);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * 4, 3 * 4);
-
-    glBindVertexArray(0);
-
     // Shader
     ResourceLoader.Resource vert = ResourceLoader.locateResource("shader/basic.vert", HelloWorld.class);
     ResourceLoader.Resource frag = ResourceLoader.locateResource("shader/basic.frag", HelloWorld.class);
@@ -155,49 +89,10 @@ public class HelloWorld {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       }
 
-      /*if (KeyListener.keyPressed(GLFW_KEY_UP) && glfwGetTime() > lastPressed + 0.25f) {
-        chunkCount++;
+      if (KeyListener.keyPressed(GLFW_KEY_I) && glfwGetTime() > lastPressed + 0.25f) {
         lastPressed = (float) glfwGetTime();
-
-        System.out.println("Chunks: " + chunkCount*chunkCount);
-        System.out.println("Chunk size: " + chunkSize);
-        System.out.println("Blocks/Chunk: " + chunkSize*chunkSize);
-        System.out.println("Blocks: " + chunkCount * chunkSize*chunkSize);
-        System.out.println("Faces: " + 6 * chunkCount * chunkSize*chunkSize);
-        System.out.println("Triangles: " + 2 * 6 * chunkCount * chunkSize*chunkSize);
-      } else if (KeyListener.keyPressed(GLFW_KEY_DOWN) && glfwGetTime() > lastPressed + 0.25f) {
-        chunkCount = chunkCount == 1 ? 1 : chunkCount-1;
-        lastPressed = (float) glfwGetTime();
-
-        System.out.println("Chunks: " + chunkCount*chunkCount);
-        System.out.println("Chunk size: " + chunkSize);
-        System.out.println("Blocks/Chunk: " + chunkSize*chunkSize);
-        System.out.println("Blocks: " + chunkCount * chunkSize*chunkSize);
-        System.out.println("Faces: " + 6 * chunkCount * chunkSize*chunkSize);
-        System.out.println("Triangles: " + 2 * 6 * chunkCount * chunkSize*chunkSize);
+        printDebugInfo(chunkCount);
       }
-
-      if (KeyListener.keyPressed(GLFW_KEY_RIGHT) && glfwGetTime() > lastPressed + 0.25f) {
-        chunkSize++;
-        lastPressed = (float) glfwGetTime();
-
-        System.out.println("Chunks: " + chunkCount*chunkCount);
-        System.out.println("Chunk size: " + chunkSize);
-        System.out.println("Blocks/Chunk: " + chunkSize*chunkSize);
-        System.out.println("Blocks: " + chunkCount * chunkSize*chunkSize);
-        System.out.println("Faces: " + 6 * chunkCount * chunkSize*chunkSize);
-        System.out.println("Triangles: " + 2 * 6 * chunkCount * chunkSize*chunkSize);
-      } else if (KeyListener.keyPressed(GLFW_KEY_LEFT) && glfwGetTime() > lastPressed + 0.25f) {
-        chunkSize = chunkSize == 1 ? 1 : chunkSize-1;
-        lastPressed = (float) glfwGetTime();
-
-        System.out.println("Chunks: " + chunkCount*chunkCount);
-        System.out.println("Chunk size: " + chunkSize);
-        System.out.println("Blocks/Chunk: " + chunkSize*chunkSize);
-        System.out.println("Blocks: " + chunkCount * chunkSize*chunkSize);
-        System.out.println("Faces: " + 6 * chunkCount * chunkSize*chunkSize);
-        System.out.println("Triangles: " + 2 * 6 * chunkCount * chunkSize*chunkSize);
-      }*/
 
       camera.update(context.getDeltaTime());
 
@@ -205,5 +100,15 @@ public class HelloWorld {
     }
 
     basicShader.terminate();
+  }
+
+  private void printDebugInfo(int chunkCount) {
+    System.out.println("Chunks: " + chunkCount*chunkCount);
+    System.out.println("Chunk size: " + Chunk.CHUNK_SIZE);
+    System.out.println("Blocks/Chunk: " + Chunk.CHUNK_SIZE*Chunk.CHUNK_SIZE);
+    System.out.println("Blocks: " + chunkCount * Chunk.CHUNK_SIZE*Chunk.CHUNK_SIZE);
+    System.out.println("Faces: " + chunkCount * 2*Chunk.CHUNK_SIZE*Chunk.CHUNK_SIZE+4*16);
+    System.out.println("Triangles: " + 2 * chunkCount * 2*Chunk.CHUNK_SIZE*Chunk.CHUNK_SIZE+4*16);
+    System.out.println("Vertices: " + 3 * 2 * chunkCount * 2*Chunk.CHUNK_SIZE*Chunk.CHUNK_SIZE+4*16);
   }
 }
