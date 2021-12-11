@@ -3,7 +3,7 @@ package de.re.voxelgame.engine;
 import de.re.voxelgame.core.*;
 import de.re.voxelgame.engine.chunk.Chunk;
 import de.re.voxelgame.engine.chunk.ChunkLoader;
-import de.re.voxelgame.util.ResourceLoader;
+import de.re.voxelgame.core.util.ResourceLoader;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;

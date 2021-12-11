@@ -1,7 +1,7 @@
 package de.re.voxelgame.core;
 
 import de.matthiasmann.twl.utils.PNGDecoder;
-import de.re.voxelgame.util.ResourceLoader;
+import de.re.voxelgame.core.util.ResourceLoader;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
