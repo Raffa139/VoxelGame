@@ -98,23 +98,36 @@ public class Chunk {
 
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
-                // Position in world
-                int X = (int) (x + position.x * CHUNK_SIZE);
-                int Z = (int) (z + position.y * CHUNK_SIZE);
-
                 // Max. size in x/z direction
-                int SX = (int) (position.x+1) * (CHUNK_SIZE-1);
-                int SZ = (int) (position.y+1) * (CHUNK_SIZE-1);
+                int SX = CHUNK_SIZE-1;
+                int SZ = CHUNK_SIZE-1;
 
-                if ((X == 0 && Z == 0) || (X == 0 && Z == SZ) || (X == SX && Z == 0) || (X == SX && Z == SZ)) { // One of 4 corner cases
-                    // Corner
-                    translatedVertices.addAll(translateFullBlock(X, Z));
-                } else if (((X == 0 || X == SX) && (Z > 0 && Z < SZ)) || ((Z == 0 || Z == SZ) && (X > 0 && X < SX))) { // One of 2x2 edge cases
-                    // Edge
-                    translatedVertices.addAll(translateFullBlock(X, Z));
-                } else if ((X > 0 && X < SX) && (Z > 0 && Z < SZ)) { // Remaining middle cases
-                    // Middle
-                    translatedVertices.addAll(translateMiddleBlock(X, Z));
+                if ((x == 0 && z == 0) || (x == 0 && z == SZ) || (x == SX && z == 0) || (x == SX && z == SZ)) { // One of 4 corner cases
+                    if (x == 0 && z == 0) { // NW
+                        translatedVertices.addAll(translateBackLeftCorner(x, z));
+                    } else if (x == 0 && z == SZ) { // SW
+                        translatedVertices.addAll(translateFrontLeftCorner(x, z));
+                    } else if (x == SX && z == 0) { // NE
+                        translatedVertices.addAll(translateBackRightCorner(x, z));
+                    } else if (x == SX && z == SZ) { // SE
+                        translatedVertices.addAll(translateFrontRightCorner(x, z));
+                    }
+                } else if (((x == 0 || x == SX) && (z > 0 && z < SZ)) || ((z == 0 || z == SZ) && (x > 0 && x < SX))) { // One of 2x2 edge cases
+                    if (z > 0 && z < SZ) { // W or E
+                        if (x == 0) { // W
+                            translatedVertices.addAll(translateLeftEdge(x, z));
+                        } else if (x == SX) { // E
+                            translatedVertices.addAll(translateRightEdge(x, z));
+                        }
+                    } else if (x > 0 && x < SX) { // N or S
+                        if (z == 0) { // N
+                            translatedVertices.addAll(translateBackEdge(x, z));
+                        } else if (z == SZ) { // S
+                            translatedVertices.addAll(translateFrontEdge(x, z));
+                        }
+                    }
+                } else if ((x > 0 && x < SX) && (z > 0 && z < SZ)) { // Remaining middle cases
+                    translatedVertices.addAll(translateMiddleBlock(x, z));
                 }
             }
         }
@@ -152,6 +165,90 @@ public class Chunk {
         translated.addAll(translateVertices(front, x, z));
         translated.addAll(translateVertices(back, x, z));
         translated.addAll(translateVertices(left, x, z));
+        translated.addAll(translateVertices(right, x, z));
+        translated.addAll(translateVertices(top, x, z));
+        translated.addAll(translateVertices(bottom, x, z));
+
+        return translated;
+    }
+
+    private List<Vertex> translateLeftEdge(int x, int z) {
+        List<Vertex> translated = new ArrayList<>();
+
+        translated.addAll(translateVertices(left, x, z));
+        translated.addAll(translateVertices(top, x, z));
+        translated.addAll(translateVertices(bottom, x, z));
+
+        return translated;
+    }
+
+    private List<Vertex> translateRightEdge(int x, int z) {
+        List<Vertex> translated = new ArrayList<>();
+
+        translated.addAll(translateVertices(right, x, z));
+        translated.addAll(translateVertices(top, x, z));
+        translated.addAll(translateVertices(bottom, x, z));
+
+        return translated;
+    }
+
+    private List<Vertex> translateFrontEdge(int x, int z) {
+        List<Vertex> translated = new ArrayList<>();
+
+        translated.addAll(translateVertices(front, x, z));
+        translated.addAll(translateVertices(top, x, z));
+        translated.addAll(translateVertices(bottom, x, z));
+
+        return translated;
+    }
+
+    private List<Vertex> translateBackEdge(int x, int z) {
+        List<Vertex> translated = new ArrayList<>();
+
+        translated.addAll(translateVertices(back, x, z));
+        translated.addAll(translateVertices(top, x, z));
+        translated.addAll(translateVertices(bottom, x, z));
+
+        return translated;
+    }
+
+    private List<Vertex> translateBackLeftCorner(int x, int z) {
+        List<Vertex> translated = new ArrayList<>();
+
+        translated.addAll(translateVertices(back, x, z));
+        translated.addAll(translateVertices(left, x, z));
+        translated.addAll(translateVertices(top, x, z));
+        translated.addAll(translateVertices(bottom, x, z));
+
+        return translated;
+    }
+
+    private List<Vertex> translateFrontLeftCorner(int x, int z) {
+        List<Vertex> translated = new ArrayList<>();
+
+        translated.addAll(translateVertices(front, x, z));
+        translated.addAll(translateVertices(left, x, z));
+        translated.addAll(translateVertices(top, x, z));
+        translated.addAll(translateVertices(bottom, x, z));
+
+        return translated;
+    }
+
+    private List<Vertex> translateBackRightCorner(int x, int z) {
+        List<Vertex> translated = new ArrayList<>();
+
+        translated.addAll(translateVertices(back, x, z));
+        translated.addAll(translateVertices(right, x, z));
+        translated.addAll(translateVertices(top, x, z));
+        translated.addAll(translateVertices(bottom, x, z));
+
+        return translated;
+    }
+
+    private List<Vertex> translateFrontRightCorner(int x, int z) {
+        List<Vertex> translated = new ArrayList<>();
+
+        translated.addAll(translateVertices(front, x, z));
         translated.addAll(translateVertices(right, x, z));
         translated.addAll(translateVertices(top, x, z));
         translated.addAll(translateVertices(bottom, x, z));

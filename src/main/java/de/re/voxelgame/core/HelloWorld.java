@@ -106,7 +106,7 @@ public class HelloWorld {
 
     Camera camera = new Camera(new Vector3f(0.0f, 0.0f, 5.0f));
 
-    int chunkCount = 1;
+    int chunkCount = 10;
     List<Chunk> chunks = new ArrayList<>();
     for (int i = 0; i < chunkCount; i++) {
       for (int j = 0; j < chunkCount; j++) {
@@ -120,7 +120,7 @@ public class HelloWorld {
     while (!context.isCloseRequested()) {
       glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      //glEnable(GL_CULL_FACE);
+      glEnable(GL_CULL_FACE);
       glEnable(GL_DEPTH_TEST);
 
       Matrix4f view = camera.getViewMatrix();
@@ -137,7 +137,7 @@ public class HelloWorld {
 
       for (Chunk chunk : chunks) {
         Matrix4f model = new Matrix4f();
-        //model.translate(chunk.getPosition().x, 0.0f, chunk.getPosition().y);
+        model.translate(chunk.getPosition().x*16, 0.0f, chunk.getPosition().y*16);
         basicShader.setMatrix4("iModel", model);
 
         glBindVertexArray(chunk.getVaoId());
