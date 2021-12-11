@@ -1,6 +1,8 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
+import de.re.voxelgame.engine.chunk.Chunk;
+import de.re.voxelgame.engine.chunk.ChunkLoader;
 import de.re.voxelgame.util.ResourceLoader;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -46,8 +48,7 @@ public class Application {
     List<Chunk> chunks = new ArrayList<>();
     for (int i = 0; i < chunkCount; i++) {
       for (int j = 0; j < chunkCount; j++) {
-        Chunk chunk = new Chunk(new Vector2f(i, j));
-        chunk.prepare();
+        Chunk chunk = ChunkLoader.loadChunk(new Vector2f(i, j));
         chunks.add(chunk);
       }
     }
@@ -73,7 +74,7 @@ public class Application {
 
       for (Chunk chunk : chunks) {
         Matrix4f model = new Matrix4f();
-        model.translate(chunk.getPosition().x*16, 0.0f, chunk.getPosition().y*16);
+        model.translate(chunk.getPosition().x*Chunk.CHUNK_SIZE, 0.0f, chunk.getPosition().y*Chunk.CHUNK_SIZE);
         basicShader.setMatrix4("iModel", model);
 
         glBindVertexArray(chunk.getVaoId());
