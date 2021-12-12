@@ -9,7 +9,11 @@ public class Vertex {
   private final Vector2f texture;
 
   public Vertex(float x, float y, float z, float u, float v) {
-    this(new Vector3f(x, y, z), new Vector2f(u, v));
+    this(x, y, z, new Vector2f(u, v));
+  }
+
+  public Vertex(float x, float y, float z, Vector2f texture) {
+    this(new Vector3f(x, y, z), texture);
   }
 
   public Vertex(Vector3f position, Vector2f texture) {

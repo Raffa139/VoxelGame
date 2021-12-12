@@ -1,6 +1,7 @@
 package de.re.voxelgame.engine.chunk;
 
-import de.re.voxelgame.engine.BlockGeometry;
+import de.re.voxelgame.engine.Block;
+import de.re.voxelgame.engine.BlockFace;
 import de.re.voxelgame.engine.Vertex;
 import org.joml.Vector2f;
 
@@ -31,30 +32,57 @@ public final class ChunkLoader {
 
         if ((x == 0 && z == 0) || (x == 0 && z == SZ) || (x == SX && z == 0) || (x == SX && z == SZ)) { // One of 4 corner cases
           if (x == 0 && z == 0) { // NW
-            translatedVertices.addAll(translateBackLeftCorner(x, z));
+            Block block = new Block(BlockFace.BACK, BlockFace.LEFT, BlockFace.TOP, BlockFace.BOTTOM)
+                .translate(x, z);
+
+            translatedVertices.addAll(block.getVertices());
           } else if (x == 0 && z == SZ) { // SW
-            translatedVertices.addAll(translateFrontLeftCorner(x, z));
+            Block block = new Block(BlockFace.FRONT, BlockFace.LEFT, BlockFace.TOP, BlockFace.BOTTOM)
+                .translate(x, z);
+
+            translatedVertices.addAll(block.getVertices());
           } else if (x == SX && z == 0) { // NE
-            translatedVertices.addAll(translateBackRightCorner(x, z));
+            Block block = new Block(BlockFace.BACK, BlockFace.RIGHT, BlockFace.TOP, BlockFace.BOTTOM)
+                .translate(x, z);
+
+            translatedVertices.addAll(block.getVertices());
           } else if (x == SX && z == SZ) { // SE
-            translatedVertices.addAll(translateFrontRightCorner(x, z));
+            Block block = new Block(BlockFace.FRONT, BlockFace.RIGHT, BlockFace.TOP, BlockFace.BOTTOM)
+                .translate(x, z);
+
+            translatedVertices.addAll(block.getVertices());
           }
         } else if (((x == 0 || x == SX) && (z > 0 && z < SZ)) || ((z == 0 || z == SZ) && (x > 0 && x < SX))) { // One of 2x2 edge cases
           if (z > 0 && z < SZ) { // W or E
             if (x == 0) { // W
-              translatedVertices.addAll(translateLeftEdge(x, z));
+              Block block = new Block(BlockFace.LEFT, BlockFace.TOP, BlockFace.BOTTOM)
+                  .translate(x, z);
+
+              translatedVertices.addAll(block.getVertices());
             } else if (x == SX) { // E
-              translatedVertices.addAll(translateRightEdge(x, z));
+              Block block = new Block(BlockFace.RIGHT, BlockFace.TOP, BlockFace.BOTTOM)
+                  .translate(x, z);
+
+              translatedVertices.addAll(block.getVertices());
             }
           } else if (x > 0 && x < SX) { // N or S
             if (z == 0) { // N
-              translatedVertices.addAll(translateBackEdge(x, z));
+              Block block = new Block(BlockFace.BACK, BlockFace.TOP, BlockFace.BOTTOM)
+                  .translate(x, z);
+
+              translatedVertices.addAll(block.getVertices());
             } else if (z == SZ) { // S
-              translatedVertices.addAll(translateFrontEdge(x, z));
+              Block block = new Block(BlockFace.FRONT, BlockFace.TOP, BlockFace.BOTTOM)
+                  .translate(x, z);
+
+              translatedVertices.addAll(block.getVertices());
             }
           }
         } else if ((x > 0 && x < SX) && (z > 0 && z < SZ)) { // Remaining middle cases
-          translatedVertices.addAll(translateMiddleBlock(x, z));
+          Block block = new Block(BlockFace.TOP, BlockFace.BOTTOM)
+              .translate(x, z);
+
+          translatedVertices.addAll(block.getVertices());
         }
       }
     }
@@ -86,109 +114,5 @@ public final class ChunkLoader {
     glBindVertexArray(0);
 
     return new Chunk(position, vaoId, vertexCount);
-  }
-
-  private static List<Vertex> translateLeftEdge(int x, int z) {
-    List<Vertex> translated = new ArrayList<>();
-
-    translated.addAll(translateVertices(BlockGeometry.LEFT, x, z));
-    translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
-    translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
-
-    return translated;
-  }
-
-  private static List<Vertex> translateRightEdge(int x, int z) {
-    List<Vertex> translated = new ArrayList<>();
-
-    translated.addAll(translateVertices(BlockGeometry.RIGHT, x, z));
-    translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
-    translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
-
-    return translated;
-  }
-
-  private static List<Vertex> translateFrontEdge(int x, int z) {
-    List<Vertex> translated = new ArrayList<>();
-
-    translated.addAll(translateVertices(BlockGeometry.FRONT, x, z));
-    translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
-    translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
-
-    return translated;
-  }
-
-  private static List<Vertex> translateBackEdge(int x, int z) {
-    List<Vertex> translated = new ArrayList<>();
-
-    translated.addAll(translateVertices(BlockGeometry.BACK, x, z));
-    translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
-    translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
-
-    return translated;
-  }
-
-  private static List<Vertex> translateBackLeftCorner(int x, int z) {
-    List<Vertex> translated = new ArrayList<>();
-
-    translated.addAll(translateVertices(BlockGeometry.BACK, x, z));
-    translated.addAll(translateVertices(BlockGeometry.LEFT, x, z));
-    translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
-    translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
-
-    return translated;
-  }
-
-  private static List<Vertex> translateFrontLeftCorner(int x, int z) {
-    List<Vertex> translated = new ArrayList<>();
-
-    translated.addAll(translateVertices(BlockGeometry.FRONT, x, z));
-    translated.addAll(translateVertices(BlockGeometry.LEFT, x, z));
-    translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
-    translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
-
-    return translated;
-  }
-
-  private static List<Vertex> translateBackRightCorner(int x, int z) {
-    List<Vertex> translated = new ArrayList<>();
-
-    translated.addAll(translateVertices(BlockGeometry.BACK, x, z));
-    translated.addAll(translateVertices(BlockGeometry.RIGHT, x, z));
-    translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
-    translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
-
-    return translated;
-  }
-
-  private static List<Vertex> translateFrontRightCorner(int x, int z) {
-    List<Vertex> translated = new ArrayList<>();
-
-    translated.addAll(translateVertices(BlockGeometry.FRONT, x, z));
-    translated.addAll(translateVertices(BlockGeometry.RIGHT, x, z));
-    translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
-    translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
-
-    return translated;
-  }
-
-  private static List<Vertex> translateMiddleBlock(int x, int z) {
-    List<Vertex> translated = new ArrayList<>();
-
-    translated.addAll(translateVertices(BlockGeometry.TOP, x, z));
-    translated.addAll(translateVertices(BlockGeometry.BOTTOM, x, z));
-
-    return translated;
-  }
-
-  private static List<Vertex> translateVertices(Vertex[] vertices, int x, int z) {
-    List<Vertex> translated = new ArrayList<>();
-
-    for (Vertex v : vertices) {
-      Vertex vertex = new Vertex(v.getPositions().x + x, v.getPositions().y, v.getPositions().z + z, v.getTextures().x, v.getTextures().y);
-      translated.add(vertex);
-    }
-
-    return translated;
   }
 }
