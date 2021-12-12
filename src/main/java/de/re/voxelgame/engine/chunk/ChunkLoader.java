@@ -3,7 +3,7 @@ package de.re.voxelgame.engine.chunk;
 import de.re.voxelgame.engine.Block;
 import de.re.voxelgame.engine.BlockFace;
 import de.re.voxelgame.engine.Vertex;
-import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,68 +21,107 @@ public final class ChunkLoader {
   private ChunkLoader() {
   }
 
-  public static Chunk loadChunk(Vector2f position) {
+  public static Chunk loadChunk(Vector3f position) {
     List<Vertex> translatedVertices = new ArrayList<>();
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
-      for (int z = 0; z < CHUNK_SIZE; z++) {
-        // Max. size in x/z direction
-        int SX = CHUNK_SIZE-1;
-        int SZ = CHUNK_SIZE-1;
+      for (int y = 0; y < CHUNK_SIZE; y++) {
+        for (int z = 0; z < CHUNK_SIZE; z++) {
+          // Max. size in x/y/z direction
+          int SX = CHUNK_SIZE - 1;
+          int SY = CHUNK_SIZE - 1;
+          int SZ = CHUNK_SIZE - 1;
 
-        if ((x == 0 && z == 0) || (x == 0 && z == SZ) || (x == SX && z == 0) || (x == SX && z == SZ)) { // One of 4 corner cases
-          if (x == 0 && z == 0) { // NW
-            Block block = new Block(BlockFace.BACK, BlockFace.LEFT, BlockFace.TOP, BlockFace.BOTTOM)
-                .translate(x, z);
+          if ((x == 0 && z == 0) || (x == 0 && z == SZ) || (x == SX && z == 0) || (x == SX && z == SZ)) { // One of 4 corner cases
+            if (x == 0 && z == 0) { // NW
+              Block block = new Block(BlockFace.BACK, BlockFace.LEFT);
+              if (y == 0) {
+                block.join(BlockFace.BOTTOM);
+              } else if (y == SY) {
+                block.join(BlockFace.TOP);
+              }
 
-            translatedVertices.addAll(block.getVertices());
-          } else if (x == 0 && z == SZ) { // SW
-            Block block = new Block(BlockFace.FRONT, BlockFace.LEFT, BlockFace.TOP, BlockFace.BOTTOM)
-                .translate(x, z);
+              translatedVertices.addAll(block.translate(x, y, z).getVertices());
+            } else if (x == 0 && z == SZ) { // SW
+              Block block = new Block(BlockFace.FRONT, BlockFace.LEFT);
+              if (y == 0) {
+                block.join(BlockFace.BOTTOM);
+              } else if (y == SY) {
+                block.join(BlockFace.TOP);
+              }
 
-            translatedVertices.addAll(block.getVertices());
-          } else if (x == SX && z == 0) { // NE
-            Block block = new Block(BlockFace.BACK, BlockFace.RIGHT, BlockFace.TOP, BlockFace.BOTTOM)
-                .translate(x, z);
+              translatedVertices.addAll(block.translate(x, y, z).getVertices());
+            } else if (x == SX && z == 0) { // NE
+              Block block = new Block(BlockFace.BACK, BlockFace.RIGHT);
+              if (y == 0) {
+                block.join(BlockFace.BOTTOM);
+              } else if (y == SY) {
+                block.join(BlockFace.TOP);
+              }
 
-            translatedVertices.addAll(block.getVertices());
-          } else if (x == SX && z == SZ) { // SE
-            Block block = new Block(BlockFace.FRONT, BlockFace.RIGHT, BlockFace.TOP, BlockFace.BOTTOM)
-                .translate(x, z);
+              translatedVertices.addAll(block.translate(x, y, z).getVertices());
+            } else if (x == SX && z == SZ) { // SE
+              Block block = new Block(BlockFace.FRONT, BlockFace.RIGHT);
+              if (y == 0) {
+                block.join(BlockFace.BOTTOM);
+              } else if (y == SY) {
+                block.join(BlockFace.TOP);
+              }
 
-            translatedVertices.addAll(block.getVertices());
-          }
-        } else if (((x == 0 || x == SX) && (z > 0 && z < SZ)) || ((z == 0 || z == SZ) && (x > 0 && x < SX))) { // One of 2x2 edge cases
-          if (z > 0 && z < SZ) { // W or E
-            if (x == 0) { // W
-              Block block = new Block(BlockFace.LEFT, BlockFace.TOP, BlockFace.BOTTOM)
-                  .translate(x, z);
-
-              translatedVertices.addAll(block.getVertices());
-            } else if (x == SX) { // E
-              Block block = new Block(BlockFace.RIGHT, BlockFace.TOP, BlockFace.BOTTOM)
-                  .translate(x, z);
-
-              translatedVertices.addAll(block.getVertices());
+              translatedVertices.addAll(block.translate(x, y, z).getVertices());
             }
-          } else if (x > 0 && x < SX) { // N or S
-            if (z == 0) { // N
-              Block block = new Block(BlockFace.BACK, BlockFace.TOP, BlockFace.BOTTOM)
-                  .translate(x, z);
+          } else if (((x == 0 || x == SX) && (z > 0 && z < SZ)) || ((z == 0 || z == SZ) && (x > 0 && x < SX))) { // One of 2x2 edge cases
+            if (z > 0 && z < SZ) { // W or E
+              if (x == 0) { // W
+                Block block = new Block(BlockFace.LEFT);
+                if (y == 0) {
+                  block.join(BlockFace.BOTTOM);
+                } else if (y == SY) {
+                  block.join(BlockFace.TOP);
+                }
 
-              translatedVertices.addAll(block.getVertices());
-            } else if (z == SZ) { // S
-              Block block = new Block(BlockFace.FRONT, BlockFace.TOP, BlockFace.BOTTOM)
-                  .translate(x, z);
+                translatedVertices.addAll(block.translate(x, y, z).getVertices());
+              } else if (x == SX) { // E
+                Block block = new Block(BlockFace.RIGHT);
+                if (y == 0) {
+                  block.join(BlockFace.BOTTOM);
+                } else if (y == SY) {
+                  block.join(BlockFace.TOP);
+                }
 
-              translatedVertices.addAll(block.getVertices());
+                translatedVertices.addAll(block.translate(x, y, z).getVertices());
+              }
+            } else if (x > 0 && x < SX) { // N or S
+              if (z == 0) { // N
+                Block block = new Block(BlockFace.BACK);
+                if (y == 0) {
+                  block.join(BlockFace.BOTTOM);
+                } else if (y == SY) {
+                  block.join(BlockFace.TOP);
+                }
+
+                translatedVertices.addAll(block.translate(x, y, z).getVertices());
+              } else if (z == SZ) { // S
+                Block block = new Block(BlockFace.FRONT);
+                if (y == 0) {
+                  block.join(BlockFace.BOTTOM);
+                } else if (y == SY) {
+                  block.join(BlockFace.TOP);
+                }
+
+                translatedVertices.addAll(block.translate(x, y, z).getVertices());
+              }
             }
-          }
-        } else if ((x > 0 && x < SX) && (z > 0 && z < SZ)) { // Remaining middle cases
-          Block block = new Block(BlockFace.TOP, BlockFace.BOTTOM)
-              .translate(x, z);
+          } else if ((x > 0 && x < SX) && (z > 0 && z < SZ)) { // Remaining middle cases
+            if (y == 0) {
+              Block block = new Block(BlockFace.BOTTOM);
+              translatedVertices.addAll(block.translate(x, y, z).getVertices());
+            } else if (y == SY) {
+              Block block = new Block(BlockFace.TOP);
+              translatedVertices.addAll(block.translate(x, y, z).getVertices());
+            }
 
-          translatedVertices.addAll(block.getVertices());
+          }
         }
       }
     }

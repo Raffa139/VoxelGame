@@ -5,7 +5,6 @@ import de.re.voxelgame.engine.chunk.Chunk;
 import de.re.voxelgame.engine.chunk.ChunkLoader;
 import de.re.voxelgame.core.util.ResourceLoader;
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.Version;
 
@@ -44,12 +43,14 @@ public class Application {
 
     Camera camera = new Camera(new Vector3f(0.0f, 10.0f, 0.0f));
 
-    int chunkCount = 10;
+    int chunkCount = 4;
     List<Chunk> chunks = new ArrayList<>();
-    for (int i = 0; i < chunkCount; i++) {
-      for (int j = 0; j < chunkCount; j++) {
-        Chunk chunk = ChunkLoader.loadChunk(new Vector2f(i, j));
-        chunks.add(chunk);
+    for (int x = 0; x < chunkCount; x++) {
+      for (int y = 0; y < chunkCount/2; y++) {
+        for (int z = 0; z < chunkCount; z++) {
+          Chunk chunk = ChunkLoader.loadChunk(new Vector3f(x, y, z));
+          chunks.add(chunk);
+        }
       }
     }
 
@@ -74,7 +75,10 @@ public class Application {
 
       for (Chunk chunk : chunks) {
         Matrix4f model = new Matrix4f();
-        model.translate(chunk.getPosition().x*Chunk.CHUNK_SIZE, 0.0f, chunk.getPosition().y*Chunk.CHUNK_SIZE);
+        model.translate(
+            chunk.getPosition().x*Chunk.CHUNK_SIZE,
+            chunk.getPosition().y*Chunk.CHUNK_SIZE,
+            chunk.getPosition().z*Chunk.CHUNK_SIZE);
         basicShader.setMatrix4("iModel", model);
 
         glBindVertexArray(chunk.getVaoId());

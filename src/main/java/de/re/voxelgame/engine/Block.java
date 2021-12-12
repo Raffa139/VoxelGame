@@ -10,7 +10,8 @@ public class Block {
   private final List<BlockFace> blockFaces;
 
   public Block(BlockFace... faces) {
-    blockFaces = Arrays.asList(faces);
+    this();
+    blockFaces.addAll(Arrays.asList(faces));
   }
 
   public Block() {
@@ -22,10 +23,10 @@ public class Block {
     return this;
   }
 
-  public Block translate(float x, float z) {
+  public Block translate(float x, float y, float z) {
     for (int i = 0; i < blockFaces.size(); i++) {
       BlockFace face = blockFaces.get(i);
-      blockFaces.set(i, face.translate(x, z));
+      blockFaces.set(i, face.translate(x, y, z));
     }
     return this;
   }
