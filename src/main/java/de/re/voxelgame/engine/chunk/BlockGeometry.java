@@ -1,4 +1,6 @@
-package de.re.voxelgame.engine;
+package de.re.voxelgame.engine.chunk;
+
+import de.re.voxelgame.engine.Vertex;
 
 public final class BlockGeometry {
   // Visual: https://www.math3d.org/OdaojzOmz

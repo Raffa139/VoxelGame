@@ -1,7 +1,5 @@
 package de.re.voxelgame.engine.chunk;
 
-import de.re.voxelgame.engine.Block;
-import de.re.voxelgame.engine.BlockFace;
 import de.re.voxelgame.engine.Vertex;
 import org.joml.Vector3f;
 

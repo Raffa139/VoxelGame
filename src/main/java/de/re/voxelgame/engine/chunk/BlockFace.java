@@ -1,4 +1,6 @@
-package de.re.voxelgame.engine;
+package de.re.voxelgame.engine.chunk;
+
+import de.re.voxelgame.engine.Vertex;
 
 import java.util.ArrayList;
 import java.util.Arrays;
