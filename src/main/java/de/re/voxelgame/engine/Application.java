@@ -4,6 +4,7 @@ import de.re.voxelgame.core.*;
 import de.re.voxelgame.engine.chunk.Chunk;
 import de.re.voxelgame.engine.chunk.ChunkLoader;
 import de.re.voxelgame.core.util.ResourceLoader;
+import de.re.voxelgame.engine.noise.OpenSimplexNoise;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.Version;
@@ -20,7 +21,17 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class Application {
   public static void main(String[] args) throws IOException, URISyntaxException {
-    new Application().run();
+    //new Application().run();
+    OpenSimplexNoise noise = new OpenSimplexNoise(689623653265816591L);
+
+    for (int x = 0; x < 100; x++) {
+      for (int y = 0; y < 100; y++) {
+        System.out.println(noise.voxelNoise2d(x, y));
+      }
+      System.out.println();
+      System.out.println();
+      System.out.println();
+    }
   }
 
   public void run() throws IOException, URISyntaxException {
