@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 
 public class Chunk {
   public static final int CHUNK_SIZE = 16;
+  public static final int CHUNK_HEIGHT = 32;
 
   private final Vector3f position;
 

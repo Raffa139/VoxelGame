@@ -1,11 +1,13 @@
 package de.re.voxelgame.engine.chunk;
 
 import de.re.voxelgame.engine.Vertex;
+import de.re.voxelgame.engine.noise.OpenSimplexNoise;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static de.re.voxelgame.engine.chunk.Chunk.CHUNK_HEIGHT;
 import static de.re.voxelgame.engine.chunk.Chunk.CHUNK_SIZE;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL15.*;
@@ -19,6 +21,81 @@ public final class ChunkLoader {
   private ChunkLoader() {
   }
 
+  public static Chunk loadChunkNoise(Vector3f position, OpenSimplexNoise noise) {
+    List<Vertex> translatedVertices = new ArrayList<>();
+
+    for (int x = 0; x < CHUNK_SIZE; x++) {
+      for (int z = 0; z < CHUNK_SIZE; z++) {
+        float tx = x+(position.x*CHUNK_SIZE);
+        float tz = z+(position.z*CHUNK_SIZE);
+
+        int height = noise.voxelNoise2d(tx, tz);
+        int heightN = noise.voxelNoise2d(tx, tz-1);
+        int heightS = noise.voxelNoise2d(tx, tz+1);
+        int heightE = noise.voxelNoise2d(tx+1, tz);
+        int heightW = noise.voxelNoise2d(tx-1, tz);
+
+        boolean visibleN = heightN < height;
+        boolean visibleS = heightS < height;
+        boolean visibleE = heightE < height;
+        boolean visibleW = heightW < height;
+
+        for (int y = 0; y < CHUNK_HEIGHT; y++) {
+          if (y == height) {
+            Block block = new Block(BlockFace.TOP);
+
+            if (y == 0) {
+              block.join(BlockFace.BOTTOM);
+            }
+            if (visibleN) {
+              block.join(BlockFace.BACK);
+            }
+            if (visibleS) {
+              block.join(BlockFace.FRONT);
+            }
+            if (visibleE) {
+              block.join(BlockFace.RIGHT);
+            }
+            if (visibleW) {
+              block.join(BlockFace.LEFT);
+            }
+
+            translatedVertices.addAll(block.translate(x, y, z).getVertices());
+          }
+        }
+      }
+    }
+
+    float[] vertices = new float[translatedVertices.size() * 5];
+    for (int i = 0; i < translatedVertices.size() * 5; i+=5) {
+      Vertex v = translatedVertices.get((int) Math.floor(i / 5.0));
+      vertices[i] = v.getPositions().x;
+      vertices[i+1] = v.getPositions().y;
+      vertices[i+2] = v.getPositions().z;
+      vertices[i+3] = v.getTextures().x;
+      vertices[i+4] = v.getTextures().y;
+    }
+
+    int vertexCount = vertices.length;
+
+    int vaoId = glGenVertexArrays();
+    glBindVertexArray(vaoId);
+
+    int vbo = glGenBuffers();
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * 4, 0L);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * 4, 3 * 4);
+
+    glBindVertexArray(0);
+
+    return new Chunk(position, vaoId, vertexCount);
+  }
+
+  @Deprecated
   public static Chunk loadChunk(Vector3f position) {
     List<Vertex> translatedVertices = new ArrayList<>();
 

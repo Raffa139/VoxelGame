@@ -21,17 +21,7 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class Application {
   public static void main(String[] args) throws IOException, URISyntaxException {
-    //new Application().run();
-    OpenSimplexNoise noise = new OpenSimplexNoise(689623653265816591L);
-
-    for (int x = 0; x < 100; x++) {
-      for (int y = 0; y < 100; y++) {
-        System.out.println(noise.voxelNoise2d(x, y));
-      }
-      System.out.println();
-      System.out.println();
-      System.out.println();
-    }
+    new Application().run();
   }
 
   public void run() throws IOException, URISyntaxException {
@@ -54,14 +44,12 @@ public class Application {
 
     Camera camera = new Camera(new Vector3f(0.0f, 10.0f, 0.0f));
 
-    int chunkCount = 4;
+    OpenSimplexNoise noise = new OpenSimplexNoise(139L);
     List<Chunk> chunks = new ArrayList<>();
+    int chunkCount = 20;
     for (int x = 0; x < chunkCount; x++) {
-      for (int y = 0; y < chunkCount/2; y++) {
-        for (int z = 0; z < chunkCount; z++) {
-          Chunk chunk = ChunkLoader.loadChunk(new Vector3f(x, y, z));
-          chunks.add(chunk);
-        }
+      for (int z = 0; z < chunkCount; z++) {
+        chunks.add(ChunkLoader.loadChunkNoise(new Vector3f(x, 0, z), noise));
       }
     }
 
@@ -121,12 +109,12 @@ public class Application {
   }
 
   private void printDebugInfo(int chunkCount) {
-    System.out.println("Chunks: " + chunkCount*chunkCount);
+    int totalChunks = chunkCount*chunkCount;
+    int totalChunkSize = Chunk.CHUNK_SIZE*Chunk.CHUNK_SIZE;
+
+    System.out.println("Chunks: " + totalChunks);
     System.out.println("Chunk size: " + Chunk.CHUNK_SIZE);
-    System.out.println("Blocks/Chunk: " + Chunk.CHUNK_SIZE*Chunk.CHUNK_SIZE);
-    System.out.println("Blocks: " + chunkCount * Chunk.CHUNK_SIZE*Chunk.CHUNK_SIZE);
-    System.out.println("Faces: " + chunkCount * 2*Chunk.CHUNK_SIZE*Chunk.CHUNK_SIZE+4*16);
-    System.out.println("Triangles: " + 2 * chunkCount * 2*Chunk.CHUNK_SIZE*Chunk.CHUNK_SIZE+4*16);
-    System.out.println("Vertices: " + 3 * 2 * chunkCount * 2*Chunk.CHUNK_SIZE*Chunk.CHUNK_SIZE+4*16);
+    System.out.println("Blocks/Chunk: " + totalChunkSize);
+    System.out.println("Blocks: " + totalChunks * totalChunkSize);
   }
 }

@@ -72,7 +72,7 @@ public class Camera {
   }
 
   private void move(float deltaTime) {
-    float speed = 10.0f * deltaTime;
+    float speed = 15.0f * deltaTime;
 
     if (KeyListener.keyPressed(GLFW_KEY_W)) {
       pos.add(mul(new Vector3f(front.x, 0.0f, front.z), speed));
