@@ -35,33 +35,26 @@ public final class ChunkLoader {
         int heightE = noise.voxelNoise2d(tx+1, tz);
         int heightW = noise.voxelNoise2d(tx-1, tz);
 
-        boolean visibleN = heightN < height;
-        boolean visibleS = heightS < height;
-        boolean visibleE = heightE < height;
-        boolean visibleW = heightW < height;
-
         for (int y = 0; y < CHUNK_HEIGHT; y++) {
+          Block block = new Block();
+
           if (y == height) {
-            Block block = new Block(BlockFace.TOP);
-
-            if (y == 0) {
-              block.join(BlockFace.BOTTOM);
-            }
-            if (visibleN) {
-              block.join(BlockFace.BACK);
-            }
-            if (visibleS) {
-              block.join(BlockFace.FRONT);
-            }
-            if (visibleE) {
-              block.join(BlockFace.RIGHT);
-            }
-            if (visibleW) {
-              block.join(BlockFace.LEFT);
-            }
-
-            translatedVertices.addAll(block.translate(x, y, z).getVertices());
+            block.join(BlockFace.TOP);
           }
+          if (y > heightN && y <= height) {
+            block.join(BlockFace.BACK);
+          }
+          if (y > heightS && y <= height) {
+            block.join(BlockFace.FRONT);
+          }
+          if (y > heightE && y <= height) {
+            block.join(BlockFace.RIGHT);
+          }
+          if (y > heightW && y <= height) {
+            block.join(BlockFace.LEFT);
+          }
+
+          translatedVertices.addAll(block.translate(x, y, z).getVertices());
         }
       }
     }
