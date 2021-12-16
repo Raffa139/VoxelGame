@@ -24,12 +24,12 @@ public class BlockFace {
     this.vertices = vertices;
   }
 
-  public BlockFace translate(float x, float y, float z) {
+  public BlockFace translate(float x, float y, float z, float lightLevel) {
     List<Vertex> translated = new ArrayList<>();
 
     for (Vertex v : vertices) {
       Vertex vertex =
-          new Vertex(v.getPositions().x + x, v.getPositions().y + y, v.getPositions().z + z, v.getTextures());
+          new Vertex(v.getPosition().x + x, v.getPosition().y + y, v.getPosition().z + z, v.getTexture(), lightLevel);
       translated.add(vertex);
     }
 
