@@ -40,31 +40,8 @@ public final class ChunkLoader {
         int heightNE = noise.voxelNoise2d(tx+1, tz-1);
         int heightSE = noise.voxelNoise2d(tx+1, tz+1);
 
-        float lightLevel = 4.0f;
-        if (heightN > height) {
-          lightLevel-=0.5f;
-        }
-        if (heightS > height) {
-          lightLevel-=0.5f;
-        }
-        if (heightE > height) {
-          lightLevel-=0.5f;
-        }
-        if (heightW > height) {
-          lightLevel-=0.5f;
-        }
-        if (heightNW > height) {
-          lightLevel-=0.5f;
-        }
-        if (heightSW > height) {
-          lightLevel-=0.5f;
-        }
-        if (heightNE > height) {
-          lightLevel-=0.5f;
-        }
-        if (heightSE > height) {
-          lightLevel-=0.5f;
-        }
+        float lightLevel = computeLightLevel(height,heightN, heightS, heightE, heightW,
+                                             heightNW, heightSW, heightNE, heightSE);
 
         for (int y = 0; y < CHUNK_HEIGHT; y++) {
           Block block = new Block(lightLevel);
@@ -92,6 +69,10 @@ public final class ChunkLoader {
       }
     }
 
+    return storeAndReturnChunk(translatedVertices, position);
+  }
+
+  private static Chunk storeAndReturnChunk(List<Vertex> translatedVertices, Vector3f position) {
     float[] vertices = new float[translatedVertices.size() * 6];
     for (int i = 0; i < translatedVertices.size() * 6; i+=6) {
       Vertex v = translatedVertices.get((int) Math.floor(i / 6.0));
@@ -122,5 +103,38 @@ public final class ChunkLoader {
     glBindVertexArray(0);
 
     return new Chunk(position, vaoId, vertexCount);
+  }
+
+  private static float computeLightLevel(int height, int heightN, int heightS, int heightE, int heightW,
+                                         int heightNW, int heightSW, int heightNE, int heightSE) {
+    float lightLevel = 4.0f;
+
+    if (heightN > height) {
+      lightLevel-=0.5f;
+    }
+    if (heightS > height) {
+      lightLevel-=0.5f;
+    }
+    if (heightE > height) {
+      lightLevel-=0.5f;
+    }
+    if (heightW > height) {
+      lightLevel-=0.5f;
+    }
+
+    if (heightNW > height) {
+      lightLevel-=0.5f;
+    }
+    if (heightSW > height) {
+      lightLevel-=0.5f;
+    }
+    if (heightNE > height) {
+      lightLevel-=0.5f;
+    }
+    if (heightSE > height) {
+      lightLevel-=0.5f;
+    }
+
+    return lightLevel;
   }
 }
