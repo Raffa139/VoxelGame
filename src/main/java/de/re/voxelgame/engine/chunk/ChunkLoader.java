@@ -35,16 +35,8 @@ public final class ChunkLoader {
         int heightE = noise.voxelNoise2d(tx+1, tz);
         int heightW = noise.voxelNoise2d(tx-1, tz);
 
-        int heightNW = noise.voxelNoise2d(tx-1, tz-1);
-        int heightSW = noise.voxelNoise2d(tx-1, tz+1);
-        int heightNE = noise.voxelNoise2d(tx+1, tz-1);
-        int heightSE = noise.voxelNoise2d(tx+1, tz+1);
-
-        float lightLevel = computeLightLevel(height,heightN, heightS, heightE, heightW,
-                                             heightNW, heightSW, heightNE, heightSE);
-
         for (int y = 0; y < CHUNK_HEIGHT; y++) {
-          Block block = new Block(lightLevel);
+          Block block = new Block();
 
           if (y == height) {
             block.join(BlockFace.TOP);
@@ -73,15 +65,14 @@ public final class ChunkLoader {
   }
 
   private static Chunk storeAndReturnChunk(List<Vertex> translatedVertices, Vector3f position) {
-    float[] vertices = new float[translatedVertices.size() * 6];
-    for (int i = 0; i < translatedVertices.size() * 6; i+=6) {
-      Vertex v = translatedVertices.get((int) Math.floor(i / 6.0));
+    float[] vertices = new float[translatedVertices.size() * 5];
+    for (int i = 0; i < translatedVertices.size() * 5; i+=5) {
+      Vertex v = translatedVertices.get((int) Math.floor(i / 5.0));
       vertices[i] = v.getPosition().x;
       vertices[i+1] = v.getPosition().y;
       vertices[i+2] = v.getPosition().z;
       vertices[i+3] = v.getTexture().x;
       vertices[i+4] = v.getTexture().y;
-      vertices[i+5] = v.getLightLevel();
     }
 
     int vertexCount = vertices.length;
@@ -94,11 +85,9 @@ public final class ChunkLoader {
     glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * 4, 0L);
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * 4, 0L);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, false, 6 * 4, 3 * 4);
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 1, GL_FLOAT, false, 6 * 4, 5 * 4);
+    glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * 4, 3 * 4);
 
     glBindVertexArray(0);
 

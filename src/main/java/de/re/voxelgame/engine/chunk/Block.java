@@ -18,6 +18,10 @@ public class Block {
     blockFaces.addAll(Arrays.asList(faces));
   }
 
+  public Block() {
+    this(-1);
+  }
+
   public Block(float lightLevel) {
     blockFaces = new ArrayList<>();
     this.lightLevel = lightLevel;
