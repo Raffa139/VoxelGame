@@ -11,20 +11,13 @@ import java.util.stream.Collectors;
 public class Block {
   private final List<BlockFace> blockFaces;
 
-  private float lightLevel;
-
-  public Block(float lightLevel, BlockFace... faces) {
-    this(lightLevel);
+  public Block(BlockFace... faces) {
+    this();
     blockFaces.addAll(Arrays.asList(faces));
   }
 
   public Block() {
-    this(-1);
-  }
-
-  public Block(float lightLevel) {
     blockFaces = new ArrayList<>();
-    this.lightLevel = lightLevel;
   }
 
   public Block join(BlockFace face) {
@@ -32,10 +25,15 @@ public class Block {
     return this;
   }
 
+  public Block join(float lightLevel, BlockFace face) {
+    face.setLightLevel(lightLevel);
+    return join(face);
+  }
+
   public Block translate(float x, float y, float z) {
     for (int i = 0; i < blockFaces.size(); i++) {
       BlockFace face = blockFaces.get(i);
-      blockFaces.set(i, face.translate(x, y, z, lightLevel));
+      blockFaces.set(i, face.translate(x, y, z));
     }
     return this;
   }
