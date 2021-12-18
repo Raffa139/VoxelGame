@@ -31,11 +31,11 @@ public class Block {
   }
 
   public Block translate(float x, float y, float z) {
-    for (int i = 0; i < blockFaces.size(); i++) {
-      BlockFace face = blockFaces.get(i);
-      blockFaces.set(i, face.translate(x, y, z));
+    Block block = new Block();
+    for (BlockFace face : blockFaces) {
+      block.join(face.translate(x, y, z));
     }
-    return this;
+    return block;
   }
 
   public boolean hasVertices() {

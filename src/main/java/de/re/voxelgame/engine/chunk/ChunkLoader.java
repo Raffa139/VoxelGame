@@ -94,37 +94,4 @@ public final class ChunkLoader {
 
     return new Chunk(position, vaoId, vertexCount);
   }
-
-  private static float computeLightLevel(int height, int heightN, int heightS, int heightE, int heightW,
-                                         int heightNW, int heightSW, int heightNE, int heightSE) {
-    float lightLevel = 4.0f;
-
-    if (heightN > height) {
-      lightLevel-=0.5f;
-    }
-    if (heightS > height) {
-      lightLevel-=0.5f;
-    }
-    if (heightE > height) {
-      lightLevel-=0.5f;
-    }
-    if (heightW > height) {
-      lightLevel-=0.5f;
-    }
-
-    if (heightNW > height) {
-      lightLevel-=0.5f;
-    }
-    if (heightSW > height) {
-      lightLevel-=0.5f;
-    }
-    if (heightNE > height) {
-      lightLevel-=0.5f;
-    }
-    if (heightSE > height) {
-      lightLevel-=0.5f;
-    }
-
-    return lightLevel;
-  }
 }
