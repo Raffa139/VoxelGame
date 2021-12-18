@@ -13,6 +13,10 @@ public class Block {
 
   private float lightLevel;
 
+  public Block(BlockFace... faces) {
+    this(-1, faces);
+  }
+
   public Block(float lightLevel, BlockFace... faces) {
     this(lightLevel);
     blockFaces.addAll(Arrays.asList(faces));
@@ -33,11 +37,11 @@ public class Block {
   }
 
   public Block translate(float x, float y, float z) {
-    for (int i = 0; i < blockFaces.size(); i++) {
-      BlockFace face = blockFaces.get(i);
-      blockFaces.set(i, face.translate(x, y, z, lightLevel));
+    Block block = new Block();
+    for (BlockFace face : blockFaces) {
+      block.join(face.translate(x, y, z, lightLevel));
     }
-    return this;
+    return block;
   }
 
   public boolean hasVertices() {

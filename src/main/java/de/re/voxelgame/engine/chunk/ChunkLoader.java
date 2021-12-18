@@ -25,8 +25,40 @@ public final class ChunkLoader {
     List<Vertex> translatedVertices = new ArrayList<>();
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
+      //Block block = new Block(BlockFace.FRONT, BlockFace.BACK, BlockFace.LEFT, BlockFace.RIGHT, BlockFace.TOP, BlockFace.BOTTOM);
+      //Block start = block.translate(x, 0, 0);
+
+      Vertex[] start = BlockGeometry.TOP;
+      List<Vertex> strans = new ArrayList<>();
+      for (Vertex v : start) {
+        Vector3f pos = v.getPosition();
+        strans.add(new Vertex(pos.x + x, pos.y, pos.z, v.getTexture().x + x, v.getTexture().y));
+      }
+
+      List<Vertex> etrans = new ArrayList<>();
       for (int z = 0; z < CHUNK_SIZE; z++) {
-        float tx = x+(position.x*CHUNK_SIZE);
+        //Block step = block.translate(x, 0, z);
+
+        if (z == CHUNK_SIZE-1) {
+          //Block end = block.translate(x, 0, z);
+          Vertex[] end = BlockGeometry.TOP;
+          for (Vertex v : end) {
+            Vector3f pos = v.getPosition();
+            etrans.add(new Vertex(pos.x + x, pos.y, pos.z + z, v.getTexture().x + x, v.getTexture().y + z));
+          }
+
+          /*Vertex v = trans.get(3);
+          trans.set(3, new Vertex(v.getPosition().x + x, v.getPosition().y, v.getPosition().z+z, v.getTexture().x, v.getTexture().y));*/
+
+          List<Vertex> el = new ArrayList<>();
+          el.add(strans.get(2));
+          el.add(etrans.get(4));
+          el.add(etrans.get(5));
+          translatedVertices.addAll(el);
+        }
+
+
+        /*float tx = x+(position.x*CHUNK_SIZE);
         float tz = z+(position.z*CHUNK_SIZE);
 
         int height = noise.voxelNoise2d(tx, tz);
@@ -57,8 +89,14 @@ public final class ChunkLoader {
           if (block.hasVertices()) {
             translatedVertices.addAll(block.translate(x, y, z).getVertices());
           }
-        }
+        }*/
       }
+
+      List<Vertex> sl = new ArrayList<>();
+      sl.add(etrans.get(0));
+      sl.add(strans.get(1));
+      sl.add(strans.get(2));
+      translatedVertices.addAll(sl);
     }
 
     return storeAndReturnChunk(translatedVertices, position);

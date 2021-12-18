@@ -46,7 +46,7 @@ public class Application {
 
     OpenSimplexNoise noise = new OpenSimplexNoise(139L);
     List<Chunk> chunks = new ArrayList<>();
-    int chunkCount = 20;
+    int chunkCount = 1;
     for (int x = 0; x < chunkCount; x++) {
       for (int z = 0; z < chunkCount; z++) {
         chunks.add(ChunkLoader.loadChunkNoise(new Vector3f(x, 0, z), noise));
