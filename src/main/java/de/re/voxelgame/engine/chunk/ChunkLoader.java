@@ -65,30 +65,37 @@ public final class ChunkLoader {
   }
 
   private static Chunk storeAndReturnChunk(List<Vertex> translatedVertices, Vector3f position) {
-    float[] vertices = new float[translatedVertices.size() * 6];
-    for (int i = 0; i < translatedVertices.size() * 6; i+=6) {
-      Vertex v = translatedVertices.get((int) Math.floor(i / 6.0));
-      vertices[i] = v.getPosition().x;
-      vertices[i+1] = v.getPosition().y;
-      vertices[i+2] = v.getPosition().z;
-      vertices[i+3] = v.getTexture().x;
-      vertices[i+4] = v.getTexture().y;
-      vertices[i+5] = v.getLightLevel();
+    int[] vertexData = new int[translatedVertices.size()];
+    for (int i = 0; i < translatedVertices.size(); i++) {
+      Vertex v = translatedVertices.get(i);
+
+      vertexData[i] = (int) v.getPosition().x << 27;
+      vertexData[i] = vertexData[i] | (int) v.getPosition().y << 22;
+      vertexData[i] = vertexData[i] | (int) v.getPosition().z << 17;
+
+      int textureCoordIndex = (int) Math.floor(i % 6.0);
+      vertexData[i] = vertexData[i] | textureCoordIndex << 14;
+
+      vertexData[i] = vertexData[i] | 1 << 5;
+
+      vertexData[i] = vertexData[i] | (int) (v.getLightLevel() * 5) << 2;
+
+      /*float x = ((vertexData[i] & (0x1F << 27)) >> 27);
+      float y = ((vertexData[i] & (0x1F << 22)) >> 22);
+      float z = ((vertexData[i] & (0x1F << 17)) >> 17);*/
     }
 
-    int vertexCount = vertices.length;
+    int vertexCount = vertexData.length;
 
     int vaoId = glGenVertexArrays();
     glBindVertexArray(vaoId);
 
     int vbo = glGenBuffers();
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexData, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * 4, 0L);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, false, 6 * 4, 3 * 4);
+    glVertexAttribPointer(0, 1, GL_FLOAT, false, 4, 0L);
 
     glBindVertexArray(0);
 
