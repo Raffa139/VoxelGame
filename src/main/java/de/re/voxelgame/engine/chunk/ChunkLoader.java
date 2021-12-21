@@ -6,6 +6,7 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static de.re.voxelgame.engine.chunk.Chunk.CHUNK_HEIGHT;
 import static de.re.voxelgame.engine.chunk.Chunk.CHUNK_SIZE;
@@ -18,6 +19,15 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public final class ChunkLoader {
+  private static final Map<Integer, Integer> VERTEX_TEXTURE_INDICES = Map.of(
+      0, 0,
+      1, 1,
+      2, 2,
+      3, 2,
+      4, 3,
+      5, 0
+  );
+
   private ChunkLoader() {
   }
 
@@ -69,20 +79,16 @@ public final class ChunkLoader {
     for (int i = 0; i < translatedVertices.size(); i++) {
       Vertex v = translatedVertices.get(i);
 
-      vertexData[i] = (int) v.getPosition().x << 27;
-      vertexData[i] = vertexData[i] | (int) v.getPosition().y << 22;
-      vertexData[i] = vertexData[i] | (int) v.getPosition().z << 17;
+      vertexData[i] = (int) v.getPosition().x << 26;
+      vertexData[i] = vertexData[i] | (int) v.getPosition().y << 20;
+      vertexData[i] = vertexData[i] | (int) v.getPosition().z << 14;
 
       int textureCoordIndex = (int) Math.floor(i % 6.0);
-      vertexData[i] = vertexData[i] | textureCoordIndex << 14;
+      vertexData[i] = vertexData[i] | VERTEX_TEXTURE_INDICES.get(textureCoordIndex) << 12;
 
-      vertexData[i] = vertexData[i] | 1 << 5;
+      vertexData[i] = vertexData[i] | 1 << 3;
 
-      vertexData[i] = vertexData[i] | (int) (v.getLightLevel() * 5) << 2;
-
-      /*float x = ((vertexData[i] & (0x1F << 27)) >> 27);
-      float y = ((vertexData[i] & (0x1F << 22)) >> 22);
-      float z = ((vertexData[i] & (0x1F << 17)) >> 17);*/
+      vertexData[i] = vertexData[i] | (int) (v.getLightLevel() * 5);
     }
 
     int vertexCount = vertexData.length;
