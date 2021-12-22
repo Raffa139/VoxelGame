@@ -32,7 +32,7 @@ public class BlockFace {
 
     for (Vertex v : vertices) {
       Vertex vertex =
-          new Vertex(v.getPosition().x + x, v.getPosition().y + y, v.getPosition().z + z, v.getTexture(), lightLevel);
+          new Vertex(v.getPosition().x + x, v.getPosition().y + y, v.getPosition().z + z, lightLevel);
       translated.add(vertex);
     }
 

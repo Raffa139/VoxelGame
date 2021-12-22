@@ -83,15 +83,19 @@ public final class ChunkLoader {
     for (int i = 0; i < translatedVertices.size(); i++) {
       Vertex v = translatedVertices.get(i);
 
+      // Push position bits according to vertex data schematics
       vertexData[i] = (int) v.getPosition().x << 26;
       vertexData[i] = vertexData[i] | (int) v.getPosition().y << 20;
       vertexData[i] = vertexData[i] | (int) v.getPosition().z << 14;
 
+      // Push index of texture coordinate according to vertex data schematics
       int textureCoordIndex = (int) Math.floor(i % 6.0);
       vertexData[i] = vertexData[i] | VERTEX_TEXTURE_INDICES.get(textureCoordIndex) << 12;
 
+      // Push texture tile id (block-id) according to vertex data schematics
       vertexData[i] = vertexData[i] | 1 << 3;
 
+      // Push light level according to vertex data schematics
       vertexData[i] = vertexData[i] | (int) (v.getLightLevel() * 5);
     }
 
