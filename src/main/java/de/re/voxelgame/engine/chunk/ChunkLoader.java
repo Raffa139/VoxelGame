@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static de.re.voxelgame.engine.chunk.Chunk.CHUNK_HEIGHT;
 import static de.re.voxelgame.engine.chunk.Chunk.CHUNK_SIZE;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL15.*;
@@ -45,22 +44,23 @@ public final class ChunkLoader {
         int heightE = noise.voxelNoise2d(tx+1, tz);
         int heightW = noise.voxelNoise2d(tx-1, tz);
 
-        for (int y = 0; y < CHUNK_HEIGHT; y++) {
+        for (int y = 0; y < CHUNK_SIZE; y++) {
+          int ty = (int) (y + position.y * CHUNK_SIZE);
           Block block = new Block();
 
-          if (y == height) {
+          if (ty == height) {
             block.join(BlockFace.TOP);
           }
-          if (y > heightE && y <= height) {
+          if (ty > heightE && ty <= height) {
             block.join(0.8f, BlockFace.RIGHT);
           }
-          if (y > heightW && y <= height) {
+          if (ty > heightW && ty <= height) {
             block.join(0.8f, BlockFace.LEFT);
           }
-          if (y > heightN && y <= height) {
+          if (ty > heightN && ty <= height) {
             block.join(0.6f, BlockFace.BACK);
           }
-          if (y > heightS && y <= height) {
+          if (ty > heightS && ty <= height) {
             block.join(0.6f, BlockFace.FRONT);
           }
 
@@ -75,6 +75,10 @@ public final class ChunkLoader {
   }
 
   private static Chunk storeAndReturnChunk(List<Vertex> translatedVertices, Vector3f position) {
+    if (translatedVertices.size() == 0) {
+      return new Chunk(position, -1, -1);
+    }
+
     int[] vertexData = new int[translatedVertices.size()];
     for (int i = 0; i < translatedVertices.size(); i++) {
       Vertex v = translatedVertices.get(i);

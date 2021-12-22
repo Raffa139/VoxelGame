@@ -47,9 +47,12 @@ public class Application {
     OpenSimplexNoise noise = new OpenSimplexNoise(139L);
     List<Chunk> chunks = new ArrayList<>();
     int chunkCount = 20;
+    int chunkStacks = 4;
     for (int x = 0; x < chunkCount; x++) {
       for (int z = 0; z < chunkCount; z++) {
-        chunks.add(ChunkLoader.loadChunkNoise(new Vector3f(x, 0, z), noise));
+        for (int y = 0; y < chunkStacks; y++) {
+          chunks.add(ChunkLoader.loadChunkNoise(new Vector3f(x, y, z), noise));
+        }
       }
     }
 
@@ -73,16 +76,18 @@ public class Application {
       basicShader.setFloat("iTime", (float)glfwGetTime());
 
       for (Chunk chunk : chunks) {
-        Matrix4f model = new Matrix4f();
-        model.translate(
-            chunk.getPosition().x*Chunk.CHUNK_SIZE,
-            chunk.getPosition().y*Chunk.CHUNK_SIZE,
-            chunk.getPosition().z*Chunk.CHUNK_SIZE);
-        basicShader.setMatrix4("iModel", model);
+        if (chunk.containsVertices()) {
+          Matrix4f model = new Matrix4f();
+          model.translate(
+              chunk.getPosition().x * Chunk.CHUNK_SIZE,
+              chunk.getPosition().y * Chunk.CHUNK_SIZE,
+              chunk.getPosition().z * Chunk.CHUNK_SIZE);
+          basicShader.setMatrix4("iModel", model);
 
-        glBindVertexArray(chunk.getVaoId());
-        glDrawArrays(GL_TRIANGLES, 0, chunk.getVertexCount());
-        glBindVertexArray(0);
+          glBindVertexArray(chunk.getVaoId());
+          glDrawArrays(GL_TRIANGLES, 0, chunk.getVertexCount());
+          glBindVertexArray(0);
+        }
       }
 
       if (KeyListener.keyPressed(GLFW_KEY_ESCAPE)) {
