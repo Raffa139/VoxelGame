@@ -47,7 +47,7 @@ public class Application {
     OpenSimplexNoise noise = new OpenSimplexNoise(139L);
     List<Chunk> chunks = new ArrayList<>();
     int chunkCount = 20;
-    int chunkStacks = 4;
+    int chunkStacks = 6;
     for (int x = 0; x < chunkCount; x++) {
       for (int z = 0; z < chunkCount; z++) {
         for (int y = 0; y < chunkStacks; y++) {
@@ -58,7 +58,7 @@ public class Application {
 
     float lastPressed = 0.0f;
     while (!context.isCloseRequested()) {
-      glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+      glClearColor(0.2f, 0.6f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glEnable(GL_CULL_FACE);
       glEnable(GL_DEPTH_TEST);

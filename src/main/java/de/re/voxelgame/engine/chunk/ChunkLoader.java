@@ -46,9 +46,24 @@ public final class ChunkLoader {
 
         for (int y = 0; y < CHUNK_SIZE; y++) {
           int ty = (int) (y + position.y * CHUNK_SIZE);
-          Block block = new Block();
+          Block block = new Block(0);
 
-          if (ty == height) {
+          // Water level = 50
+          if (ty > 50 && ty <= 56) {
+            // Sand
+            block = new Block(1);
+          } else if (ty > 56 && ty <= 85) {
+            // Grass
+            block = new Block(2);
+          } else if (ty > 85 && ty <= 95) {
+            // Dirt
+            block = new Block(3);
+          } else if (ty > 95) {
+            // Stone
+            block = new Block(4);
+          }
+
+          if (ty == height || (ty == 50 && ty > height)) {
             block.join(BlockFace.TOP);
           }
           if (ty > heightE && ty <= height) {
@@ -93,7 +108,7 @@ public final class ChunkLoader {
       vertexData[i] = vertexData[i] | VERTEX_TEXTURE_INDICES.get(textureCoordIndex) << 12;
 
       // Push texture tile id (block-id) according to vertex data schematics
-      vertexData[i] = vertexData[i] | 1 << 3;
+      vertexData[i] = vertexData[i] | v.getBlockId() << 3;
 
       // Push light level according to vertex data schematics
       vertexData[i] = vertexData[i] | (int) (v.getLightLevel() * 5);

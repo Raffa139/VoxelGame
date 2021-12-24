@@ -7,17 +7,20 @@ public class Vertex {
 
   private final float lightLevel;
 
+  private final int blockId;
+
   public Vertex(float x, float y, float z) {
-    this(x, y, z, -1.0f);
+    this(x, y, z, -1.0f, -1);
   }
 
-  public Vertex(float x, float y, float z, float lightLevel) {
-    this(new Vector3f(x, y, z), lightLevel);
+  public Vertex(float x, float y, float z, float lightLevel, int blockId) {
+    this(new Vector3f(x, y, z), lightLevel, blockId);
   }
 
-  public Vertex(Vector3f position, float lightLevel) {
+  public Vertex(Vector3f position, float lightLevel, int blockId) {
     this.position = position;
     this.lightLevel = lightLevel;
+    this.blockId = blockId;
   }
 
   public Vector3f getPosition() {
@@ -26,5 +29,9 @@ public class Vertex {
 
   public float getLightLevel() {
     return lightLevel;
+  }
+
+  public int getBlockId() {
+    return blockId;
   }
 }
