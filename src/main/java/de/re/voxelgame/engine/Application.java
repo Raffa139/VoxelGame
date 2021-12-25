@@ -11,6 +11,8 @@ import org.lwjgl.Version;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,17 +58,22 @@ public class Application {
 
     Camera camera = new Camera(new Vector3f(0.0f, 10.0f, 0.0f));
 
-    OpenSimplexNoise noise = new OpenSimplexNoise(139L);
+    OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
     List<Chunk> chunks = new ArrayList<>();
     int chunkCount = 20;
     int chunkStacks = 6;
-    for (int x = 0; x < chunkCount; x++) {
+    /*for (int x = 0; x < chunkCount; x++) {
       for (int z = 0; z < chunkCount; z++) {
         for (int y = 0; y < chunkStacks; y++) {
           chunks.add(ChunkLoader.loadChunkNoise(new Vector3f(x, y, z), noise));
         }
       }
-    }
+    }*/
+
+    int x = 0;
+    int z = 0;
+    int y = 0;
+    float last = 0.0f;
 
     float lastPressed = 0.0f;
     while (!context.isCloseRequested()) {
@@ -86,6 +93,35 @@ public class Application {
       basicShader.setMatrix4("iView", view);
       basicShader.setMatrix4("iProjection", projection);
       basicShader.setFloat("iTime", (float)glfwGetTime());
+
+      float currentFrame = (float)glfwGetTime();
+      if ((currentFrame - last) >= 0.005f) {
+        last = currentFrame;
+
+        if (x < chunkCount) {
+          System.out.println("Chunk update");
+          System.out.println("X: " + x);
+          System.out.println("Z: " + z);
+          System.out.println("Y: " + y);
+
+          if (z < chunkCount) {
+            if (y < chunkStacks) {
+              chunks.add(ChunkLoader.loadChunkNoise(new Vector3f(x, y, z), noise));
+              y++;
+            }
+
+            if (y == chunkStacks) {
+              z++;
+              y = 0;
+            }
+          }
+
+          if (z == chunkCount) {
+            x++;
+            z = 0;
+          }
+        }
+      }
 
       for (Chunk chunk : chunks) {
         if (chunk.containsVertices()) {
@@ -114,7 +150,7 @@ public class Application {
 
       if (KeyListener.keyPressed(GLFW_KEY_I) && glfwGetTime() > lastPressed + 0.25f) {
         lastPressed = (float) glfwGetTime();
-        printDebugInfo(chunkCount);
+        System.out.println("Info");
       }
 
       camera.update(context.getDeltaTime());
@@ -123,15 +159,5 @@ public class Application {
     }
 
     basicShader.terminate();
-  }
-
-  private void printDebugInfo(int chunkCount) {
-    int totalChunks = chunkCount*chunkCount;
-    int totalChunkSize = Chunk.CHUNK_SIZE*Chunk.CHUNK_SIZE;
-
-    System.out.println("Chunks: " + totalChunks);
-    System.out.println("Chunk size: " + Chunk.CHUNK_SIZE);
-    System.out.println("Blocks/Chunk: " + totalChunkSize);
-    System.out.println("Blocks: " + totalChunks * totalChunkSize);
   }
 }
