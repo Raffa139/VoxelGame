@@ -51,7 +51,7 @@ public final class ChunkLoader {
           Voxel voxel = new Voxel(6);
 
           // Water level = 50
-          if (ty > 50 && ty <= 56) {
+          if (ty != 50 && (ty > 44 && ty <= 56)) {
             // Sand
             voxel = new Voxel(2);
           } else if (ty > 56 && ty <= 85) {
@@ -63,6 +63,9 @@ public final class ChunkLoader {
           } else if (ty > 90) {
             // Stone
             voxel = new Voxel(0);
+          } else if (ty <= 44) {
+            // Gravel
+            voxel = new Voxel(10);
           }
 
           if (ty == height || (ty == 50 && ty > height)) {

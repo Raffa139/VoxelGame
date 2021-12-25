@@ -52,7 +52,8 @@ public class Application {
         "textures/water.png",
         "textures/wood.png",
         "textures/leaves.png",
-        "textures/cactus_side.png"
+        "textures/cactus_side.png",
+        "textures/gravel.png"
     };
     TextureArray textureArray = new TextureArray(16, 16, textureFiles);
 
