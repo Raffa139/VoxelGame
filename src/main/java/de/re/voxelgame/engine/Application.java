@@ -40,7 +40,19 @@ public class Application {
     Shader basicShader = new Shader(vert.toPath(), frag.toPath());
 
     // Texture
-    Texture texture = new Texture("images/tex_atlas.png");
+    String[] textureFiles = {
+        "textures/cobblestone.png",
+        "textures/dirt.png",
+        "textures/sand.png",
+        "textures/grass_side.png",
+        "textures/grass.png",
+        "textures/missing.png",
+        "textures/water.png",
+        "textures/wood.png",
+        "textures/leaves.png",
+        "textures/cactus_side.png"
+    };
+    TextureArray textureArray = new TextureArray(16, 16, textureFiles);
 
     Camera camera = new Camera(new Vector3f(0.0f, 10.0f, 0.0f));
 
@@ -68,7 +80,7 @@ public class Application {
               .perspective((float) Math.toRadians(65.0f), 1080.0f / 720.0f, 0.01f, 1000.0f);
 
       glActiveTexture(GL_TEXTURE0);
-      glBindTexture(GL_TEXTURE_2D, texture.getId());
+      glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray.getId());
 
       basicShader.use();
       basicShader.setMatrix4("iView", view);
