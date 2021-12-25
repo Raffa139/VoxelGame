@@ -1,4 +1,4 @@
-package de.re.voxelgame.engine.chunk;
+package de.re.voxelgame.engine.world;
 
 import org.joml.Vector3f;
 

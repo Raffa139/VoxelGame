@@ -1,8 +1,8 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
-import de.re.voxelgame.engine.chunk.Chunk;
-import de.re.voxelgame.engine.chunk.ChunkLoader;
+import de.re.voxelgame.engine.world.Chunk;
+import de.re.voxelgame.engine.world.ChunkLoader;
 import de.re.voxelgame.core.util.ResourceLoader;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
 import org.joml.Matrix4f;
