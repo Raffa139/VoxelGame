@@ -9,7 +9,7 @@ uniform vec3 iColor;
 uniform sampler2DArray sampler;
 
 void main() {
-    vec3 textureCoords = vec3(Texs.xy, Texs.w);
+    vec3 textureCoords = vec3(Texs.xyw);
 
     vec3 color;
     if (Texs.w == 6) {

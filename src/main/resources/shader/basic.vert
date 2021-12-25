@@ -23,8 +23,8 @@ void main() {
     gl_Position = iProjection * iView * iModel * vec4(x, y, z, 1.0);
 
     uint texIndex = uint((iVertexData & 0x3u << 12) >> 12);
-    float texTile = float((iVertexData & 0x1FFu << 3) >> 3);
+    float texLayer = float((iVertexData & 0x1FFu << 3) >> 3);
     float lightLevel = float(iVertexData & 0x7u) / 5.0f;
 
-    Texs = vec4(texCoords[texIndex], lightLevel, texTile);
+    Texs = vec4(texCoords[texIndex], lightLevel, texLayer);
 }

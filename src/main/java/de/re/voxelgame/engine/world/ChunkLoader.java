@@ -3,6 +3,7 @@ package de.re.voxelgame.engine.world;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
 import de.re.voxelgame.engine.voxel.Voxel;
 import de.re.voxelgame.engine.voxel.VoxelFace;
+import de.re.voxelgame.engine.voxel.VoxelType;
 import de.re.voxelgame.engine.voxel.VoxelVertex;
 import org.joml.Vector3f;
 
@@ -48,24 +49,24 @@ public final class ChunkLoader {
 
         for (int y = 0; y < CHUNK_SIZE; y++) {
           int ty = (int) (y + position.y * CHUNK_SIZE);
-          Voxel voxel = new Voxel(6);
+          Voxel voxel = new Voxel(VoxelType.WATER);
 
           // Water level = 50
           if (ty != 50 && (ty > 44 && ty <= 56)) {
             // Sand
-            voxel = new Voxel(2);
+            voxel = new Voxel(VoxelType.SAND);
           } else if (ty > 56 && ty <= 85) {
             // Grass
-            voxel = new Voxel(4);
+            voxel = new Voxel(VoxelType.GRASS);
           } else if (ty > 85 && ty <= 90) {
             // Dirt
-            voxel = new Voxel(1);
+            voxel = new Voxel(VoxelType.DIRT);
           } else if (ty > 90) {
             // Stone
-            voxel = new Voxel(0);
+            voxel = new Voxel(VoxelType.COBBLESTONE);
           } else if (ty <= 44) {
             // Gravel
-            voxel = new Voxel(10);
+            voxel = new Voxel(VoxelType.GRAVEL);
           }
 
           if (ty == height || (ty == 50 && ty > height)) {
@@ -113,7 +114,7 @@ public final class ChunkLoader {
       vertexData[i] = vertexData[i] | VERTEX_TEXTURE_INDICES.get(textureCoordIndex) << 12;
 
       // Push texture tile id (voxel-type) according to vertex data schematics
-      vertexData[i] = vertexData[i] | v.getType() << 3;
+      vertexData[i] = vertexData[i] | v.getTextureLayer() << 3;
 
       // Push light level according to vertex data schematics
       vertexData[i] = vertexData[i] | (int) (v.getLightLevel() * 5);

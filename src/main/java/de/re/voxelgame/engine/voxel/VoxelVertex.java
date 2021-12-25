@@ -7,20 +7,20 @@ public class VoxelVertex {
 
   private final float lightLevel;
 
-  private final int type;
+  private final int textureLayer;
 
   public VoxelVertex(float x, float y, float z) {
     this(x, y, z, -1.0f, -1);
   }
 
-  public VoxelVertex(float x, float y, float z, float lightLevel, int type) {
-    this(new Vector3f(x, y, z), lightLevel, type);
+  public VoxelVertex(float x, float y, float z, float lightLevel, int textureLayer) {
+    this(new Vector3f(x, y, z), lightLevel, textureLayer);
   }
 
-  public VoxelVertex(Vector3f position, float lightLevel, int type) {
+  public VoxelVertex(Vector3f position, float lightLevel, int textureLayer) {
     this.position = position;
     this.lightLevel = lightLevel;
-    this.type = type;
+    this.textureLayer = textureLayer;
   }
 
   public Vector3f getPosition() {
@@ -31,7 +31,7 @@ public class VoxelVertex {
     return lightLevel;
   }
 
-  public int getType() {
-    return type;
+  public int getTextureLayer() {
+    return textureLayer;
   }
 }

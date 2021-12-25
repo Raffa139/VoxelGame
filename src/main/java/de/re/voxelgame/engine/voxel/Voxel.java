@@ -9,14 +9,14 @@ import java.util.stream.Collectors;
 public class Voxel {
   private final List<VoxelFace> voxelFaces;
 
-  private final int type;
+  private final VoxelType type;
 
-  public Voxel(int type, VoxelFace... faces) {
+  public Voxel(VoxelType type, VoxelFace... faces) {
     this(type);
     voxelFaces.addAll(Arrays.asList(faces));
   }
 
-  public Voxel(int type) {
+  public Voxel(VoxelType type) {
     voxelFaces = new ArrayList<>();
     this.type = type;
   }
@@ -34,7 +34,7 @@ public class Voxel {
   public Voxel translate(float x, float y, float z) {
     Voxel voxel = new Voxel(type);
     for (VoxelFace face : voxelFaces) {
-      voxel.join(face.translate(x, y, z, type));
+      voxel.join(face.translate(x, y, z, textureLayer(face)));
     }
     return voxel;
   }
@@ -48,5 +48,24 @@ public class Voxel {
         .map(VoxelFace::getVertices)
         .flatMap(Collection::stream)
         .collect(Collectors.toList());
+  }
+
+  private int textureLayer(VoxelFace face) {
+    switch (face.getOrientation()) {
+      case NORTH:
+        return type.getNorthernTextureTile();
+      case EAST:
+        return type.getEasternTextureTile();
+      case SOUTH:
+        return type.getSouthernTextureTile();
+      case WEST:
+        return type.getWesternTextureTile();
+      case TOP:
+        return type.getTopTextureTile();
+      case BOTTOM:
+        return type.getBottomTextureTile();
+      default:
+        throw new IllegalStateException("Unable to compute face orientation");
+    }
   }
 }
