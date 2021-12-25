@@ -9,12 +9,24 @@ uniform vec3 iColor;
 uniform sampler2D sampler;
 
 void main() {
-    vec3 col = vec3(1.0);
-    if (Texs.w == 0) col = vec3(0.0, 0.0, 1.0);
-    if (Texs.w == 1) col = vec3(1.0, 1.0, 1.0);
-    if (Texs.w == 2) col = texture(sampler, Texs.xy).rgb;
-    if (Texs.w == 3) col = vec3(1.0, 0.0, 0.0);
-    if (Texs.w == 4) col = vec3(0.5, 0.5, 0.5);
+    int texIndex = int(Texs.w);
 
-    FragColor = vec4(col, 1.0) * Texs.z;
+    int col = texIndex % 4;
+    float offX = float(col) / 4.0;
+
+    int row = texIndex / 4;
+    float offY = float(row) / 4.0;
+
+    vec2 coords = Texs.xy / 4.0;
+    coords.x += offX;
+    coords.y += offY;
+
+    vec3 color;
+    if (Texs.w == 6) {
+        color = vec3(0.1, 0.2, 0.7);
+    } else {
+        color = texture(sampler, coords).rgb;
+    }
+
+    FragColor = vec4(color, 1.0) * Texs.z;
 }

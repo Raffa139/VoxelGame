@@ -46,21 +46,21 @@ public final class ChunkLoader {
 
         for (int y = 0; y < CHUNK_SIZE; y++) {
           int ty = (int) (y + position.y * CHUNK_SIZE);
-          Block block = new Block(0);
+          Block block = new Block(6);
 
           // Water level = 50
           if (ty > 50 && ty <= 56) {
             // Sand
-            block = new Block(1);
+            block = new Block(2);
           } else if (ty > 56 && ty <= 85) {
             // Grass
-            block = new Block(2);
-          } else if (ty > 85 && ty <= 95) {
-            // Dirt
-            block = new Block(3);
-          } else if (ty > 95) {
-            // Stone
             block = new Block(4);
+          } else if (ty > 85 && ty <= 90) {
+            // Dirt
+            block = new Block(1);
+          } else if (ty > 90) {
+            // Stone
+            block = new Block(0);
           }
 
           if (ty == height || (ty == 50 && ty > height)) {

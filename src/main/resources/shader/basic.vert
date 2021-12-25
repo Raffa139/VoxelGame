@@ -9,9 +9,9 @@ uniform mat4 iProjection;
 out vec4 Texs;
 
 vec2 texCoords[4] = vec2[4](
-    vec2(0.5f, 0.0f),
-    vec2(0.5f, 0.5f),
-    vec2(0.0f, 0.5f),
+    vec2(1.0f, 0.0f),
+    vec2(1.0f, 1.0f),
+    vec2(0.0f, 1.0f),
     vec2(0.0f, 0.0f)
 );
 

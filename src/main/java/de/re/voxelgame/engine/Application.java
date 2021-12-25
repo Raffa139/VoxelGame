@@ -40,7 +40,7 @@ public class Application {
     Shader basicShader = new Shader(vert.toPath(), frag.toPath());
 
     // Texture
-    Texture texture = new Texture("images/grass.png");
+    Texture texture = new Texture("images/tex_atlas.png");
 
     Camera camera = new Camera(new Vector3f(0.0f, 10.0f, 0.0f));
 
