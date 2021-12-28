@@ -25,10 +25,11 @@ public class Camera {
     this.yaw = -90.0f;
   }
 
-  public void update (float deltaTime) {
+  public void update (float deltaTime, boolean allowTurn) {
     float speed = 0.075f;
-    turn(MouseListener.getLastPosX() * speed, MouseListener.getLastPosY() * speed);
-
+    if (allowTurn) {
+      turn(MouseListener.getLastPosX() * speed, MouseListener.getLastPosY() * speed);
+    }
     move(deltaTime);
   }
 
@@ -38,6 +39,10 @@ public class Camera {
 
   public Vector3f getPos() {
     return pos;
+  }
+
+  public Vector3f getFront() {
+    return front;
   }
 
   public float getPitch() {

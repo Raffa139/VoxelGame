@@ -18,5 +18,7 @@ void main() {
         color = texture(sampler, textureCoords).rgb;
     }
 
+    color += iColor;
+
     FragColor = vec4(color, 1.0) * Texs.z;
 }
