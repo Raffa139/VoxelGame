@@ -16,10 +16,12 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 public class GLContext {
   private final long window;
 
-  int frames;
-  float deltaTime;
-  float lastFrame;
-  float last;
+  private int frames;
+  private float deltaTime;
+  private float lastFrame;
+  private float last;
+
+  private boolean mouseCursorToggled = false;
 
   public GLContext(int width, int height, String title) {
     // Setup error callback. Default implementation will print error messages in System.err
@@ -103,6 +105,19 @@ public class GLContext {
 
   public void requestClose() {
     glfwSetWindowShouldClose(window, true);
+  }
+
+  public void toggleMouseCursor() {
+    if (!mouseCursorToggled) {
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    } else {
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+    mouseCursorToggled = !mouseCursorToggled;
+  }
+
+  public boolean isMouseCursorToggled() {
+    return mouseCursorToggled;
   }
 
   public void terminate() {
