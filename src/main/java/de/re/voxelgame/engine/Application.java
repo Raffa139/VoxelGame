@@ -1,13 +1,15 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
+import de.re.voxelgame.engine.intersection.AABB;
+import de.re.voxelgame.engine.intersection.Ray;
+import de.re.voxelgame.engine.intersection.RayCaster;
 import de.re.voxelgame.engine.world.Chunk;
 import de.re.voxelgame.engine.world.ChunkLoader;
 import de.re.voxelgame.core.util.ResourceLoader;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.lwjgl.Version;
 
 import java.io.IOException;
@@ -17,8 +19,6 @@ import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.List;
 
-import static de.re.voxelgame.core.util.Vectors.*;
-import static de.re.voxelgame.engine.world.Chunk.CHUNK_SIZE;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
@@ -116,30 +116,6 @@ public class Application {
       chunkShader.setMatrix4("iProjection", projection);
       chunkShader.setFloat("iTime", (float)glfwGetTime());
 
-      // Mouse picking
-      // https://gist.github.com/DomNomNom/46bb1ce47f68d255fd5d
-      // (https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter23/chapter23.html)
-      float rx = (float) ((2.0 * MouseListener.getLastPosX()) / 1080.0 - 1.0f);
-      float ry = (float) ((2.0 * MouseListener.getLastPosY()) / 720.0 - 1.0f);
-      float rz = 1.0f;
-      Matrix4f inverseView = view.invert(new Matrix4f());
-      Matrix4f inverseProjection = projection.invert(new Matrix4f());
-
-      // Ray in normalized device coords
-      Vector3f rNdc = new Vector3f(rx, -ry, rz);
-      //Vector3f rNdc = camera.getFront();
-
-      // Ray in projected space
-      Vector4f rClip = new Vector4f(rNdc.x, rNdc.y, -1.0f, 1.0f);
-
-      // Ray in view space
-      Vector4f rView = rClip.mul(inverseProjection, new Vector4f());
-      rView = new Vector4f(rView.x, rView.y, -1.0f, 0.0f); // (only x/y needed to 'un-project')
-
-      // Ray in world space
-      Vector4f rWorld = rView.mul(inverseView, new Vector4f());
-      Vector3f ray = new Vector3f(rWorld.x, rWorld.y, rWorld.z).normalize();
-
       float currentFrame = (float)glfwGetTime();
       if ((currentFrame - last) >= 0.0001f) {
         last = currentFrame;
@@ -169,36 +145,12 @@ public class Application {
         }
       }
 
+      Ray ray = RayCaster.fromCamera(camera);
       Vector3f intersectionPos = null;
       for (Chunk chunk : chunks) {
         if (chunk.containsVertices()) {
-          Vector3f chunkWorldPos = new Vector3f(
-              chunk.getPosition().x * CHUNK_SIZE,
-              chunk.getPosition().y * CHUNK_SIZE,
-              chunk.getPosition().z * CHUNK_SIZE
-          );
-          Vector3f boxMin = new Vector3f(
-              chunkWorldPos.x,
-              chunkWorldPos.y,
-              chunkWorldPos.z
-          );
-          Vector3f boxMax = new Vector3f(
-              chunkWorldPos.x + (CHUNK_SIZE - 1),
-              chunkWorldPos.y + (CHUNK_SIZE - 1),
-              chunkWorldPos.z + (CHUNK_SIZE - 1)
-          );
-
-          Vector3f ro = camera.getPos();
-          Vector3f rd = camera.getFront().normalize();
-
-          Vector3f tMin = div(sub(boxMin, ro), rd);
-          Vector3f tMax = div(sub(boxMax, ro), rd);
-          Vector3f t1 = min(tMin, tMax);
-          Vector3f t2 = max(tMin, tMax);
-          float tNear = Math.max(Math.max(t1.x, t1.y), t1.z);
-          float tFar = Math.min(Math.min(t2.x, t2.y), t2.z);
-          boolean intersects = tNear < tFar;
-          //Vector2f intersection = new Vector2f(tNear, tFar);
+          AABB chunkBounding = chunk.getBoundingBox();
+          boolean intersects = ray.intersectsAABB(chunkBounding);
 
           if (intersects) {
             intersectionPos = chunk.getPosition();
@@ -210,10 +162,7 @@ public class Application {
       for (Chunk chunk : chunks) {
         if (chunk.containsVertices()) {
           Matrix4f model = new Matrix4f();
-          model.translate(
-              chunk.getPosition().x * CHUNK_SIZE,
-              chunk.getPosition().y * CHUNK_SIZE,
-              chunk.getPosition().z * CHUNK_SIZE);
+          model.translate(chunk.getWorldPosition());
           chunkShader.setMatrix4("iModel", model);
 
           if (chunk.getPosition().equals(intersectionPos)) {
