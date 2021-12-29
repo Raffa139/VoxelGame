@@ -40,9 +40,34 @@ public class Application {
 
   private void loop(GLContext context) throws IOException, URISyntaxException {
     // Shader
-    ResourceLoader.Resource vert = ResourceLoader.locateResource("shader/basic.vert", Application.class);
-    ResourceLoader.Resource frag = ResourceLoader.locateResource("shader/basic.frag", Application.class);
-    Shader basicShader = new Shader(vert.toPath(), frag.toPath());
+    ResourceLoader.Resource chunkVert = ResourceLoader.locateResource("shader/chunk.vert", Application.class);
+    ResourceLoader.Resource chunkFrag = ResourceLoader.locateResource("shader/chunk.frag", Application.class);
+    Shader chunkShader = new Shader(chunkVert.toPath(), chunkFrag.toPath());
+
+    ResourceLoader.Resource hudVert = ResourceLoader.locateResource("shader/basicHud.vert", Application.class);
+    ResourceLoader.Resource hudFrag = ResourceLoader.locateResource("shader/basicHud.frag", Application.class);
+    Shader hudShader = new Shader(hudVert.toPath(), hudFrag.toPath());
+
+    // Cross-hair
+    float[] crossHairVertices = {
+        -0.5f,  0.05f, 0.0f,
+        -0.5f, -0.05f, 0.0f,
+         0.5f, -0.05f, 0.0f,
+         0.5f, -0.05f, 0.0f,
+         0.5f,  0.05f, 0.0f,
+        -0.5f,  0.05f, 0.0f
+    };
+
+    int crossHairVao = glGenVertexArrays();
+    glBindVertexArray(crossHairVao);
+
+    int crossHairVbo = glGenBuffers();
+    glBindBuffer(GL_ARRAY_BUFFER, crossHairVbo);
+    glBufferData(GL_ARRAY_BUFFER, crossHairVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * 4, 0L);
+
+    glBindVertexArray(0);
 
     // Texture
     String[] textureFiles = {
@@ -86,10 +111,10 @@ public class Application {
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray.getId());
 
-      basicShader.use();
-      basicShader.setMatrix4("iView", view);
-      basicShader.setMatrix4("iProjection", projection);
-      basicShader.setFloat("iTime", (float)glfwGetTime());
+      chunkShader.use();
+      chunkShader.setMatrix4("iView", view);
+      chunkShader.setMatrix4("iProjection", projection);
+      chunkShader.setFloat("iTime", (float)glfwGetTime());
 
       // Mouse picking
       // https://gist.github.com/DomNomNom/46bb1ce47f68d255fd5d
@@ -164,7 +189,7 @@ public class Application {
           );
 
           Vector3f ro = camera.getPos();
-          Vector3f rd = ray;
+          Vector3f rd = camera.getFront().normalize();
 
           Vector3f tMin = div(sub(boxMin, ro), rd);
           Vector3f tMax = div(sub(boxMax, ro), rd);
@@ -189,12 +214,12 @@ public class Application {
               chunk.getPosition().x * CHUNK_SIZE,
               chunk.getPosition().y * CHUNK_SIZE,
               chunk.getPosition().z * CHUNK_SIZE);
-          basicShader.setMatrix4("iModel", model);
+          chunkShader.setMatrix4("iModel", model);
 
           if (chunk.getPosition().equals(intersectionPos)) {
-            basicShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
+            chunkShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
           } else {
-            basicShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.0f));
+            chunkShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.0f));
           }
 
           glBindVertexArray(chunk.getVaoId());
@@ -202,6 +227,18 @@ public class Application {
           glBindVertexArray(0);
         }
       }
+
+      hudShader.use();
+      hudShader.setMatrix4("iModel", new Matrix4f().scale(0.05f));
+
+      glBindVertexArray(crossHairVao);
+      glDrawArrays(GL_TRIANGLES, 0, crossHairVertices.length);
+
+      hudShader.setMatrix4("iModel", new Matrix4f()
+          .rotate((float) Math.toRadians(90.0), new Vector3f(0.0f, 0.0f, 1.0f))
+          .scale(0.05f));
+      glDrawArrays(GL_TRIANGLES, 0, crossHairVertices.length);
+      glBindVertexArray(0);
 
       if (KeyListener.keyPressed(GLFW_KEY_ESCAPE)) {
         context.requestClose();
@@ -223,6 +260,7 @@ public class Application {
       context.update();
     }
 
-    basicShader.terminate();
+    chunkShader.terminate();
+    hudShader.terminate();
   }
 }
