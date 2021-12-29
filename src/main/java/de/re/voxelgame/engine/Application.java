@@ -92,6 +92,8 @@ public class Application {
       basicShader.setFloat("iTime", (float)glfwGetTime());
 
       // Mouse picking
+      // https://gist.github.com/DomNomNom/46bb1ce47f68d255fd5d
+      // (https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter23/chapter23.html)
       float rx = (float) ((2.0 * MouseListener.getLastPosX()) / 1080.0 - 1.0f);
       float ry = (float) ((2.0 * MouseListener.getLastPosY()) / 720.0 - 1.0f);
       float rz = 1.0f;
@@ -142,15 +144,9 @@ public class Application {
         }
       }
 
+      Vector3f intersectionPos = null;
       for (Chunk chunk : chunks) {
         if (chunk.containsVertices()) {
-          Matrix4f model = new Matrix4f();
-          model.translate(
-              chunk.getPosition().x * CHUNK_SIZE,
-              chunk.getPosition().y * CHUNK_SIZE,
-              chunk.getPosition().z * CHUNK_SIZE);
-          basicShader.setMatrix4("iModel", model);
-
           Vector3f chunkWorldPos = new Vector3f(
               chunk.getPosition().x * CHUNK_SIZE,
               chunk.getPosition().y * CHUNK_SIZE,
@@ -162,9 +158,9 @@ public class Application {
               chunkWorldPos.z
           );
           Vector3f boxMax = new Vector3f(
-              chunkWorldPos.x + (CHUNK_SIZE-1),
-              chunkWorldPos.y + (CHUNK_SIZE-1),
-              chunkWorldPos.z + (CHUNK_SIZE-1)
+              chunkWorldPos.x + (CHUNK_SIZE - 1),
+              chunkWorldPos.y + (CHUNK_SIZE - 1),
+              chunkWorldPos.z + (CHUNK_SIZE - 1)
           );
 
           Vector3f ro = camera.getPos();
@@ -180,6 +176,22 @@ public class Application {
           //Vector2f intersection = new Vector2f(tNear, tFar);
 
           if (intersects) {
+            intersectionPos = chunk.getPosition();
+            break;
+          }
+        }
+      }
+
+      for (Chunk chunk : chunks) {
+        if (chunk.containsVertices()) {
+          Matrix4f model = new Matrix4f();
+          model.translate(
+              chunk.getPosition().x * CHUNK_SIZE,
+              chunk.getPosition().y * CHUNK_SIZE,
+              chunk.getPosition().z * CHUNK_SIZE);
+          basicShader.setMatrix4("iModel", model);
+
+          if (chunk.getPosition().equals(intersectionPos)) {
             basicShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
           } else {
             basicShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.0f));
