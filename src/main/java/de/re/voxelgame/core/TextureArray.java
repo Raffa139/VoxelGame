@@ -45,6 +45,10 @@ public class TextureArray {
     glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
   }
 
+  public void cleanup() {
+    glDeleteTextures(id);
+  }
+
   public int getId() {
     return id;
   }

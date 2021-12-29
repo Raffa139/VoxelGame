@@ -56,16 +56,12 @@ public class Application {
         -0.5f,  0.05f, 0.0f
     };
 
-    int crossHairVao = glGenVertexArrays();
-    glBindVertexArray(crossHairVao);
-
-    int crossHairVbo = glGenBuffers();
-    glBindBuffer(GL_ARRAY_BUFFER, crossHairVbo);
-    glBufferData(GL_ARRAY_BUFFER, crossHairVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * 4, 0L);
-
-    glBindVertexArray(0);
+    int crossHairVao = MemoryManager
+        .allocateVao()
+        .bufferData(crossHairVertices, GL_STATIC_DRAW)
+        .enableAttribArray(0)
+        .attribPointer(0, 3, GL_FLOAT, false, 3 * 4, 0L)
+        .doFinal();
 
     // Texture
     String[] textureFiles = {
@@ -175,6 +171,7 @@ public class Application {
       context.update();
     }
 
+    textureArray.cleanup();
     chunkShader.terminate();
     hudShader.terminate();
   }

@@ -1,5 +1,6 @@
 package de.re.voxelgame.engine.world;
 
+import de.re.voxelgame.core.MemoryManager;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
 import de.re.voxelgame.engine.voxel.Voxel;
 import de.re.voxelgame.engine.voxel.VoxelFace;
@@ -13,12 +14,7 @@ import java.util.Map;
 
 import static de.re.voxelgame.engine.world.Chunk.CHUNK_SIZE;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public final class ChunkLoader {
   private static final Map<Integer, Integer> VERTEX_TEXTURE_INDICES = Map.of(
@@ -120,20 +116,13 @@ public final class ChunkLoader {
       vertexData[i] = vertexData[i] | (int) (v.getLightLevel() * 5);
     }
 
-    int vertexCount = vertexData.length;
+    int vaoId = MemoryManager
+        .allocateVao()
+        .bufferData(vertexData, GL_STATIC_DRAW)
+        .enableAttribArray(0)
+        .attribPointer(0, 1, GL_FLOAT, false, 4, 0L)
+        .doFinal();
 
-    int vaoId = glGenVertexArrays();
-    glBindVertexArray(vaoId);
-
-    int vbo = glGenBuffers();
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertexData, GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 1, GL_FLOAT, false, 4, 0L);
-
-    glBindVertexArray(0);
-
-    return new Chunk(position, vaoId, vertexCount);
+    return new Chunk(position, vaoId, vertexData.length);
   }
 }

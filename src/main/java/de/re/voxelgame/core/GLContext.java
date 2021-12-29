@@ -121,6 +121,8 @@ public class GLContext {
   }
 
   public void terminate() {
+    MemoryManager.terminate();
+
     glfwFreeCallbacks(window);
     glfwDestroyWindow(window);
 
