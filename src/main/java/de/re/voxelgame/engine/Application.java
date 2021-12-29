@@ -5,9 +5,9 @@ import de.re.voxelgame.engine.intersection.AABB;
 import de.re.voxelgame.engine.intersection.Ray;
 import de.re.voxelgame.engine.intersection.RayCaster;
 import de.re.voxelgame.engine.world.Chunk;
-import de.re.voxelgame.engine.world.ChunkLoader;
 import de.re.voxelgame.core.util.ResourceLoader;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
+import de.re.voxelgame.engine.world.ChunkManager;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.Version;
@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -88,14 +86,7 @@ public class Application {
     Camera camera = new Camera(new Vector3f(0.0f, 10.0f, 0.0f));
 
     OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
-    List<Chunk> chunks = new ArrayList<>();
-    int chunkCount = 20;
-    int chunkStacks = 6;
-
-    int x = 0;
-    int z = 0;
-    int y = 0;
-    float last = 0.0f;
+    ChunkManager chunkManager = new ChunkManager(noise);
 
     float lastPressed = 0.0f;
     while (!context.isCloseRequested()) {
@@ -111,43 +102,18 @@ public class Application {
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray.getId());
 
+      float currentFrameTime = (float) glfwGetTime();
+
       chunkShader.use();
       chunkShader.setMatrix4("iView", view);
       chunkShader.setMatrix4("iProjection", projection);
-      chunkShader.setFloat("iTime", (float)glfwGetTime());
+      chunkShader.setFloat("iTime", currentFrameTime);
 
-      float currentFrame = (float)glfwGetTime();
-      if ((currentFrame - last) >= 0.0001f) {
-        last = currentFrame;
-
-        if (x < chunkCount) {
-          System.out.println("Chunk update");
-          System.out.println("X: " + x);
-          System.out.println("Z: " + z);
-          System.out.println("Y: " + y);
-
-          if (z < chunkCount) {
-            if (y < chunkStacks) {
-              chunks.add(ChunkLoader.loadChunkNoise(new Vector3f(x, y, z), noise));
-              y++;
-            }
-
-            if (y == chunkStacks) {
-              z++;
-              y = 0;
-            }
-          }
-
-          if (z == chunkCount) {
-            x++;
-            z = 0;
-          }
-        }
-      }
+      chunkManager.update(currentFrameTime, 0.0001f);
 
       Ray ray = RayCaster.fromCamera(camera);
       Vector3f intersectionPos = null;
-      for (Chunk chunk : chunks) {
+      for (Chunk chunk : chunkManager.getChunks()) {
         if (chunk.containsVertices()) {
           AABB chunkBounding = chunk.getBoundingBox();
           boolean intersects = ray.intersectsAABB(chunkBounding);
@@ -159,7 +125,7 @@ public class Application {
         }
       }
 
-      for (Chunk chunk : chunks) {
+      for (Chunk chunk : chunkManager.getChunks()) {
         if (chunk.containsVertices()) {
           Matrix4f model = new Matrix4f();
           model.translate(chunk.getWorldPosition());
@@ -199,8 +165,8 @@ public class Application {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       }
 
-      if (KeyListener.keyPressed(GLFW_KEY_E) && glfwGetTime() > lastPressed + 0.25f) {
-        lastPressed = (float) glfwGetTime();
+      if (KeyListener.keyPressed(GLFW_KEY_E) && currentFrameTime > lastPressed + 0.25f) {
+        lastPressed = currentFrameTime;
         context.toggleMouseCursor();
       }
 
