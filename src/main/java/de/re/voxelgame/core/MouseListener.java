@@ -12,6 +12,8 @@ public final class MouseListener {
   private static double scrollOffsetX;
   private static double scrollOffsetY;
 
+  private static boolean mouseMoved = false;
+
   private MouseListener() {
   }
 
@@ -35,9 +37,14 @@ public final class MouseListener {
     return BUTTONS[button];
   }
 
+  public static boolean hasMouseMoved() {
+    return mouseMoved;
+  }
+
   static void cursorPosCallback(long window, double xPos, double yPos) {
     lastPosX = xPos;
     lastPosY = yPos;
+    mouseMoved = true;
   }
 
   static void mouseButtonCallback(long window, int button, int action, int mods) {

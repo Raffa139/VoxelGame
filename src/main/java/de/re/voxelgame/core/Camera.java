@@ -22,14 +22,24 @@ public class Camera {
     this.up = new Vector3f(0.0f, 1.0f, 0.0f);
     this.front = new Vector3f(0.0f, 0.0f, 0.0f);
     this.pitch = 0.0f;
-    this.yaw = -90.0f;
+    this.yaw = 0.0f;
   }
 
-  public void update (float deltaTime, boolean allowTurn) {
+  public void update(float deltaTime, boolean allowTurn) {
     float speed = 0.075f;
-    if (allowTurn) {
-      turn(MouseListener.getLastPosX() * speed, MouseListener.getLastPosY() * speed);
+
+    double xCurrent = MouseListener.getLastPosX() * speed;
+    double yCurrent = MouseListener.getLastPosY() * speed;
+    if (!MouseListener.hasMouseMoved()) {
+      lastPosX = (float) xCurrent;
+      lastPosY = (float) yCurrent;
     }
+    if (allowTurn) {
+      turn(xCurrent, yCurrent);
+    }
+    lastPosX = (float) xCurrent;
+    lastPosY = (float) yCurrent;
+
     move(deltaTime);
   }
 
@@ -56,8 +66,6 @@ public class Camera {
   private void turn(double xCurrent, double yCurrent) {
     float xOffset = (float) (xCurrent - lastPosX);
     float yOffset = (float) (lastPosY - yCurrent);
-    lastPosX = (float) xCurrent;
-    lastPosY = (float) yCurrent;
 
     yaw += xOffset;
     pitch += yOffset;
