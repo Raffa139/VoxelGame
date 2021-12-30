@@ -1,9 +1,6 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
-import de.re.voxelgame.engine.intersection.AABB;
-import de.re.voxelgame.engine.intersection.Ray;
-import de.re.voxelgame.engine.intersection.RayCaster;
 import de.re.voxelgame.engine.world.Chunk;
 import de.re.voxelgame.core.util.ResourceLoader;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
@@ -79,7 +76,7 @@ public class Application {
     };
     TextureArray textureArray = new TextureArray(16, 16, textureFiles);
 
-    Camera camera = new Camera(new Vector3f(0.0f, 10.0f, 0.0f));
+    DebugCamera camera = new DebugCamera(new Vector3f(0.0f, 10.0f, 0.0f));
 
     OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
     ChunkManager chunkManager = new ChunkManager(noise);
@@ -107,27 +104,13 @@ public class Application {
 
       chunkManager.update(currentFrameTime, 0.0001f);
 
-      Ray ray = RayCaster.fromCamera(camera);
-      Vector3f intersectionPos = null;
-      for (Chunk chunk : chunkManager.getChunks()) {
-        if (chunk.containsVertices()) {
-          AABB chunkBounding = chunk.getBoundingBox();
-          boolean intersects = ray.intersectsAABB(chunkBounding);
-
-          if (intersects) {
-            intersectionPos = chunk.getPosition();
-            break;
-          }
-        }
-      }
-
       for (Chunk chunk : chunkManager.getChunks()) {
         if (chunk.containsVertices()) {
           Matrix4f model = new Matrix4f();
           model.translate(chunk.getWorldPosition());
           chunkShader.setMatrix4("iModel", model);
 
-          if (chunk.getPosition().equals(intersectionPos)) {
+          if (chunk.getPosition().equals(camera.getPositionOfCurrentChunk())) {
             chunkShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
           } else {
             chunkShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.0f));
@@ -164,6 +147,10 @@ public class Application {
       if (KeyListener.keyPressed(GLFW_KEY_E) && currentFrameTime > lastPressed + 0.25f) {
         lastPressed = currentFrameTime;
         context.toggleMouseCursor();
+        System.out.println(
+            "X: " + camera.getPositionInCurrentChunk().x +
+          ", Y: " + camera.getPositionInCurrentChunk().y +
+          ", Z: " + camera.getPositionInCurrentChunk().z);
       }
 
       camera.update(context.getDeltaTime(), !context.isMouseCursorToggled());
