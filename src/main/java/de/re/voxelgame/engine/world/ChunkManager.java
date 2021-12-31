@@ -3,8 +3,7 @@ package de.re.voxelgame.engine.world;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ChunkManager {
   // Keeps track of chunks & their positions
@@ -14,7 +13,7 @@ public class ChunkManager {
   private static final int CHUNK_COUNT = 20;
   private static final int CHUNK_STACKS = 6;
 
-  private final List<Chunk> chunks;
+  private final Map<Vector3f, Chunk> chunks;
 
   private final OpenSimplexNoise noise;
 
@@ -25,7 +24,7 @@ public class ChunkManager {
   private float lastUpdateTime;
 
   public ChunkManager(OpenSimplexNoise noise) {
-    this.chunks = new ArrayList<>();
+    this.chunks = new HashMap<>();
     this.noise = noise;
     this.x = 0;
     this.z = 0;
@@ -40,7 +39,8 @@ public class ChunkManager {
       if (x < CHUNK_COUNT) {
         if (z < CHUNK_COUNT) {
           if (y < CHUNK_STACKS) {
-            chunks.add(ChunkLoader.loadChunkNoise(new Vector3f(x, y, z), noise));
+            Vector3f position = new Vector3f(x, y, z);
+            chunks.put(position, ChunkLoader.loadChunkNoise(position, noise, null));
             y++;
           }
 
@@ -58,7 +58,16 @@ public class ChunkManager {
     }
   }
 
-  public List<Chunk> getChunks() {
+  public void reloadChunk(Vector3f position, Vector3f voxelPosition) {
+    Vector3f vPos = new Vector3f(voxelPosition.x, voxelPosition.y-2.0f, voxelPosition.z);
+    chunks.put(position, ChunkLoader.loadChunkNoise(position, noise, vPos));
+  }
+
+  public Map<Vector3f, Chunk> getChunkPositionMap() {
     return chunks;
+  }
+
+  public Collection<Chunk> getChunks() {
+    return chunks.values();
   }
 }

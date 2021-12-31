@@ -3,6 +3,7 @@
 layout (location = 0) out vec4 FragColor;
 
 in vec4 Texs;
+in float Highlighted;
 
 uniform float iTime;
 uniform vec3 iColor;
@@ -18,7 +19,9 @@ void main() {
         color = texture(sampler, textureCoords).rgb;
     }
 
-    color += iColor;
+    if (Highlighted == 1.0) {
+        color += iColor;
+    }
 
     FragColor = vec4(color, 1.0) * Texs.z;
 }

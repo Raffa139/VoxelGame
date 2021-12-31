@@ -19,9 +19,13 @@ public class DebugCamera extends Camera {
 
   public Vector3f getPositionInCurrentChunk() {
     return new Vector3f(
-        getPos().x % Chunk.CHUNK_SIZE,
-        getPos().y % Chunk.CHUNK_SIZE,
-        getPos().z % Chunk.CHUNK_SIZE
+        (float) Math.floor(getPos().x % Chunk.CHUNK_SIZE),
+        (float) Math.floor(getPos().y % Chunk.CHUNK_SIZE),
+        (float) Math.floor(getPos().z % Chunk.CHUNK_SIZE)
     );
+  }
+
+  public void setPosition(Vector3f position) {
+    this.pos = position;
   }
 }

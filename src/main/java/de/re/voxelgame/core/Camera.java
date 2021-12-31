@@ -7,15 +7,15 @@ import static de.re.voxelgame.core.util.Vectors.*;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Camera {
-  private Vector3f pos;
-  private Vector3f up;
-  private Vector3f front;
+  protected Vector3f pos;
+  protected Vector3f up;
+  protected Vector3f front;
 
-  private float pitch;
-  private float yaw;
+  protected float pitch;
+  protected float yaw;
 
-  private float lastPosX;
-  private float lastPosY;
+  protected float lastPosX;
+  protected float lastPosY;
 
   public Camera(Vector3f pos) {
     this.pos = pos;

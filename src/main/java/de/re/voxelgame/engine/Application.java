@@ -101,20 +101,16 @@ public class Application {
       chunkShader.setMatrix4("iView", view);
       chunkShader.setMatrix4("iProjection", projection);
       chunkShader.setFloat("iTime", currentFrameTime);
+      chunkShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
 
       chunkManager.update(currentFrameTime, 0.0001f);
+      chunkManager.reloadChunk(camera.getPositionOfCurrentChunk(), camera.getPositionInCurrentChunk());
 
       for (Chunk chunk : chunkManager.getChunks()) {
         if (chunk.containsVertices()) {
           Matrix4f model = new Matrix4f();
           model.translate(chunk.getWorldPosition());
           chunkShader.setMatrix4("iModel", model);
-
-          if (chunk.getPosition().equals(camera.getPositionOfCurrentChunk())) {
-            chunkShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
-          } else {
-            chunkShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.0f));
-          }
 
           glBindVertexArray(chunk.getVaoId());
           glDrawArrays(GL_TRIANGLES, 0, chunk.getVertexCount());
@@ -147,6 +143,7 @@ public class Application {
       if (KeyListener.keyPressed(GLFW_KEY_E) && currentFrameTime > lastPressed + 0.25f) {
         lastPressed = currentFrameTime;
         context.toggleMouseCursor();
+        camera.setPosition(new Vector3f(camera.getPos().x, 70.0f, camera.getPos().z));
         System.out.println(
             "X: " + camera.getPositionInCurrentChunk().x +
           ", Y: " + camera.getPositionInCurrentChunk().y +

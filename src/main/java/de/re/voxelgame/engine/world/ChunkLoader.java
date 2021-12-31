@@ -29,7 +29,7 @@ public final class ChunkLoader {
   private ChunkLoader() {
   }
 
-  public static Chunk loadChunkNoise(Vector3f position, OpenSimplexNoise noise) {
+  public static Chunk loadChunkNoise(Vector3f position, OpenSimplexNoise noise, Vector3f highlightVoxelPosition) {
     List<VoxelVertex> translatedVertices = new ArrayList<>();
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
@@ -44,25 +44,27 @@ public final class ChunkLoader {
         int heightW = noise.voxelNoise2d(tx-1, tz);
 
         for (int y = 0; y < CHUNK_SIZE; y++) {
+          boolean highlighted = new Vector3f(x, y, z).equals(highlightVoxelPosition);
+
           int ty = (int) (y + position.y * CHUNK_SIZE);
-          Voxel voxel = new Voxel(VoxelType.WATER);
+          Voxel voxel = new Voxel(VoxelType.WATER, highlighted);
 
           // Water level = 50
           if (ty != 50 && (ty > 44 && ty <= 56)) {
             // Sand
-            voxel = new Voxel(VoxelType.SAND);
+            voxel = new Voxel(VoxelType.SAND, highlighted);
           } else if (ty > 56 && ty <= 85) {
             // Grass
-            voxel = new Voxel(VoxelType.GRASS);
+            voxel = new Voxel(VoxelType.GRASS, highlighted);
           } else if (ty > 85 && ty <= 90) {
             // Dirt
-            voxel = new Voxel(VoxelType.DIRT);
+            voxel = new Voxel(VoxelType.DIRT, highlighted);
           } else if (ty > 90) {
             // Stone
-            voxel = new Voxel(VoxelType.COBBLESTONE);
+            voxel = new Voxel(VoxelType.COBBLESTONE, highlighted);
           } else if (ty <= 44) {
             // Gravel
-            voxel = new Voxel(VoxelType.GRAVEL);
+            voxel = new Voxel(VoxelType.GRAVEL, highlighted);
           }
 
           if (ty == height || (ty == 50 && ty > height)) {
@@ -91,6 +93,10 @@ public final class ChunkLoader {
     return storeAndReturnChunk(translatedVertices, position);
   }
 
+  public static void unloadChunk(Chunk chunk) {
+    // TODO
+  }
+
   private static Chunk storeAndReturnChunk(List<VoxelVertex> translatedVertices, Vector3f position) {
     if (translatedVertices.size() == 0) {
       return new Chunk(position, -1, -1);
@@ -110,10 +116,13 @@ public final class ChunkLoader {
       vertexData[i] = vertexData[i] | VERTEX_TEXTURE_INDICES.get(textureCoordIndex) << 12;
 
       // Push texture tile id (voxel-type) according to vertex data schematics
-      vertexData[i] = vertexData[i] | v.getTextureLayer() << 3;
+      vertexData[i] = vertexData[i] | v.getTextureLayer() << 4;
 
       // Push light level according to vertex data schematics
-      vertexData[i] = vertexData[i] | (int) (v.getLightLevel() * 5);
+      vertexData[i] = vertexData[i] | (int) (v.getLightLevel() * 5) << 1;
+
+      // Push highlighted flag according to vertex data schematics
+      vertexData[i] = vertexData[i] | (v.isHighlighted() ? 1 : 0);
     }
 
     int vaoId = MemoryManager

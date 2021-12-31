@@ -28,12 +28,12 @@ public class VoxelFace {
     this.lightLevel = lightLevel;
   }
 
-  public VoxelFace translate(float x, float y, float z, int textureLayer) {
+  public VoxelFace translate(float x, float y, float z, int textureLayer, boolean highlighted) {
     List<VoxelVertex> translated = new ArrayList<>();
 
     for (VoxelVertex v : vertices) {
       VoxelVertex voxelVertex =
-          new VoxelVertex(v.getPosition().x + x, v.getPosition().y + y, v.getPosition().z + z, lightLevel, textureLayer);
+          new VoxelVertex(v.getPosition().x + x, v.getPosition().y + y, v.getPosition().z + z, lightLevel, textureLayer, highlighted);
       translated.add(voxelVertex);
     }
 

@@ -23,6 +23,10 @@ public final class MemoryManager {
     return new VertexArray(vaoId);
   }
 
+  public static void freeVao() {
+    // TODO
+  }
+
   public static void terminate() {
     for (int vaoId : VAO_IDS) {
       glDeleteVertexArrays(vaoId);

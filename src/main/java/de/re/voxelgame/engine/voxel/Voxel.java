@@ -11,14 +11,17 @@ public class Voxel {
 
   private final VoxelType type;
 
-  public Voxel(VoxelType type, VoxelFace... faces) {
-    this(type);
+  private final boolean highlighted;
+
+  public Voxel(VoxelType type, boolean highlighted, VoxelFace... faces) {
+    this(type, highlighted);
     voxelFaces.addAll(Arrays.asList(faces));
   }
 
-  public Voxel(VoxelType type) {
+  public Voxel(VoxelType type, boolean highlighted) {
     voxelFaces = new ArrayList<>();
     this.type = type;
+    this.highlighted = highlighted;
   }
 
   public Voxel join(VoxelFace face) {
@@ -32,9 +35,9 @@ public class Voxel {
   }
 
   public Voxel translate(float x, float y, float z) {
-    Voxel voxel = new Voxel(type);
+    Voxel voxel = new Voxel(type, highlighted);
     for (VoxelFace face : voxelFaces) {
-      voxel.join(face.translate(x, y, z, textureLayer(face)));
+      voxel.join(face.translate(x, y, z, textureLayer(face), highlighted));
     }
     return voxel;
   }
