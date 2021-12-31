@@ -2,6 +2,13 @@ package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
 import de.re.voxelgame.core.util.Vectors;
+import de.re.voxelgame.engine.intersection.AABB;
+import de.re.voxelgame.engine.intersection.Ray;
+import de.re.voxelgame.engine.intersection.RayCaster;
+import de.re.voxelgame.engine.voxel.Voxel;
+import de.re.voxelgame.engine.voxel.VoxelFace;
+import de.re.voxelgame.engine.voxel.VoxelType;
+import de.re.voxelgame.engine.voxel.VoxelVertex;
 import de.re.voxelgame.engine.world.Chunk;
 import de.re.voxelgame.core.util.ResourceLoader;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
@@ -15,6 +22,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
+import java.util.List;
 
 import static de.re.voxelgame.engine.world.Chunk.CHUNK_SIZE;
 import static org.lwjgl.glfw.GLFW.*;
@@ -46,6 +54,10 @@ public class Application {
     ResourceLoader.Resource hudFrag = ResourceLoader.locateResource("shader/basicHud.frag", Application.class);
     Shader hudShader = new Shader(hudVert.toPath(), hudFrag.toPath());
 
+    ResourceLoader.Resource aabbVert = ResourceLoader.locateResource("shader/chunkAABB.vert", Application.class);
+    ResourceLoader.Resource aabbFrag = ResourceLoader.locateResource("shader/chunkAABB.frag", Application.class);
+    Shader chunkAABBShader = new Shader(aabbVert.toPath(), aabbFrag.toPath());
+
     // Cross-hair
     float[] crossHairVertices = {
         -0.5f,  0.05f, 0.0f,
@@ -59,6 +71,30 @@ public class Application {
     int crossHairVao = MemoryManager
         .allocateVao()
         .bufferData(crossHairVertices, GL_STATIC_DRAW)
+        .enableAttribArray(0)
+        .attribPointer(0, 3, GL_FLOAT, false, 3 * 4, 0L)
+        .doFinal();
+
+    // Chunk border
+    Voxel border = new Voxel(VoxelType.MISSING, false,
+        VoxelFace.FRONT,
+        VoxelFace.BACK,
+        VoxelFace.LEFT,
+        VoxelFace.RIGHT,
+        VoxelFace.TOP,
+        VoxelFace.BOTTOM);
+    List<VoxelVertex> borderVertices = border.getVertices();
+    float[] borderVertexData = new float[borderVertices.size()*3];
+    for (int i = 0; i < borderVertexData.length; i+=3) {
+      VoxelVertex v = borderVertices.get((int) Math.floor(i/3.0));
+      borderVertexData[i] = v.getPosition().x;
+      borderVertexData[i+1] = v.getPosition().y;
+      borderVertexData[i+2] = v.getPosition().z;
+    }
+
+    int borderVaoId = MemoryManager
+        .allocateVao()
+        .bufferData(borderVertexData, GL_STATIC_DRAW)
         .enableAttribArray(0)
         .attribPointer(0, 3, GL_FLOAT, false, 3 * 4, 0L)
         .doFinal();
@@ -101,14 +137,9 @@ public class Application {
 
       float currentFrameTime = (float) glfwGetTime();
 
-      chunkShader.use();
-      chunkShader.setMatrix4("iView", view);
-      chunkShader.setMatrix4("iProjection", projection);
-      chunkShader.setFloat("iTime", currentFrameTime);
-      chunkShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
-
       chunkManager.update(currentFrameTime, 0.0001f);
 
+      // Cross-hair voxel intersection
       WorldPosition voxelInCrossHair = null;
       boolean crossHairOnBlock = false;
       for (float t = 0.0f; t < 8.0f; t+=0.1f) {
@@ -124,24 +155,67 @@ public class Application {
         }
       }
 
-      if (!crossHairOnBlock || !voxelInCrossHair.getCurrentChunkPosition().equals(lastVoxelInCrossHair.getCurrentChunkPosition())) {
-        chunkManager.reloadChunk(voxelInCrossHair.getCurrentChunkPosition(), null);
-        chunkManager.reloadChunk(lastVoxelInCrossHair.getCurrentChunkPosition(), null);
-        lastVoxelInCrossHair = voxelInCrossHair;
-      } else {
-        chunkManager.reloadChunk(voxelInCrossHair.getCurrentChunkPosition(), voxelInCrossHair.getAbsolutePositionInCurrentChunk());
+      if (!context.isMouseCursorToggled()) {
+        if (!crossHairOnBlock || !voxelInCrossHair.getCurrentChunkPosition().equals(lastVoxelInCrossHair.getCurrentChunkPosition())) {
+          chunkManager.reloadChunk(voxelInCrossHair.getCurrentChunkPosition(), null);
+          chunkManager.reloadChunk(lastVoxelInCrossHair.getCurrentChunkPosition(), null);
+          lastVoxelInCrossHair = voxelInCrossHair;
+        } else {
+          chunkManager.reloadChunk(voxelInCrossHair.getCurrentChunkPosition(), voxelInCrossHair.getAbsolutePositionInCurrentChunk());
+        }
       }
+
+      // Chunk mouse-cursor intersection
+      Ray ray = RayCaster.fromMousePosition(MouseListener.getLastPosX(), MouseListener.getLastPosY(), camera, projection, 1080.0f, 720.0f);
+      WorldPosition intersectionPos = null;
+      for (Chunk chunk : chunkManager.getChunks()) {
+        AABB chunkBounding = chunk.getBoundingBox();
+        boolean intersects = ray.intersectsAABB(chunkBounding);
+
+        if (intersects) {
+          intersectionPos = chunk.getRelativePosition();
+          break;
+        }
+      }
+
+      chunkShader.use();
+      chunkShader.setMatrix4("iView", view);
+      chunkShader.setMatrix4("iProjection", projection);
+      chunkShader.setFloat("iTime", currentFrameTime);
+      chunkShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
+
+      chunkAABBShader.use();
+      chunkAABBShader.setMatrix4("iView", view);
+      chunkAABBShader.setMatrix4("iProjection", projection);
 
       for (Chunk chunk : chunkManager.getChunks()) {
         if (chunk.containsVertices()) {
           Matrix4f model = new Matrix4f();
           model.translate(chunk.getWorldPosition().getVector());
+
+          chunkShader.use();
           chunkShader.setMatrix4("iModel", model);
 
           glBindVertexArray(chunk.getVaoId());
           glDrawArrays(GL_TRIANGLES, 0, chunk.getVertexCount());
           glBindVertexArray(0);
         }
+
+        // Draw chunk border
+        Matrix4f model = new Matrix4f();
+        model.translate(chunk.getWorldPosition().getVector()).scale(CHUNK_SIZE);
+
+        chunkAABBShader.use();
+        chunkAABBShader.setMatrix4("iModel", model);
+        if (chunk.getRelativePosition().equals(intersectionPos) && context.isMouseCursorToggled()) {
+          chunkAABBShader.setVec3("iColor", new Vector3f(1.0f, 0.0f, 0.0f));
+        } else {
+          chunkAABBShader.setVec3("iColor", new Vector3f(1.0f, 1.0f, 1.0f));
+        }
+
+        glBindVertexArray(borderVaoId);
+        glDrawArrays(GL_LINES, 0, borderVertexData.length);
+        glBindVertexArray(0);
       }
 
       hudShader.use();
@@ -168,9 +242,9 @@ public class Application {
 
       if (KeyListener.keyPressed(GLFW_KEY_E) && currentFrameTime > lastPressed + 0.25f) {
         lastPressed = currentFrameTime;
-        //context.toggleMouseCursor();
-        //camera.setWorldPosition(new WorldPosition(camera.getPos().x, 70.0f, camera.getPos().z));
-        System.out.println();
+        context.toggleMouseCursor();
+
+        /*System.out.println();
         System.out.println("Voxel: ");
         System.out.println(
             "ABS X: " + voxelInCrossHair.getAbsolutePositionInCurrentChunk().x +
@@ -190,7 +264,7 @@ public class Application {
         System.out.println(
             "X: " + camera.getWorldPosition().getPositionInCurrentChunk().x +
           ", Y: " + camera.getWorldPosition().getPositionInCurrentChunk().y +
-          ", Z: " + camera.getWorldPosition().getPositionInCurrentChunk().z);
+          ", Z: " + camera.getWorldPosition().getPositionInCurrentChunk().z);*/
       }
 
       camera.update(context.getDeltaTime(), !context.isMouseCursorToggled());
@@ -200,6 +274,7 @@ public class Application {
 
     textureArray.cleanup();
     chunkShader.terminate();
+    chunkAABBShader.terminate();
     hudShader.terminate();
   }
 }

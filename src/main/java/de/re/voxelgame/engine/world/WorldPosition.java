@@ -2,6 +2,8 @@ package de.re.voxelgame.engine.world;
 
 import org.joml.Vector3f;
 
+import java.util.Objects;
+
 public class WorldPosition {
   private final Vector3f vector;
 
@@ -43,5 +45,19 @@ public class WorldPosition {
 
   public Vector3f getVector() {
     return vector;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    WorldPosition that = (WorldPosition) o;
+    return Objects.equals(vector, that.vector);
+  }
+
+  @Override
+  public int hashCode() {
+    return vector != null ? vector.hashCode() : 0;
   }
 }
