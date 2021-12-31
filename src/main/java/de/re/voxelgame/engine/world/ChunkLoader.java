@@ -29,13 +29,14 @@ public final class ChunkLoader {
   private ChunkLoader() {
   }
 
-  public static Chunk loadChunkNoise(Vector3f position, OpenSimplexNoise noise, Vector3f highlightVoxelPosition) {
+  public static Chunk loadChunkNoise(WorldPosition position, OpenSimplexNoise noise, Vector3f highlightVoxelPosition) {
     List<VoxelVertex> translatedVertices = new ArrayList<>();
+    Vector3f pos = position.getVector();
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
       for (int z = 0; z < CHUNK_SIZE; z++) {
-        float tx = x+(position.x*CHUNK_SIZE);
-        float tz = z+(position.z*CHUNK_SIZE);
+        float tx = x+(pos.x*CHUNK_SIZE);
+        float tz = z+(pos.z*CHUNK_SIZE);
 
         int height = noise.voxelNoise2d(tx, tz);
         int heightN = noise.voxelNoise2d(tx, tz-1);
@@ -46,7 +47,7 @@ public final class ChunkLoader {
         for (int y = 0; y < CHUNK_SIZE; y++) {
           boolean highlighted = new Vector3f(x, y, z).equals(highlightVoxelPosition);
 
-          int ty = (int) (y + position.y * CHUNK_SIZE);
+          int ty = (int) (y + pos.y * CHUNK_SIZE);
           Voxel voxel = new Voxel(VoxelType.WATER, highlighted);
 
           // Water level = 50
@@ -97,7 +98,7 @@ public final class ChunkLoader {
     // TODO
   }
 
-  private static Chunk storeAndReturnChunk(List<VoxelVertex> translatedVertices, Vector3f position) {
+  private static Chunk storeAndReturnChunk(List<VoxelVertex> translatedVertices, WorldPosition position) {
     if (translatedVertices.size() == 0) {
       return new Chunk(position, -1, -1);
     }

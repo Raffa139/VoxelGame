@@ -1,10 +1,12 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
+import de.re.voxelgame.core.util.Vectors;
 import de.re.voxelgame.engine.world.Chunk;
 import de.re.voxelgame.core.util.ResourceLoader;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
 import de.re.voxelgame.engine.world.ChunkManager;
+import de.re.voxelgame.engine.world.WorldPosition;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.Version;
@@ -76,7 +78,7 @@ public class Application {
     };
     TextureArray textureArray = new TextureArray(16, 16, textureFiles);
 
-    DebugCamera camera = new DebugCamera(new Vector3f(0.0f, 10.0f, 0.0f));
+    DebugCamera camera = new DebugCamera(new WorldPosition(0.0f, 10.0f, 0.0f));
 
     OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
     ChunkManager chunkManager = new ChunkManager(noise);
@@ -104,12 +106,13 @@ public class Application {
       chunkShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
 
       chunkManager.update(currentFrameTime, 0.0001f);
-      chunkManager.reloadChunk(camera.getPositionOfCurrentChunk(), camera.getPositionInCurrentChunk());
+      WorldPosition voxelInCrossHair = new WorldPosition(Vectors.add(camera.getPos(), Vectors.mul(camera.getFront().normalize(), 3.0f)));
+      chunkManager.reloadChunk(voxelInCrossHair.getCurrentChunkPosition(), voxelInCrossHair.getPositionInCurrentChunk());
 
       for (Chunk chunk : chunkManager.getChunks()) {
         if (chunk.containsVertices()) {
           Matrix4f model = new Matrix4f();
-          model.translate(chunk.getWorldPosition());
+          model.translate(chunk.getWorldPosition().getVector());
           chunkShader.setMatrix4("iModel", model);
 
           glBindVertexArray(chunk.getVaoId());
@@ -143,11 +146,11 @@ public class Application {
       if (KeyListener.keyPressed(GLFW_KEY_E) && currentFrameTime > lastPressed + 0.25f) {
         lastPressed = currentFrameTime;
         context.toggleMouseCursor();
-        camera.setPosition(new Vector3f(camera.getPos().x, 70.0f, camera.getPos().z));
+        camera.setWorldPosition(new WorldPosition(camera.getPos().x, 70.0f, camera.getPos().z));
         System.out.println(
-            "X: " + camera.getPositionInCurrentChunk().x +
-          ", Y: " + camera.getPositionInCurrentChunk().y +
-          ", Z: " + camera.getPositionInCurrentChunk().z);
+            "X: " + camera.getWorldPosition().getPositionInCurrentChunk().x +
+          ", Y: " + camera.getWorldPosition().getPositionInCurrentChunk().y +
+          ", Z: " + camera.getWorldPosition().getPositionInCurrentChunk().z);
       }
 
       camera.update(context.getDeltaTime(), !context.isMouseCursorToggled());

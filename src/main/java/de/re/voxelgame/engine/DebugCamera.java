@@ -1,31 +1,18 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.Camera;
-import de.re.voxelgame.engine.world.Chunk;
-import org.joml.Vector3f;
+import de.re.voxelgame.engine.world.WorldPosition;
 
 public class DebugCamera extends Camera {
-  public DebugCamera(Vector3f pos) {
-    super(pos);
+  public DebugCamera(WorldPosition worldPosition) {
+    super(worldPosition.getVector());
   }
 
-  public Vector3f getPositionOfCurrentChunk() {
-    return new Vector3f(
-        (float) Math.floor(getPos().x / Chunk.CHUNK_SIZE),
-        (float) Math.floor(getPos().y / Chunk.CHUNK_SIZE),
-        (float) Math.floor(getPos().z / Chunk.CHUNK_SIZE)
-    );
+  public WorldPosition getWorldPosition() {
+    return new WorldPosition(pos);
   }
 
-  public Vector3f getPositionInCurrentChunk() {
-    return new Vector3f(
-        (float) Math.floor(getPos().x % Chunk.CHUNK_SIZE),
-        (float) Math.floor(getPos().y % Chunk.CHUNK_SIZE),
-        (float) Math.floor(getPos().z % Chunk.CHUNK_SIZE)
-    );
-  }
-
-  public void setPosition(Vector3f position) {
-    this.pos = position;
+  public void setWorldPosition(WorldPosition worldPosition) {
+    this.pos = worldPosition.getVector();
   }
 }

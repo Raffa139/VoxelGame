@@ -40,7 +40,7 @@ public class ChunkManager {
         if (z < CHUNK_COUNT) {
           if (y < CHUNK_STACKS) {
             Vector3f position = new Vector3f(x, y, z);
-            chunks.put(position, ChunkLoader.loadChunkNoise(position, noise, null));
+            chunks.put(position, ChunkLoader.loadChunkNoise(new WorldPosition(position), noise, null));
             y++;
           }
 
@@ -59,8 +59,7 @@ public class ChunkManager {
   }
 
   public void reloadChunk(Vector3f position, Vector3f voxelPosition) {
-    Vector3f vPos = new Vector3f(voxelPosition.x, voxelPosition.y-2.0f, voxelPosition.z);
-    chunks.put(position, ChunkLoader.loadChunkNoise(position, noise, vPos));
+    chunks.put(position, ChunkLoader.loadChunkNoise(new WorldPosition(position), noise, voxelPosition));
   }
 
   public Map<Vector3f, Chunk> getChunkPositionMap() {
