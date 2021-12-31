@@ -16,6 +16,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 
+import static de.re.voxelgame.engine.world.Chunk.CHUNK_SIZE;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
@@ -84,6 +85,7 @@ public class Application {
     ChunkManager chunkManager = new ChunkManager(noise);
 
     float lastPressed = 0.0f;
+    WorldPosition lastVoxelInCrossHair = new WorldPosition(0.0f);
     while (!context.isCloseRequested()) {
       glClearColor(0.2f, 0.6f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -106,8 +108,29 @@ public class Application {
       chunkShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
 
       chunkManager.update(currentFrameTime, 0.0001f);
-      WorldPosition voxelInCrossHair = new WorldPosition(Vectors.add(camera.getPos(), Vectors.mul(camera.getFront().normalize(), 3.0f)));
-      chunkManager.reloadChunk(voxelInCrossHair.getCurrentChunkPosition(), voxelInCrossHair.getPositionInCurrentChunk());
+
+      WorldPosition voxelInCrossHair = null;
+      boolean crossHairOnBlock = false;
+      for (float t = 0.0f; t < 8.0f; t+=0.1f) {
+        voxelInCrossHair = new WorldPosition(Vectors.add(camera.getPos(), Vectors.mul(camera.getFront().normalize(), t)));
+        float tx = voxelInCrossHair.getAbsolutePositionInCurrentChunk().x + (voxelInCrossHair.getCurrentChunkPosition().x * CHUNK_SIZE);
+        float tz = voxelInCrossHair.getAbsolutePositionInCurrentChunk().z + (voxelInCrossHair.getCurrentChunkPosition().z * CHUNK_SIZE);
+        int ty = (int) (voxelInCrossHair.getAbsolutePositionInCurrentChunk().y + voxelInCrossHair.getCurrentChunkPosition().y * CHUNK_SIZE);
+
+        int height = noise.voxelNoise2d(tx, tz);
+        if (ty <= height) {
+          crossHairOnBlock = true;
+          break;
+        }
+      }
+
+      if (!crossHairOnBlock || !voxelInCrossHair.getCurrentChunkPosition().equals(lastVoxelInCrossHair.getCurrentChunkPosition())) {
+        chunkManager.reloadChunk(voxelInCrossHair.getCurrentChunkPosition(), null);
+        chunkManager.reloadChunk(lastVoxelInCrossHair.getCurrentChunkPosition(), null);
+        lastVoxelInCrossHair = voxelInCrossHair;
+      } else {
+        chunkManager.reloadChunk(voxelInCrossHair.getCurrentChunkPosition(), voxelInCrossHair.getAbsolutePositionInCurrentChunk());
+      }
 
       for (Chunk chunk : chunkManager.getChunks()) {
         if (chunk.containsVertices()) {
@@ -145,8 +168,25 @@ public class Application {
 
       if (KeyListener.keyPressed(GLFW_KEY_E) && currentFrameTime > lastPressed + 0.25f) {
         lastPressed = currentFrameTime;
-        context.toggleMouseCursor();
-        camera.setWorldPosition(new WorldPosition(camera.getPos().x, 70.0f, camera.getPos().z));
+        //context.toggleMouseCursor();
+        //camera.setWorldPosition(new WorldPosition(camera.getPos().x, 70.0f, camera.getPos().z));
+        System.out.println();
+        System.out.println("Voxel: ");
+        System.out.println(
+            "ABS X: " + voxelInCrossHair.getAbsolutePositionInCurrentChunk().x +
+          ", ABS Y: " + voxelInCrossHair.getAbsolutePositionInCurrentChunk().y +
+          ", ABS Z: " + voxelInCrossHair.getAbsolutePositionInCurrentChunk().z);
+        System.out.println(
+            "X: " + voxelInCrossHair.getPositionInCurrentChunk().x +
+          ", Y: " + voxelInCrossHair.getPositionInCurrentChunk().y +
+          ", Z: " + voxelInCrossHair.getPositionInCurrentChunk().z);
+
+        System.out.println();
+        System.out.println("Camera: ");
+        System.out.println(
+            "ABS X: " + camera.getWorldPosition().getAbsolutePositionInCurrentChunk().x +
+          ", ABS Y: " + camera.getWorldPosition().getAbsolutePositionInCurrentChunk().y +
+          ", ABS Z: " + camera.getWorldPosition().getAbsolutePositionInCurrentChunk().z);
         System.out.println(
             "X: " + camera.getWorldPosition().getPositionInCurrentChunk().x +
           ", Y: " + camera.getWorldPosition().getPositionInCurrentChunk().y +

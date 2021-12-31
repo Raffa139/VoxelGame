@@ -3,7 +3,7 @@ package de.re.voxelgame.engine.world;
 import org.joml.Vector3f;
 
 public class WorldPosition {
-  private Vector3f vector;
+  private final Vector3f vector;
 
   public WorldPosition(float d) {
     this(d, d, d);
@@ -25,12 +25,20 @@ public class WorldPosition {
     );
   }
 
+  public Vector3f getCurrentAbsoluteChunkPosition() {
+    return getCurrentChunkPosition().absolute();
+  }
+
   public Vector3f getPositionInCurrentChunk() {
     return new Vector3f(
         (float) Math.floor(vector.x % Chunk.CHUNK_SIZE),
         (float) Math.floor(vector.y % Chunk.CHUNK_SIZE),
         (float) Math.floor(vector.z % Chunk.CHUNK_SIZE)
     );
+  }
+
+  public Vector3f getAbsolutePositionInCurrentChunk() {
+    return getPositionInCurrentChunk().absolute();
   }
 
   public Vector3f getVector() {
