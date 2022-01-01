@@ -59,6 +59,10 @@ public class ChunkManager {
   }
 
   public void reloadChunk(Vector3f position, Vector3f voxelPosition) {
+    if (chunks.containsKey(position)) {
+      ChunkLoader.unloadChunk(chunks.get(position));
+    }
+
     chunks.put(position, ChunkLoader.loadChunkNoise(new WorldPosition(position), noise, voxelPosition));
   }
 

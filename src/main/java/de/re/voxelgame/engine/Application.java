@@ -168,13 +168,15 @@ public class Application {
       // Chunk mouse-cursor intersection
       Ray ray = RayCaster.fromMousePosition(MouseListener.getLastPosX(), MouseListener.getLastPosY(), camera, projection, 1080.0f, 720.0f);
       WorldPosition intersectionPos = null;
-      for (Chunk chunk : chunkManager.getChunks()) {
-        AABB chunkBounding = chunk.getBoundingBox();
-        boolean intersects = ray.intersectsAABB(chunkBounding);
+      if (context.isMouseCursorToggled()) {
+        for (Chunk chunk : chunkManager.getChunks()) {
+          AABB chunkBounding = chunk.getBoundingBox();
+          boolean intersects = ray.intersectsAABB(chunkBounding);
 
-        if (intersects) {
-          intersectionPos = chunk.getRelativePosition();
-          break;
+          if (intersects) {
+            intersectionPos = chunk.getRelativePosition();
+            break;
+          }
         }
       }
 
@@ -202,20 +204,22 @@ public class Application {
         }
 
         // Draw chunk border
-        Matrix4f model = new Matrix4f();
-        model.translate(chunk.getWorldPosition().getVector()).scale(CHUNK_SIZE);
+        if (context.isMouseCursorToggled()) {
+          Matrix4f model = new Matrix4f();
+          model.translate(chunk.getWorldPosition().getVector()).scale(CHUNK_SIZE);
 
-        chunkAABBShader.use();
-        chunkAABBShader.setMatrix4("iModel", model);
-        if (chunk.getRelativePosition().equals(intersectionPos) && context.isMouseCursorToggled()) {
-          chunkAABBShader.setVec3("iColor", new Vector3f(1.0f, 0.0f, 0.0f));
-        } else {
-          chunkAABBShader.setVec3("iColor", new Vector3f(1.0f, 1.0f, 1.0f));
+          chunkAABBShader.use();
+          chunkAABBShader.setMatrix4("iModel", model);
+          if (chunk.getRelativePosition().equals(intersectionPos) && context.isMouseCursorToggled()) {
+            chunkAABBShader.setVec3("iColor", new Vector3f(1.0f, 0.0f, 0.0f));
+          } else {
+            chunkAABBShader.setVec3("iColor", new Vector3f(1.0f, 1.0f, 1.0f));
+          }
+
+          glBindVertexArray(borderVaoId);
+          glDrawArrays(GL_LINES, 0, borderVertexData.length);
+          glBindVertexArray(0);
         }
-
-        glBindVertexArray(borderVaoId);
-        glDrawArrays(GL_LINES, 0, borderVertexData.length);
-        glBindVertexArray(0);
       }
 
       hudShader.use();

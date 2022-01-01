@@ -1,7 +1,6 @@
 package de.re.voxelgame.core;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
@@ -9,32 +8,43 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 
 public final class MemoryManager {
-  private static final List<Integer> VAO_IDS = new ArrayList<>();
-
-  private static final List<Integer> VBO_IDS = new ArrayList<>();
+  private static final Map<Integer, Set<Integer>> VAO_IDS = new HashMap<>();
 
   private MemoryManager() {
   }
 
   public static VertexArray allocateVao() {
     int vaoId = glGenVertexArrays();
-    VAO_IDS.add(vaoId);
+    VAO_IDS.put(vaoId, new HashSet<>());
     glBindVertexArray(vaoId);
     return new VertexArray(vaoId);
   }
 
-  public static void freeVao() {
-    // TODO
+  public static void freeVao(int vaoId) {
+    Set<Integer> vboIds = VAO_IDS.get(vaoId);
+    for (int vboId : vboIds) {
+      glDeleteBuffers(vboId);
+    }
+
+    glDeleteVertexArrays(vaoId);
+    VAO_IDS.remove(vaoId);
   }
 
   public static void terminate() {
-    for (int vaoId : VAO_IDS) {
+    for (int vaoId : VAO_IDS.keySet()) {
+      Set<Integer> vboIds = VAO_IDS.get(vaoId);
+      for (int vboId : vboIds) {
+        glDeleteBuffers(vboId);
+      }
+
       glDeleteVertexArrays(vaoId);
     }
+  }
 
-    for (int vboId : VBO_IDS) {
-      glDeleteBuffers(vboId);
-    }
+  private static void appendVboToVao(int vaoId, int vboId) {
+    Set<Integer> vboIds = VAO_IDS.get(vaoId);
+    vboIds.add(vboId);
+    VAO_IDS.put(vaoId, vboIds);
   }
 
   public static class VertexArray {
@@ -59,7 +69,7 @@ public final class MemoryManager {
 
     private ArrayBuffer bufferData(Object data, int usage) {
       int vboId = glGenBuffers();
-      VBO_IDS.add(vboId);
+      appendVboToVao(id, vboId);
       glBindBuffer(GL_ARRAY_BUFFER, vboId);
 
       if (data instanceof float[]) {

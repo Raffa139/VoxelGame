@@ -95,7 +95,9 @@ public final class ChunkLoader {
   }
 
   public static void unloadChunk(Chunk chunk) {
-    // TODO
+    if (chunk.containsVertices()) {
+      MemoryManager.freeVao(chunk.getVaoId());
+    }
   }
 
   private static Chunk storeAndReturnChunk(List<VoxelVertex> translatedVertices, WorldPosition position) {
