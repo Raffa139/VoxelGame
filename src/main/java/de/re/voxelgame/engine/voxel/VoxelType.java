@@ -1,6 +1,7 @@
 package de.re.voxelgame.engine.voxel;
 
 public enum VoxelType {
+  AIR(-1),
   COBBLESTONE(0),
   DIRT(1),
   SAND(2),

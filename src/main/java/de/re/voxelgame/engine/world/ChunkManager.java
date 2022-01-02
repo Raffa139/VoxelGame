@@ -32,7 +32,7 @@ public class ChunkManager {
     this.lastUpdateTime = 0.0f;
   }
 
-  public void update(float currentTime, float timeout) {
+  public void generate(float currentTime, float timeout) {
     if ((currentTime - lastUpdateTime) >= timeout) {
       lastUpdateTime = currentTime;
 
@@ -40,7 +40,33 @@ public class ChunkManager {
         if (z < CHUNK_COUNT) {
           if (y < CHUNK_STACKS) {
             Vector3f position = new Vector3f(x, y, z);
-            chunks.put(position, ChunkLoader.loadChunkNoise(new WorldPosition(position), noise, null));
+            Vector3f positionS = new Vector3f(x, y, z+1);
+            Vector3f positionN = new Vector3f(x, y, z-1);
+            Vector3f positionE = new Vector3f(x+1, y, z);
+            Vector3f positionW = new Vector3f(x-1, y, z);
+            Vector3f positionT = new Vector3f(x, y+1, z);
+            Vector3f positionB = new Vector3f(x, y-1, z);
+
+            if (z < CHUNK_COUNT-1) {
+              preloadOrGetChunk(positionS);
+            }
+            if (z > 0) {
+              preloadOrGetChunk(positionN);
+            }
+            if (x < CHUNK_COUNT-1) {
+              preloadOrGetChunk(positionE);
+            }
+            if (x > 0) {
+              preloadOrGetChunk(positionW);
+            }
+            if (y < CHUNK_STACKS-1) {
+              preloadOrGetChunk(positionT);
+            }
+            if (y > 0) {
+              preloadOrGetChunk(positionB);
+            }
+            loadChunk(position, null);
+
             y++;
           }
 
@@ -60,10 +86,13 @@ public class ChunkManager {
 
   public void reloadChunk(Vector3f position, Vector3f voxelPosition) {
     if (chunks.containsKey(position)) {
-      ChunkLoader.unloadChunk(chunks.get(position));
-    }
+      Chunk chunk = chunks.get(position);
 
-    chunks.put(position, ChunkLoader.loadChunkNoise(new WorldPosition(position), noise, voxelPosition));
+      if (chunk.hasMesh()) {
+        ChunkLoader.unloadChunkMesh(chunk.getMesh());
+      }
+      loadChunk(position, voxelPosition);
+    }
   }
 
   public Map<Vector3f, Chunk> getChunkPositionMap() {
@@ -72,5 +101,20 @@ public class ChunkManager {
 
   public Collection<Chunk> getChunks() {
     return chunks.values();
+  }
+
+  private Chunk preloadOrGetChunk(Vector3f position) {
+    if (!chunks.containsKey(position)) {
+      Chunk chunk = ChunkLoader.generateChunk(new WorldPosition(position), noise);
+      chunks.put(position, chunk);
+      return chunk;
+    }
+
+    return chunks.get(position);
+  }
+
+  private void loadChunk(Vector3f position, Vector3f voxelPosition) {
+    Chunk chunk = preloadOrGetChunk(position);
+    chunk.setMesh(ChunkLoader.loadChunkMesh(chunk, voxelPosition, chunks));
   }
 }

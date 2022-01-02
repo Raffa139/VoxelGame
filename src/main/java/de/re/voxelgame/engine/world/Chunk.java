@@ -2,6 +2,7 @@ package de.re.voxelgame.engine.world;
 
 import de.re.voxelgame.core.util.Vectors;
 import de.re.voxelgame.engine.intersection.AABB;
+import de.re.voxelgame.engine.voxel.VoxelType;
 
 public class Chunk {
   public static final int CHUNK_SIZE = 32;
@@ -10,21 +11,16 @@ public class Chunk {
 
   private final AABB boundingBox;
 
-  private final int vaoId;
+  private ChunkMesh mesh;
 
-  private final int vertexCount;
+  private byte[][][] voxelIds;
 
-  public Chunk(WorldPosition position, int vaoId, int vertexCount) {
+  public Chunk(WorldPosition position, byte[][][] voxelIds) {
     this.position = position;
-    this.vaoId = vaoId;
-    this.vertexCount = vertexCount;
+    this.voxelIds = voxelIds;
 
     WorldPosition worldPos = getWorldPosition();
     this.boundingBox = new AABB(worldPos.getVector(), Vectors.add(worldPos.getVector(), CHUNK_SIZE-1));
-  }
-
-  public boolean containsVertices() {
-    return vaoId >= 0 && vertexCount > 0;
   }
 
   public WorldPosition getRelativePosition() {
@@ -39,11 +35,27 @@ public class Chunk {
     return boundingBox;
   }
 
-  public int getVaoId() {
-    return vaoId;
+  public boolean hasMesh() {
+    return mesh != null;
   }
 
-  public int getVertexCount() {
-    return vertexCount;
+  public ChunkMesh getMesh() {
+    return mesh;
+  }
+
+  public void setMesh(ChunkMesh mesh) {
+    this.mesh = mesh;
+  }
+
+  public byte[][][] getVoxelIds() {
+    return voxelIds;
+  }
+
+  public void placeVoxel(int x, int y, int z, VoxelType type) {
+    voxelIds[x][y][z] = (byte) type.ordinal();
+  }
+
+  public void removeVoxel(int x, int y, int z) {
+    voxelIds[x][y][z] = 0;
   }
 }

@@ -137,7 +137,7 @@ public class Application {
 
       float currentFrameTime = (float) glfwGetTime();
 
-      chunkManager.update(currentFrameTime, 0.0001f);
+      chunkManager.generate(currentFrameTime, 0.0001f);
 
       // Cross-hair voxel intersection
       WorldPosition voxelInCrossHair = null;
@@ -191,15 +191,15 @@ public class Application {
       chunkAABBShader.setMatrix4("iProjection", projection);
 
       for (Chunk chunk : chunkManager.getChunks()) {
-        if (chunk.containsVertices()) {
+        if (chunk.hasMesh()) {
           Matrix4f model = new Matrix4f();
           model.translate(chunk.getWorldPosition().getVector());
 
           chunkShader.use();
           chunkShader.setMatrix4("iModel", model);
 
-          glBindVertexArray(chunk.getVaoId());
-          glDrawArrays(GL_TRIANGLES, 0, chunk.getVertexCount());
+          glBindVertexArray(chunk.getMesh().getVaoId());
+          glDrawArrays(GL_TRIANGLES, 0, chunk.getMesh().getVertexCount());
           glBindVertexArray(0);
         }
 

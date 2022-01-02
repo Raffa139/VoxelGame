@@ -29,80 +29,123 @@ public final class ChunkLoader {
   private ChunkLoader() {
   }
 
-  public static Chunk loadChunkNoise(WorldPosition position, OpenSimplexNoise noise, Vector3f highlightVoxelPosition) {
-    List<VoxelVertex> translatedVertices = new ArrayList<>();
+  public static Chunk generateChunk(WorldPosition position, OpenSimplexNoise noise) {
+    byte[][][] voxelIds = new byte[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
     Vector3f pos = position.getVector();
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
       for (int z = 0; z < CHUNK_SIZE; z++) {
         float tx = x+(pos.x*CHUNK_SIZE);
         float tz = z+(pos.z*CHUNK_SIZE);
-
         int height = noise.voxelNoise2d(tx, tz);
-        int heightN = noise.voxelNoise2d(tx, tz-1);
-        int heightS = noise.voxelNoise2d(tx, tz+1);
-        int heightE = noise.voxelNoise2d(tx+1, tz);
-        int heightW = noise.voxelNoise2d(tx-1, tz);
 
         for (int y = 0; y < CHUNK_SIZE; y++) {
-          boolean highlighted = new Vector3f(x, y, z).equals(highlightVoxelPosition);
-
           int ty = (int) (y + pos.y * CHUNK_SIZE);
-          Voxel voxel = new Voxel(VoxelType.WATER, highlighted);
+          voxelIds[x][y][z] = 0;
 
-          // Water level = 50
-          if (ty != 50 && (ty > 44 && ty <= 56)) {
-            // Sand
-            voxel = new Voxel(VoxelType.SAND, highlighted);
-          } else if (ty > 56 && ty <= 85) {
-            // Grass
-            voxel = new Voxel(VoxelType.GRASS, highlighted);
-          } else if (ty > 85 && ty <= 90) {
-            // Dirt
-            voxel = new Voxel(VoxelType.DIRT, highlighted);
-          } else if (ty > 90) {
-            // Stone
-            voxel = new Voxel(VoxelType.COBBLESTONE, highlighted);
-          } else if (ty <= 44) {
-            // Gravel
-            voxel = new Voxel(VoxelType.GRAVEL, highlighted);
-          }
-
-          if (ty == height || (ty == 50 && ty > height)) {
-            voxel.join(VoxelFace.TOP);
-          }
-          if (ty > heightE && ty <= height) {
-            voxel.join(0.8f, VoxelFace.RIGHT);
-          }
-          if (ty > heightW && ty <= height) {
-            voxel.join(0.8f, VoxelFace.LEFT);
-          }
-          if (ty > heightN && ty <= height) {
-            voxel.join(0.6f, VoxelFace.BACK);
-          }
-          if (ty > heightS && ty <= height) {
-            voxel.join(0.6f, VoxelFace.FRONT);
-          }
-
-          if (voxel.hasVertices()) {
-            translatedVertices.addAll(voxel.translate(x, y, z).getVertices());
+          if (ty <= height) {
+            if (ty == 50) { // Water level = 50
+              // Water
+              voxelIds[x][y][z] = (byte) VoxelType.WATER.ordinal();
+            } else if (ty > 44 && ty <= 56) {
+              // Sand
+              voxelIds[x][y][z] = (byte) VoxelType.SAND.ordinal();
+            } else if (ty > 56 && ty <= 85) {
+              // Grass
+              voxelIds[x][y][z] = (byte) VoxelType.GRASS.ordinal();
+            } else if (ty > 85 && ty <= 90) {
+              // Dirt
+              voxelIds[x][y][z] = (byte) VoxelType.DIRT.ordinal();
+            } else if (ty > 90) {
+              // Stone
+              voxelIds[x][y][z] = (byte) VoxelType.COBBLESTONE.ordinal();
+            } else {
+              // Gravel
+              voxelIds[x][y][z] = (byte) VoxelType.GRAVEL.ordinal();
+            }
           }
         }
       }
     }
 
-    return storeAndReturnChunk(translatedVertices, position);
+    return new Chunk(position, voxelIds);
   }
 
-  public static void unloadChunk(Chunk chunk) {
-    if (chunk.containsVertices()) {
-      MemoryManager.freeVao(chunk.getVaoId());
+  public static ChunkMesh loadChunkMesh(Chunk chunk, Vector3f highlightedVoxelPosition, Map<Vector3f, Chunk> chunks) {
+    List<VoxelVertex> translatedVertices = new ArrayList<>();
+    Vector3f pos = chunk.getRelativePosition().getVector();
+    byte[][][] voxelIds = chunk.getVoxelIds();
+
+    for (int x = 0; x < CHUNK_SIZE; x++) {
+      for (int z = 0; z < CHUNK_SIZE; z++) {
+        for (int y = 0; y < CHUNK_SIZE; y++) {
+          byte currentVoxel = voxelIds[x][y][z];
+          if (currentVoxel > 0) {
+            boolean highlighted = new Vector3f(x, y, z).equals(highlightedVoxelPosition);
+
+            Voxel voxel = new Voxel(VoxelType.values()[currentVoxel], highlighted);
+
+            byte voxelS =
+                z < CHUNK_SIZE - 1 ? voxelIds[x][y][z + 1] :
+                    chunks.get(new Vector3f(pos.x, pos.y, pos.z+1)) != null ?
+                        chunks.get(new Vector3f(pos.x, pos.y, pos.z+1)).getVoxelIds()[x][y][0] : -1;
+            byte voxelN =
+                z > 0 ? voxelIds[x][y][z - 1] :
+                    chunks.get(new Vector3f(pos.x, pos.y, pos.z-1)) != null ?
+                        chunks.get(new Vector3f(pos.x, pos.y, pos.z-1)).getVoxelIds()[x][y][CHUNK_SIZE-1] : -1;
+            byte voxelE =
+                x < CHUNK_SIZE - 1 ? voxelIds[x + 1][y][z] :
+                    chunks.get(new Vector3f(pos.x+1, pos.y, pos.z)) != null ?
+                        chunks.get(new Vector3f(pos.x+1, pos.y, pos.z)).getVoxelIds()[0][y][z] : -1;
+            byte voxelW =
+                x > 0 ? voxelIds[x - 1][y][z] :
+                    chunks.get(new Vector3f(pos.x-1, pos.y, pos.z)) != null ?
+                        chunks.get(new Vector3f(pos.x-1, pos.y, pos.z)).getVoxelIds()[CHUNK_SIZE-1][y][z] : -1;
+            byte voxelT =
+                y < CHUNK_SIZE - 1 ? voxelIds[x][y + 1][z] :
+                    chunks.get(new Vector3f(pos.x, pos.y+1, pos.z)) != null ?
+                        chunks.get(new Vector3f(pos.x, pos.y+1, pos.z)).getVoxelIds()[x][0][z] : -1;
+            byte voxelB =
+                y > 0 ? voxelIds[x][y - 1][z] :
+                    chunks.get(new Vector3f(pos.x, pos.y-1, pos.z)) != null ?
+                        chunks.get(new Vector3f(pos.x, pos.y-1, pos.z)).getVoxelIds()[x][CHUNK_SIZE-1][z] : -1;
+
+            if (voxelT == 0) {
+              voxel.join(VoxelFace.TOP);
+            }
+            if (voxelE == 0) {
+              voxel.join(0.8f, VoxelFace.RIGHT);
+            }
+            if (voxelW == 0) {
+              voxel.join(0.8f, VoxelFace.LEFT);
+            }
+            if (voxelN == 0) {
+              voxel.join(0.6f, VoxelFace.BACK);
+            }
+            if (voxelS == 0) {
+              voxel.join(0.6f, VoxelFace.FRONT);
+            }
+
+            if (voxel.hasVertices()) {
+              translatedVertices.addAll(voxel.translate(x, y, z).getVertices());
+            }
+          }
+        }
+      }
+    }
+
+    return storeAndReturnChunkMesh(translatedVertices);
+  }
+
+  public static void unloadChunkMesh(ChunkMesh mesh) {
+    if (mesh.containsVertices()) {
+      MemoryManager.freeVao(mesh.getVaoId());
     }
   }
 
-  private static Chunk storeAndReturnChunk(List<VoxelVertex> translatedVertices, WorldPosition position) {
+  private static ChunkMesh storeAndReturnChunkMesh(List<VoxelVertex> translatedVertices) {
     if (translatedVertices.size() == 0) {
-      return new Chunk(position, -1, -1);
+      return null;
     }
 
     int[] vertexData = new int[translatedVertices.size()];
@@ -135,6 +178,6 @@ public final class ChunkLoader {
         .attribPointer(0, 1, GL_FLOAT, false, 4, 0L)
         .doFinal();
 
-    return new Chunk(position, vaoId, vertexData.length);
+    return new ChunkMesh(vaoId, vertexData.length);
   }
 }
