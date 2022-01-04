@@ -51,6 +51,10 @@ public class Chunk {
     return voxelIds;
   }
 
+  public byte getVoxelId(int x, int y, int z) {
+    return voxelIds[x][y][z];
+  }
+
   public void placeVoxel(int x, int y, int z, VoxelType type) {
     voxelIds[x][y][z] = (byte) type.ordinal();
   }

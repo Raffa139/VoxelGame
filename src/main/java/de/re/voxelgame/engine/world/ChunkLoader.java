@@ -113,6 +113,9 @@ public final class ChunkLoader {
             if (voxelT == 0) {
               voxel.join(VoxelFace.TOP);
             }
+            if (voxelB == 0) {
+              voxel.join(VoxelFace.BOTTOM);
+            }
             if (voxelE == 0) {
               voxel.join(0.8f, VoxelFace.RIGHT);
             }

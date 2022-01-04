@@ -141,16 +141,18 @@ public class Application {
 
       // Cross-hair voxel intersection
       WorldPosition voxelInCrossHair = null;
+      WorldPosition placeableVoxel = null;
       boolean crossHairOnBlock = false;
       for (float t = 0.0f; t < 8.0f; t+=0.1f) {
         voxelInCrossHair = new WorldPosition(Vectors.add(camera.getPos(), Vectors.mul(camera.getFront().normalize(), t)));
-        float tx = voxelInCrossHair.getAbsolutePositionInCurrentChunk().x + (voxelInCrossHair.getCurrentChunkPosition().x * CHUNK_SIZE);
-        float tz = voxelInCrossHair.getAbsolutePositionInCurrentChunk().z + (voxelInCrossHair.getCurrentChunkPosition().z * CHUNK_SIZE);
-        int ty = (int) (voxelInCrossHair.getAbsolutePositionInCurrentChunk().y + voxelInCrossHair.getCurrentChunkPosition().y * CHUNK_SIZE);
+        Vector3f chunkPos = voxelInCrossHair.getCurrentChunkPosition();
+        Vector3f voxelPos = voxelInCrossHair.getAbsolutePositionInCurrentChunk();
+        Chunk chunk = chunkManager.getChunkPositionMap().get(chunkPos);
 
-        int height = noise.voxelNoise2d(tx, tz);
-        if (ty <= height) {
+        byte voxelId = chunk != null ? chunk.getVoxelId((int) voxelPos.x, (int) voxelPos.y, (int) voxelPos.z) : 0;
+        if (voxelId != 0) {
           crossHairOnBlock = true;
+          placeableVoxel = new WorldPosition(Vectors.add(camera.getPos(), Vectors.mul(camera.getFront().normalize(), t-0.1f)));
           break;
         }
       }
@@ -162,6 +164,35 @@ public class Application {
           lastVoxelInCrossHair = voxelInCrossHair;
         } else {
           chunkManager.reloadChunk(voxelInCrossHair.getCurrentChunkPosition(), voxelInCrossHair.getAbsolutePositionInCurrentChunk());
+        }
+      }
+
+      // Voxel placement
+      if (!context.isMouseCursorToggled()) {
+        if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_1) && currentFrameTime > lastPressed + 0.25f) {
+          lastPressed = currentFrameTime;
+
+          if (crossHairOnBlock) {
+            Vector3f chunkPos = placeableVoxel.getCurrentChunkPosition();
+            Vector3f voxelPos = placeableVoxel.getAbsolutePositionInCurrentChunk();
+            Chunk chunk = chunkManager.getChunkPositionMap().get(chunkPos);
+            if (chunk != null) {
+              chunk.placeVoxel((int) voxelPos.x, (int) voxelPos.y, (int) voxelPos.z, VoxelType.WOOD);
+            }
+          }
+        }
+
+        if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_2) && currentFrameTime > lastPressed + 0.25f) {
+          lastPressed = currentFrameTime;
+
+          if (crossHairOnBlock) {
+            Vector3f chunkPos = voxelInCrossHair.getCurrentChunkPosition();
+            Vector3f voxelPos = voxelInCrossHair.getAbsolutePositionInCurrentChunk();
+            Chunk chunk = chunkManager.getChunkPositionMap().get(chunkPos);
+            if (chunk != null) {
+              chunk.removeVoxel((int) voxelPos.x, (int) voxelPos.y, (int) voxelPos.z);
+            }
+          }
         }
       }
 
