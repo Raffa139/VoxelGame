@@ -40,7 +40,19 @@ public class WorldPosition {
   }
 
   public Vector3f getAbsolutePositionInCurrentChunk() {
-    return getPositionInCurrentChunk().absolute();
+    Vector3f pos = getPositionInCurrentChunk();
+
+    if (pos.x < 0.0f && pos.x != -16.0f) {
+      float diff = pos.x + 16.0f;
+      pos.x = -16.0f - diff;
+    }
+
+    if (pos.z < 0.0f && pos.z != -16.0f) {
+      float diff = pos.z + 16.0f;
+      pos.z = -16.0f - diff;
+    }
+
+    return pos.absolute();
   }
 
   public Vector3f getVector() {
