@@ -44,25 +44,31 @@ public final class ChunkLoader {
           voxelIds[x][y][z] = 0;
 
           if (ty <= height) {
-            if (ty == 50) { // Water level = 50
-              // Water
-              voxelIds[x][y][z] = (byte) VoxelType.WATER.ordinal();
-            } else if (ty > 44 && ty <= 56) {
-              // Sand
+            if (ty > 44 && ty <= 56) {
               voxelIds[x][y][z] = (byte) VoxelType.SAND.ordinal();
             } else if (ty > 56 && ty <= 85) {
-              // Grass
               voxelIds[x][y][z] = (byte) VoxelType.GRASS.ordinal();
             } else if (ty > 85 && ty <= 90) {
-              // Dirt
               voxelIds[x][y][z] = (byte) VoxelType.DIRT.ordinal();
             } else if (ty > 90) {
-              // Stone
               voxelIds[x][y][z] = (byte) VoxelType.COBBLESTONE.ordinal();
             } else {
-              // Gravel
               voxelIds[x][y][z] = (byte) VoxelType.GRAVEL.ordinal();
             }
+          }
+        }
+      }
+    }
+
+    for (int x = 0; x < CHUNK_SIZE; x++) {
+      for (int z = 0; z < CHUNK_SIZE; z++) {
+        for (int y = 0; y < CHUNK_SIZE; y++) {
+          int ty = (int) (y + pos.y * CHUNK_SIZE);
+          byte voxelIdBelow = voxelIds[x][y > 0 ? y-1 : 0][z];
+          byte voxelIdOnTop = voxelIds[x][y < CHUNK_SIZE-1 ? y+1 : 0][z];
+
+          if (ty == 50 && (voxelIdBelow == 0 || voxelIdOnTop == 0)) { // Water level = 50
+            voxelIds[x][y][z] = (byte) VoxelType.WATER.ordinal();
           }
         }
       }
@@ -83,7 +89,8 @@ public final class ChunkLoader {
           if (currentVoxel > 0) {
             boolean highlighted = new Vector3f(x, y, z).equals(highlightedVoxelPosition);
 
-            Voxel voxel = new Voxel(VoxelType.values()[currentVoxel], highlighted);
+            VoxelType currentVoxelType = VoxelType.values()[currentVoxel];
+            Voxel voxel = new Voxel(currentVoxelType, highlighted);
 
             byte voxelS =
                 z < CHUNK_SIZE - 1 ? voxelIds[x][y][z + 1] :
@@ -110,22 +117,22 @@ public final class ChunkLoader {
                     chunks.get(new Vector3f(pos.x, pos.y-1, pos.z)) != null ?
                         chunks.get(new Vector3f(pos.x, pos.y-1, pos.z)).getVoxelIds()[x][CHUNK_SIZE-1][z] : -1;
 
-            if (voxelT == 0) {
+            if (voxelT == 0 || (currentVoxelType != VoxelType.WATER && voxelT == VoxelType.WATER.ordinal())) {
               voxel.join(VoxelFace.TOP);
             }
-            if (voxelB == 0) {
+            if (voxelB == 0 && currentVoxelType != VoxelType.WATER) {
               voxel.join(VoxelFace.BOTTOM);
             }
-            if (voxelE == 0) {
+            if (voxelE == 0 || (currentVoxelType != VoxelType.WATER && voxelE == VoxelType.WATER.ordinal())) {
               voxel.join(0.8f, VoxelFace.RIGHT);
             }
-            if (voxelW == 0) {
+            if (voxelW == 0 || (currentVoxelType != VoxelType.WATER && voxelW == VoxelType.WATER.ordinal())) {
               voxel.join(0.8f, VoxelFace.LEFT);
             }
-            if (voxelN == 0) {
+            if (voxelN == 0 || (currentVoxelType != VoxelType.WATER && voxelN == VoxelType.WATER.ordinal())) {
               voxel.join(0.6f, VoxelFace.BACK);
             }
-            if (voxelS == 0) {
+            if (voxelS == 0 || (currentVoxelType != VoxelType.WATER && voxelS == VoxelType.WATER.ordinal())) {
               voxel.join(0.6f, VoxelFace.FRONT);
             }
 
