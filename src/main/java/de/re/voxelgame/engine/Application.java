@@ -1,7 +1,6 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
-import de.re.voxelgame.core.util.Vectors;
 import de.re.voxelgame.engine.intersection.AABB;
 import de.re.voxelgame.engine.intersection.Ray;
 import de.re.voxelgame.engine.intersection.RayCaster;
@@ -12,6 +11,7 @@ import de.re.voxelgame.engine.voxel.VoxelVertex;
 import de.re.voxelgame.engine.world.Chunk;
 import de.re.voxelgame.core.util.ResourceLoader;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
+import de.re.voxelgame.engine.world.ChunkInteractionManager;
 import de.re.voxelgame.engine.world.ChunkManager;
 import de.re.voxelgame.engine.world.WorldPosition;
 import org.joml.Matrix4f;
@@ -115,13 +115,12 @@ public class Application {
     };
     TextureArray textureArray = new TextureArray(16, 16, textureFiles);
 
-    DebugCamera camera = new DebugCamera(new WorldPosition(0.0f, 10.0f, 0.0f));
-
     OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
     ChunkManager chunkManager = new ChunkManager(noise);
+    VoxelCamera camera = new VoxelCamera(new WorldPosition(0.0f, 10.0f, 0.0f), new CrossHair(chunkManager));
+    ChunkInteractionManager interactionManager = new ChunkInteractionManager(chunkManager, camera);
 
     float lastPressed = 0.0f;
-    WorldPosition lastVoxelInCrossHair = new WorldPosition(0.0f);
     while (!context.isCloseRequested()) {
       glClearColor(0.2f, 0.6f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -140,59 +139,22 @@ public class Application {
       chunkManager.generate(currentFrameTime, 0.0001f);
 
       // Cross-hair voxel intersection
-      WorldPosition voxelInCrossHair = null;
-      WorldPosition placeableVoxel = null;
-      boolean crossHairOnBlock = false;
-      for (float t = 0.0f; t < 8.0f; t+=0.1f) {
-        voxelInCrossHair = new WorldPosition(Vectors.add(camera.getPos(), Vectors.mul(camera.getFront().normalize(), t)));
-        Vector3f chunkPos = voxelInCrossHair.getCurrentChunkPosition();
-        Vector3f voxelPos = voxelInCrossHair.getAbsolutePositionInCurrentChunk();
-        Chunk chunk = chunkManager.getChunkPositionMap().get(chunkPos);
-
-        byte voxelId = chunk != null ? chunk.getVoxelId((int) voxelPos.x, (int) voxelPos.y, (int) voxelPos.z) : 0;
-        if (voxelId != 0) {
-          crossHairOnBlock = true;
-          placeableVoxel = new WorldPosition(Vectors.add(camera.getPos(), Vectors.mul(camera.getFront().normalize(), t-0.1f)));
-          break;
-        }
-      }
+      camera.update(context.getDeltaTime(), !context.isMouseCursorToggled());
 
       if (!context.isMouseCursorToggled()) {
-        if (!crossHairOnBlock || !voxelInCrossHair.getCurrentChunkPosition().equals(lastVoxelInCrossHair.getCurrentChunkPosition())) {
-          chunkManager.reloadChunk(voxelInCrossHair.getCurrentChunkPosition(), null);
-          chunkManager.reloadChunk(lastVoxelInCrossHair.getCurrentChunkPosition(), null);
-          lastVoxelInCrossHair = voxelInCrossHair;
-        } else {
-          chunkManager.reloadChunk(voxelInCrossHair.getCurrentChunkPosition(), voxelInCrossHair.getAbsolutePositionInCurrentChunk());
-        }
+        interactionManager.highlightVoxel();
       }
 
       // Voxel placement
       if (!context.isMouseCursorToggled()) {
         if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_1) && currentFrameTime > lastPressed + 0.25f) {
           lastPressed = currentFrameTime;
-
-          if (crossHairOnBlock) {
-            Vector3f chunkPos = placeableVoxel.getCurrentChunkPosition();
-            Vector3f voxelPos = placeableVoxel.getAbsolutePositionInCurrentChunk();
-            Chunk chunk = chunkManager.getChunkPositionMap().get(chunkPos);
-            if (chunk != null) {
-              chunk.placeVoxel((int) voxelPos.x, (int) voxelPos.y, (int) voxelPos.z, VoxelType.WOOD);
-            }
-          }
+          interactionManager.placeVoxel();
         }
 
         if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_2) && currentFrameTime > lastPressed + 0.25f) {
           lastPressed = currentFrameTime;
-
-          if (crossHairOnBlock) {
-            Vector3f chunkPos = voxelInCrossHair.getCurrentChunkPosition();
-            Vector3f voxelPos = voxelInCrossHair.getAbsolutePositionInCurrentChunk();
-            Chunk chunk = chunkManager.getChunkPositionMap().get(chunkPos);
-            if (chunk != null) {
-              chunk.removeVoxel((int) voxelPos.x, (int) voxelPos.y, (int) voxelPos.z);
-            }
-          }
+          interactionManager.removeVoxel();
         }
       }
 
@@ -278,28 +240,6 @@ public class Application {
       if (KeyListener.keyPressed(GLFW_KEY_E) && currentFrameTime > lastPressed + 0.25f) {
         lastPressed = currentFrameTime;
         context.toggleMouseCursor();
-
-        /*System.out.println();
-        System.out.println("Voxel: ");
-        System.out.println(
-            "ABS X: " + voxelInCrossHair.getAbsolutePositionInCurrentChunk().x +
-          ", ABS Y: " + voxelInCrossHair.getAbsolutePositionInCurrentChunk().y +
-          ", ABS Z: " + voxelInCrossHair.getAbsolutePositionInCurrentChunk().z);
-        System.out.println(
-            "X: " + voxelInCrossHair.getPositionInCurrentChunk().x +
-          ", Y: " + voxelInCrossHair.getPositionInCurrentChunk().y +
-          ", Z: " + voxelInCrossHair.getPositionInCurrentChunk().z);
-
-        System.out.println();
-        System.out.println("Camera: ");
-        System.out.println(
-            "ABS X: " + camera.getWorldPosition().getAbsolutePositionInCurrentChunk().x +
-          ", ABS Y: " + camera.getWorldPosition().getAbsolutePositionInCurrentChunk().y +
-          ", ABS Z: " + camera.getWorldPosition().getAbsolutePositionInCurrentChunk().z);
-        System.out.println(
-            "X: " + camera.getWorldPosition().getPositionInCurrentChunk().x +
-          ", Y: " + camera.getWorldPosition().getPositionInCurrentChunk().y +
-          ", Z: " + camera.getWorldPosition().getPositionInCurrentChunk().z);*/
       }
 
       camera.update(context.getDeltaTime(), !context.isMouseCursorToggled());
