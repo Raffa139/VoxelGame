@@ -117,7 +117,7 @@ public class Application {
 
     OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
     ChunkManager chunkManager = new ChunkManager(noise);
-    VoxelCamera camera = new VoxelCamera(new WorldPosition(0.0f, 10.0f, 0.0f), new CrossHair(chunkManager));
+    VoxelCamera camera = new VoxelCamera(new WorldPosition(0.0f, 10.0f, 0.0f), new CrossHairTarget(chunkManager));
     ChunkInteractionManager interactionManager = new ChunkInteractionManager(chunkManager, camera);
 
     float lastPressed = 0.0f;

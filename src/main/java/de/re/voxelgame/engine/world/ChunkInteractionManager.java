@@ -18,9 +18,9 @@ public class ChunkInteractionManager {
   }
 
   public void highlightVoxel() {
-    WorldPosition voxelInCrossHair = camera.getCrossHair().getVoxelInCrossHair();
+    WorldPosition voxelInCrossHair = camera.getCrossHairTarget().getTargetedVoxel();
 
-    if (!camera.getCrossHair().isCrossHairOnBlock() ||
+    if (!camera.getCrossHairTarget().isTargetInRange() ||
         !voxelInCrossHair.getCurrentChunkPosition().equals(lastVoxelInCrossHair.getCurrentChunkPosition())) {
       chunkManager.reloadChunk(voxelInCrossHair.getCurrentChunkPosition(), null);
       chunkManager.reloadChunk(lastVoxelInCrossHair.getCurrentChunkPosition(), null);
@@ -31,9 +31,9 @@ public class ChunkInteractionManager {
   }
 
   public void placeVoxel() {
-    WorldPosition placeableVoxel = camera.getCrossHair().getPlaceableVoxel();
+    WorldPosition placeableVoxel = camera.getCrossHairTarget().getPlaceableVoxel();
 
-    if (camera.getCrossHair().isCrossHairOnBlock()) {
+    if (camera.getCrossHairTarget().isTargetInRange()) {
       Vector3f chunkPos = placeableVoxel.getCurrentChunkPosition();
       Vector3f voxelPos = placeableVoxel.getAbsolutePositionInCurrentChunk();
       Chunk chunk = chunkManager.getChunkPositionMap().get(chunkPos);
@@ -44,9 +44,9 @@ public class ChunkInteractionManager {
   }
 
   public void removeVoxel() {
-    WorldPosition voxelInCrossHair = camera.getCrossHair().getVoxelInCrossHair();
+    WorldPosition voxelInCrossHair = camera.getCrossHairTarget().getTargetedVoxel();
 
-    if (camera.getCrossHair().isCrossHairOnBlock()) {
+    if (camera.getCrossHairTarget().isTargetInRange()) {
       Vector3f chunkPos = voxelInCrossHair.getCurrentChunkPosition();
       Vector3f voxelPos = voxelInCrossHair.getAbsolutePositionInCurrentChunk();
       Chunk chunk = chunkManager.getChunkPositionMap().get(chunkPos);
