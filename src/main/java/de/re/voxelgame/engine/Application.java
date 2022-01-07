@@ -1,9 +1,6 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
-import de.re.voxelgame.engine.intersection.AABB;
-import de.re.voxelgame.engine.intersection.Ray;
-import de.re.voxelgame.engine.intersection.RayCaster;
 import de.re.voxelgame.engine.voxel.Voxel;
 import de.re.voxelgame.engine.voxel.VoxelFace;
 import de.re.voxelgame.engine.voxel.VoxelType;
@@ -159,18 +156,9 @@ public class Application {
       }
 
       // Chunk mouse-cursor intersection
-      Ray ray = RayCaster.fromMousePosition(MouseListener.getLastPosX(), MouseListener.getLastPosY(), camera, projection, 1080.0f, 720.0f);
       WorldPosition intersectionPos = null;
       if (context.isMouseCursorToggled()) {
-        for (Chunk chunk : chunkManager.getChunks()) {
-          AABB chunkBounding = chunk.getBoundingBox();
-          boolean intersects = ray.intersectsAABB(chunkBounding);
-
-          if (intersects) {
-            intersectionPos = chunk.getRelativePosition();
-            break;
-          }
-        }
+        intersectionPos = interactionManager.calculateMouseCursorIntersection(projection, 1080.0f, 720.0f);
       }
 
       chunkShader.use();

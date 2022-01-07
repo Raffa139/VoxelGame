@@ -1,7 +1,12 @@
 package de.re.voxelgame.engine.world;
 
+import de.re.voxelgame.core.MouseListener;
 import de.re.voxelgame.engine.VoxelCamera;
+import de.re.voxelgame.engine.intersection.AABB;
+import de.re.voxelgame.engine.intersection.Ray;
+import de.re.voxelgame.engine.intersection.RayCaster;
 import de.re.voxelgame.engine.voxel.VoxelType;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class ChunkInteractionManager {
@@ -54,5 +59,20 @@ public class ChunkInteractionManager {
         chunk.removeVoxel((int) voxelPos.x, (int) voxelPos.y, (int) voxelPos.z);
       }
     }
+  }
+
+  public WorldPosition calculateMouseCursorIntersection(Matrix4f projection, float resolutionX, float resolutionY) {
+    Ray ray = RayCaster.fromMousePosition(MouseListener.getLastPosX(), MouseListener.getLastPosY(), camera, projection, resolutionX, resolutionY);
+
+    for (Chunk chunk : chunkManager.getChunks()) {
+      AABB chunkBounding = chunk.getBoundingBox();
+      boolean intersects = ray.intersectsAABB(chunkBounding);
+
+      if (intersects) {
+        return chunk.getRelativePosition();
+      }
+    }
+
+    return null;
   }
 }
