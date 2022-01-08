@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static de.re.voxelgame.engine.world.Chunk.CHUNK_SIZE;
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL30.*;
@@ -62,6 +63,8 @@ public class ChunkRenderer {
   }
 
   public void render(Collection<Chunk> chunks, Matrix4f view, Matrix4f projection, WorldPosition mouseCursorIntersectionPos, int fbo, int fbo2) {
+    float currentTime = (float) glfwGetTime();
+
     // First rendering pass for transparent voxels
     glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
 
@@ -69,6 +72,7 @@ public class ChunkRenderer {
     waterShader.setMatrix4("iView", view);
     waterShader.setMatrix4("iProjection", projection);
     waterShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
+    waterShader.setFloat("iTime", currentTime);
 
     glClearColor(0.2f, 0.6f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -96,6 +100,7 @@ public class ChunkRenderer {
     shader.setMatrix4("iView", view);
     shader.setMatrix4("iProjection", projection);
     shader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
+    shader.setFloat("iTime", currentTime);
 
     AABBShader.use();
     AABBShader.setMatrix4("iView", view);

@@ -10,7 +10,7 @@ public class ChunkManager {
   // Loading chunks as needed (when camera moves)
   // Memory management of chunk data
 
-  private static final int CHUNK_COUNT = 20;
+  private static final int CHUNK_COUNT = 10;
   private static final int CHUNK_STACKS = 6;
 
   private final Map<Vector3f, Chunk> chunks;
