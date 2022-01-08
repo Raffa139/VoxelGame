@@ -1,27 +1,18 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
-import de.re.voxelgame.engine.voxel.Voxel;
-import de.re.voxelgame.engine.voxel.VoxelFace;
-import de.re.voxelgame.engine.voxel.VoxelType;
-import de.re.voxelgame.engine.voxel.VoxelVertex;
-import de.re.voxelgame.engine.world.Chunk;
+import de.re.voxelgame.engine.gui.HudRenderer;
+import de.re.voxelgame.engine.world.*;
 import de.re.voxelgame.core.util.ResourceLoader;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
-import de.re.voxelgame.engine.world.ChunkInteractionManager;
-import de.re.voxelgame.engine.world.ChunkManager;
-import de.re.voxelgame.engine.world.WorldPosition;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.lwjgl.Version;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
-import java.util.List;
 
-import static de.re.voxelgame.engine.world.Chunk.CHUNK_SIZE;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
@@ -55,47 +46,6 @@ public class Application {
     ResourceLoader.Resource aabbFrag = ResourceLoader.locateResource("shader/chunkAABB.frag", Application.class);
     Shader chunkAABBShader = new Shader(aabbVert.toPath(), aabbFrag.toPath());
 
-    // Cross-hair
-    float[] crossHairVertices = {
-        -0.5f,  0.05f, 0.0f,
-        -0.5f, -0.05f, 0.0f,
-         0.5f, -0.05f, 0.0f,
-         0.5f, -0.05f, 0.0f,
-         0.5f,  0.05f, 0.0f,
-        -0.5f,  0.05f, 0.0f
-    };
-
-    int crossHairVao = MemoryManager
-        .allocateVao()
-        .bufferData(crossHairVertices, GL_STATIC_DRAW)
-        .enableAttribArray(0)
-        .attribPointer(0, 3, GL_FLOAT, false, 3 * 4, 0L)
-        .doFinal();
-
-    // Chunk border
-    Voxel border = new Voxel(VoxelType.MISSING, false,
-        VoxelFace.FRONT,
-        VoxelFace.BACK,
-        VoxelFace.LEFT,
-        VoxelFace.RIGHT,
-        VoxelFace.TOP,
-        VoxelFace.BOTTOM);
-    List<VoxelVertex> borderVertices = border.getVertices();
-    float[] borderVertexData = new float[borderVertices.size()*3];
-    for (int i = 0; i < borderVertexData.length; i+=3) {
-      VoxelVertex v = borderVertices.get((int) Math.floor(i/3.0));
-      borderVertexData[i] = v.getPosition().x;
-      borderVertexData[i+1] = v.getPosition().y;
-      borderVertexData[i+2] = v.getPosition().z;
-    }
-
-    int borderVaoId = MemoryManager
-        .allocateVao()
-        .bufferData(borderVertexData, GL_STATIC_DRAW)
-        .enableAttribArray(0)
-        .attribPointer(0, 3, GL_FLOAT, false, 3 * 4, 0L)
-        .doFinal();
-
     // Texture
     String[] textureFiles = {
         "textures/cobblestone.png",
@@ -117,19 +67,15 @@ public class Application {
     VoxelCamera camera = new VoxelCamera(new WorldPosition(0.0f, 10.0f, 0.0f), new CrossHairTarget(chunkManager));
     ChunkInteractionManager interactionManager = new ChunkInteractionManager(chunkManager, camera);
 
+    ChunkRenderer chunkRenderer = new ChunkRenderer(context, chunkShader, chunkAABBShader);
+    HudRenderer hudRenderer = new HudRenderer(context, hudShader);
+
     float lastPressed = 0.0f;
     while (!context.isCloseRequested()) {
       glClearColor(0.2f, 0.6f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glEnable(GL_CULL_FACE);
       glEnable(GL_DEPTH_TEST);
-
-      Matrix4f view = camera.getViewMatrix();
-      Matrix4f projection = new Matrix4f()
-              .perspective((float) Math.toRadians(65.0f), context.getAspectRatio(), 0.01f, 1000.0f);
-
-      glActiveTexture(GL_TEXTURE0);
-      glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray.getId());
 
       float currentFrameTime = (float) glfwGetTime();
 
@@ -155,65 +101,22 @@ public class Application {
         }
       }
 
+      Matrix4f view = camera.getViewMatrix();
+      Matrix4f projection = new Matrix4f()
+          .perspective((float) Math.toRadians(65.0f), context.getAspectRatio(), 0.01f, 1000.0f);
+
       // Chunk mouse-cursor intersection
       WorldPosition intersectionPos = null;
       if (context.isMouseCursorToggled()) {
         intersectionPos = interactionManager.calculateMouseCursorIntersection(projection, context.getWindowWidth(), context.getWindowHeight());
       }
 
-      chunkShader.use();
-      chunkShader.setMatrix4("iView", view);
-      chunkShader.setMatrix4("iProjection", projection);
-      chunkShader.setFloat("iTime", currentFrameTime);
-      chunkShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray.getId());
+      chunkRenderer.render(chunkManager.getChunks(), view, projection, intersectionPos);
+      glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
-      chunkAABBShader.use();
-      chunkAABBShader.setMatrix4("iView", view);
-      chunkAABBShader.setMatrix4("iProjection", projection);
-
-      for (Chunk chunk : chunkManager.getChunks()) {
-        if (chunk.hasMesh()) {
-          Matrix4f model = new Matrix4f();
-          model.translate(chunk.getWorldPosition().getVector());
-
-          chunkShader.use();
-          chunkShader.setMatrix4("iModel", model);
-
-          glBindVertexArray(chunk.getMesh().getVaoId());
-          glDrawArrays(GL_TRIANGLES, 0, chunk.getMesh().getVertexCount());
-          glBindVertexArray(0);
-        }
-
-        // Draw chunk border
-        if (context.isMouseCursorToggled()) {
-          Matrix4f model = new Matrix4f();
-          model.translate(chunk.getWorldPosition().getVector()).scale(CHUNK_SIZE);
-
-          chunkAABBShader.use();
-          chunkAABBShader.setMatrix4("iModel", model);
-          if (chunk.getRelativePosition().equals(intersectionPos) && context.isMouseCursorToggled()) {
-            chunkAABBShader.setVec3("iColor", new Vector3f(1.0f, 0.0f, 0.0f));
-          } else {
-            chunkAABBShader.setVec3("iColor", new Vector3f(1.0f, 1.0f, 1.0f));
-          }
-
-          glBindVertexArray(borderVaoId);
-          glDrawArrays(GL_LINES, 0, borderVertexData.length);
-          glBindVertexArray(0);
-        }
-      }
-
-      hudShader.use();
-      hudShader.setMatrix4("iModel", new Matrix4f().scale(0.05f));
-
-      glBindVertexArray(crossHairVao);
-      glDrawArrays(GL_TRIANGLES, 0, crossHairVertices.length);
-
-      hudShader.setMatrix4("iModel", new Matrix4f()
-          .rotate((float) Math.toRadians(90.0), new Vector3f(0.0f, 0.0f, 1.0f))
-          .scale(0.05f));
-      glDrawArrays(GL_TRIANGLES, 0, crossHairVertices.length);
-      glBindVertexArray(0);
+      hudRenderer.render();
 
       if (KeyListener.keyPressed(GLFW_KEY_ESCAPE)) {
         context.requestClose();

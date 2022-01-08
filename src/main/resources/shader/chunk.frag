@@ -5,7 +5,6 @@ layout (location = 0) out vec4 FragColor;
 in vec4 Texs;
 in float Highlighted;
 
-uniform float iTime;
 uniform vec3 iColor;
 uniform sampler2DArray sampler;
 
