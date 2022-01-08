@@ -14,7 +14,12 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class GLContext {
+  private static GLContext instant;
+
   private final long window;
+
+  private int windowWidth;
+  private int windowHeight;
 
   private int frames;
   private float deltaTime;
@@ -23,7 +28,13 @@ public class GLContext {
 
   private boolean mouseCursorToggled = false;
 
-  public GLContext(int width, int height, String title) {
+  private GLContext(long window, int width, int height) {
+    this.window = window;
+    windowWidth = width;
+    windowHeight = height;
+  }
+
+  public static GLContext init(int width, int height, String title) {
     // Setup error callback. Default implementation will print error messages in System.err
     glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
 
@@ -41,7 +52,7 @@ public class GLContext {
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
     // Create window
-    window = glfwCreateWindow(width, height, title, NULL, NULL);
+    long window = glfwCreateWindow(width, height, title, NULL, NULL);
     if (window == NULL) {
       glfwTerminate();
       throw new IllegalStateException("Failed to create GLFW window!");
@@ -81,6 +92,12 @@ public class GLContext {
     // creates the GLCapabilities instance and makes the OpenGL
     // bindings available for use.
     createCapabilities();
+
+    if (instant == null) {
+      instant = new GLContext(window, width, height);
+    }
+
+    return instant;
   }
 
   public void update() {
@@ -142,7 +159,29 @@ public class GLContext {
     return deltaTime;
   }
 
+  public int getWindowWidth() {
+    return windowWidth;
+  }
+
+  public int getWindowHeight() {
+    return windowHeight;
+  }
+
+  public float getAspectRatio() {
+    return (float) windowWidth / (float) windowHeight;
+  }
+
+  private void setWindowWidth(int width) {
+    windowWidth = width;
+  }
+
+  private void setWindowHeight(int height) {
+    windowHeight = height;
+  }
+
   private static void framebufferSizeCallback(long window, int width, int height) {
+    instant.setWindowWidth(width);
+    instant.setWindowHeight(height);
     glViewport(0, 0, width, height);
   }
 }

@@ -35,7 +35,7 @@ public class Application {
   public void run() throws IOException, URISyntaxException {
     System.out.println("LWJGL " + Version.getVersion());
 
-    GLContext context = new GLContext(1080, 720, "OpenGL");
+    GLContext context = GLContext.init(1080, 720, "OpenGL");
     loop(context);
 
     context.terminate();
@@ -126,7 +126,7 @@ public class Application {
 
       Matrix4f view = camera.getViewMatrix();
       Matrix4f projection = new Matrix4f()
-              .perspective((float) Math.toRadians(65.0f), 1080.0f / 720.0f, 0.01f, 1000.0f);
+              .perspective((float) Math.toRadians(65.0f), context.getAspectRatio(), 0.01f, 1000.0f);
 
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray.getId());
@@ -158,7 +158,7 @@ public class Application {
       // Chunk mouse-cursor intersection
       WorldPosition intersectionPos = null;
       if (context.isMouseCursorToggled()) {
-        intersectionPos = interactionManager.calculateMouseCursorIntersection(projection, 1080.0f, 720.0f);
+        intersectionPos = interactionManager.calculateMouseCursorIntersection(projection, context.getWindowWidth(), context.getWindowHeight());
       }
 
       chunkShader.use();
