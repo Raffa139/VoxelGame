@@ -15,8 +15,6 @@ import java.time.temporal.ChronoField;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL30.*;
 
 public class Application {
   public static void main(String[] args) throws IOException, URISyntaxException {
@@ -60,7 +58,7 @@ public class Application {
         "textures/cactus_side.png",
         "textures/gravel.png"
     };
-    TextureArray textureArray = new TextureArray(16, 16, textureFiles);
+    Texture2dArray texture2dArray = new Texture2dArray(16, 16, textureFiles);
 
     OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
     ChunkManager chunkManager = new ChunkManager(noise);
@@ -111,10 +109,8 @@ public class Application {
         intersectionPos = interactionManager.calculateMouseCursorIntersection(projection, context.getWindowWidth(), context.getWindowHeight());
       }
 
-      glActiveTexture(GL_TEXTURE0);
-      glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray.getId());
+      texture2dArray.bind(0);
       chunkRenderer.render(chunkManager.getChunks(), view, projection, intersectionPos);
-      glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
       hudRenderer.render();
 
@@ -138,7 +134,7 @@ public class Application {
       context.update();
     }
 
-    textureArray.cleanup();
+    texture2dArray.cleanup();
     chunkShader.terminate();
     chunkAABBShader.terminate();
     hudShader.terminate();

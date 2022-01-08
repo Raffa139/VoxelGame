@@ -10,14 +10,15 @@ import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.glTexImage3D;
 import static org.lwjgl.opengl.GL12.glTexSubImage3D;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.GL_TEXTURE_2D_ARRAY;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
-public class TextureArray {
-  private final int id;
+public class Texture2dArray extends Texture {
+  public Texture2dArray(int width, int height, String... files) throws IOException, URISyntaxException {
+    super(glGenTextures());
 
-  public TextureArray(int width, int height, String... files) throws IOException, URISyntaxException {
-    id = glGenTextures();
     glBindTexture(GL_TEXTURE_2D_ARRAY, id);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -29,7 +30,7 @@ public class TextureArray {
 
     for (int layer = 0; layer < depth; layer++) {
       String file = files[layer];
-      PNGDecoder decoder = new PNGDecoder(ResourceLoader.locateResource(file, Texture.class).toFileInputStream());
+      PNGDecoder decoder = new PNGDecoder(ResourceLoader.locateResource(file, Texture2dArray.class).toFileInputStream());
       ByteBuffer buffer = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
       decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
       buffer.flip();
@@ -43,13 +44,13 @@ public class TextureArray {
     }
 
     glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
   }
 
-  public void cleanup() {
-    glDeleteTextures(id);
-  }
-
-  public int getId() {
-    return id;
+  @Override
+  public void bind(int index) {
+    glActiveTexture(GL_TEXTURE0 + index);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, id);
   }
 }
