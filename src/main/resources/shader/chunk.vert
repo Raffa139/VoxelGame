@@ -9,6 +9,7 @@ uniform mat4 iProjection;
 uniform float iTime;
 
 out vec4 Texs;
+out vec3 VertPos;
 out float Highlighted;
 
 vec2 texCoords[4] = vec2[4](
@@ -31,14 +32,12 @@ void main() {
     Texs = vec4(texCoords[texIndex], lightLevel, texLayer);
     Highlighted = highlighted;
 
+    VertPos = (iModel * vec4(x, y, z, 1.0)).xyz;
     if (Texs.w == 6) {
-        vec3 vert = (iModel * vec4(x, y, z, 1.0)).xyz;
-        vert.y += sin((iTime + vert.x) * 1.5) / 12.0;
-        vert.y += cos((iTime + vert.z) * 1.5) / 12.0;
-        vert.y -= 0.2;
-
-        gl_Position = iProjection * iView * vec4(vert, 1.0);
-    } else {
-        gl_Position = iProjection * iView * iModel * vec4(x, y, z, 1.0);
+        VertPos.y += sin((iTime + VertPos.x) * 1.5) / 12.0;
+        VertPos.y += cos((iTime + VertPos.z) * 1.5) / 12.0;
+        VertPos.y -= 0.2;
     }
+
+    gl_Position = iProjection * iView * vec4(VertPos, 1.0);
 }

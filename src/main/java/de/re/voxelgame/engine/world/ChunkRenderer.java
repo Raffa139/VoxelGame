@@ -1,8 +1,6 @@
 package de.re.voxelgame.engine.world;
 
-import de.re.voxelgame.core.GLContext;
-import de.re.voxelgame.core.MemoryManager;
-import de.re.voxelgame.core.Shader;
+import de.re.voxelgame.core.*;
 import de.re.voxelgame.engine.voxel.Voxel;
 import de.re.voxelgame.engine.voxel.VoxelFace;
 import de.re.voxelgame.engine.voxel.VoxelType;
@@ -62,16 +60,21 @@ public class ChunkRenderer {
     this.AABBShader = AABBShader;
   }
 
-  public void render(Collection<Chunk> chunks, Matrix4f view, Matrix4f projection, WorldPosition mouseCursorIntersectionPos, int fbo, int fbo2) {
+  public void render(Collection<Chunk> chunks, Matrix4f view, Matrix4f projection,
+                     WorldPosition mouseCursorIntersectionPos, int fbo, int fbo2,
+                     Texture2dArray textureArray, Texture2d normalMap) {
     float currentTime = (float) glfwGetTime();
 
     // First rendering pass for transparent voxels
     glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
 
+    normalMap.bind(0);
+
     waterShader.use();
     waterShader.setMatrix4("iView", view);
     waterShader.setMatrix4("iProjection", projection);
     waterShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
+    waterShader.setVec3("iLightDirection", new Vector3f(0.7f, 0.3f, 0.3f));
     waterShader.setFloat("iTime", currentTime);
 
     glClearColor(0.2f, 0.6f, 1.0f, 1.0f);
@@ -95,6 +98,8 @@ public class ChunkRenderer {
 
     // Second rendering pass for normal voxels
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+    textureArray.bind(0);
 
     shader.use();
     shader.setMatrix4("iView", view);

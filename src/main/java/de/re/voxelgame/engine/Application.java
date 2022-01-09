@@ -68,7 +68,9 @@ public class Application {
         "textures/cactus_side.png",
         "textures/gravel.png"
     };
-    Texture2dArray texture2dArray = new Texture2dArray(16, 16, textureFiles);
+    Texture2dArray textureArray = new Texture2dArray(16, 16, textureFiles);
+
+    Texture2d normalMap = new Texture2d("textures/normal_map.png");
 
     OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
     ChunkManager chunkManager = new ChunkManager(noise);
@@ -196,8 +198,9 @@ public class Application {
         intersectionPos = interactionManager.calculateMouseCursorIntersection(projection, context.getWindowWidth(), context.getWindowHeight());
       }
 
-      texture2dArray.bind(0);
-      chunkRenderer.render(chunkManager.getChunks(), view, projection, intersectionPos, fbo, textureColorBuffer);
+      waterShader.use();
+      waterShader.setVec3("iCameraPos", camera.getPos());
+      chunkRenderer.render(chunkManager.getChunks(), view, projection, intersectionPos, fbo, fbo2, textureArray, normalMap);
 
       screenShader.use();
       screenShader.setInt("normalVoxelSampler", 0);
@@ -253,8 +256,11 @@ public class Application {
     glDeleteTextures(depthBuffer2);
     glDeleteFramebuffers(fbo);
     glDeleteFramebuffers(fbo2);
-    texture2dArray.cleanup();
+
+    textureArray.cleanup();
+    normalMap.cleanup();
     chunkShader.terminate();
+    waterShader.terminate();
     chunkAABBShader.terminate();
     hudShader.terminate();
   }
