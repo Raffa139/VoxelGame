@@ -14,10 +14,15 @@ void main() {
     }
 
     vec3 textureCoords = vec3(Texs.xyw);
-    vec3 color = texture(sampler, textureCoords).rgb;
-    if (Highlighted == 1.0) {
-        color += iColor;
+    vec4 color = texture(sampler, textureCoords);
+
+    if (color.a == 0) {
+        discard;
     }
 
-    FragColor = vec4(color, 1.0) * Texs.z;
+    if (Highlighted == 1.0) {
+        color += vec4(iColor, 1.0);
+    }
+
+    FragColor = vec4(color) * Texs.z;
 }

@@ -182,7 +182,7 @@ public class Application {
       if (!context.isMouseCursorToggled()) {
         if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_2) && currentFrameTime > lastPressed + 0.25f) {
           lastPressed = currentFrameTime;
-          interactionManager.placeVoxel(VoxelType.WOOD);
+          interactionManager.placeVoxel(VoxelType.LEAVES);
         }
 
         if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_1) && currentFrameTime > lastPressed + 0.25f) {
