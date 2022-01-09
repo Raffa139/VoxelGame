@@ -35,7 +35,7 @@ public class ChunkInteractionManager {
     }
   }
 
-  public void placeVoxel() {
+  public void placeVoxel(VoxelType type) {
     WorldPosition placeableVoxel = camera.getCrossHairTarget().getPlaceableVoxel();
 
     if (camera.getCrossHairTarget().isTargetInRange()) {
@@ -43,7 +43,7 @@ public class ChunkInteractionManager {
       Vector3f voxelPos = placeableVoxel.getAbsolutePositionInCurrentChunk();
       Chunk chunk = chunkManager.getChunkPositionMap().get(chunkPos);
       if (chunk != null) {
-        chunk.placeVoxel((int) voxelPos.x, (int) voxelPos.y, (int) voxelPos.z, VoxelType.WOOD);
+        chunk.placeVoxel((int) voxelPos.x, (int) voxelPos.y, (int) voxelPos.z, type);
       }
     }
   }

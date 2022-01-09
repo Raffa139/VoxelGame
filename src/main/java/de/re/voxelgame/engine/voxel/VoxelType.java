@@ -10,8 +10,8 @@ public enum VoxelType {
   WATER(6),
   WOOD(7),
   LEAVES(8),
-  CACTUS(9),
-  GRAVEL(10);
+  CACTUS(10, 11, 9),
+  GRAVEL(12);
 
   private final int northernTextureTile;
   private final int easternTextureTile;

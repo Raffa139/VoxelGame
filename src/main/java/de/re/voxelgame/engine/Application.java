@@ -2,6 +2,7 @@ package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
 import de.re.voxelgame.engine.gui.HudRenderer;
+import de.re.voxelgame.engine.voxel.VoxelType;
 import de.re.voxelgame.engine.world.*;
 import de.re.voxelgame.core.util.ResourceLoader;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
@@ -66,6 +67,8 @@ public class Application {
         "textures/wood.png",
         "textures/leaves.png",
         "textures/cactus_side.png",
+        "textures/cactus_top.png",
+        "textures/cactus_bottom.png",
         "textures/gravel.png"
     };
     Texture2dArray textureArray = new Texture2dArray(16, 16, textureFiles);
@@ -177,12 +180,12 @@ public class Application {
 
       // Voxel placement
       if (!context.isMouseCursorToggled()) {
-        if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_1) && currentFrameTime > lastPressed + 0.25f) {
+        if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_2) && currentFrameTime > lastPressed + 0.25f) {
           lastPressed = currentFrameTime;
-          interactionManager.placeVoxel();
+          interactionManager.placeVoxel(VoxelType.WOOD);
         }
 
-        if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_2) && currentFrameTime > lastPressed + 0.25f) {
+        if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_1) && currentFrameTime > lastPressed + 0.25f) {
           lastPressed = currentFrameTime;
           interactionManager.removeVoxel();
         }
