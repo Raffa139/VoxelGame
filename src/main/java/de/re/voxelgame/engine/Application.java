@@ -104,18 +104,24 @@ public class Application {
     int textureColorBuffer = glGenTextures();
     glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, context.getWindowWidth(), context.getWindowHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer) null);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
 
-    int rbo = glGenRenderbuffers();
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, context.getWindowWidth(), context.getWindowHeight());
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    int depthBuffer = glGenTextures();
+    glBindTexture(GL_TEXTURE_2D, depthBuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, context.getWindowWidth(), context.getWindowHeight(), 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, (ByteBuffer) null);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthBuffer, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
       System.err.println("ERROR::FRAMEBUFFER::NOT::COMPLETE");
@@ -129,18 +135,24 @@ public class Application {
     int textureColorBuffer2 = glGenTextures();
     glBindTexture(GL_TEXTURE_2D, textureColorBuffer2);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, context.getWindowWidth(), context.getWindowHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer) null);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer2, 0);
 
-    int rbo2 = glGenRenderbuffers();
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo2);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, context.getWindowWidth(), context.getWindowHeight());
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    int depthBuffer2 = glGenTextures();
+    glBindTexture(GL_TEXTURE_2D, depthBuffer2);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, context.getWindowWidth(), context.getWindowHeight(), 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, (ByteBuffer) null);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo2);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthBuffer2, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
       System.err.println("ERROR::FRAMEBUFFER::NOT::COMPLETE");
@@ -190,6 +202,8 @@ public class Application {
       screenShader.use();
       screenShader.setInt("normalVoxelSampler", 0);
       screenShader.setInt("transparentSampler", 1);
+      screenShader.setInt("voxelDepthSampler", 2);
+      screenShader.setInt("transparentDepthSampler", 3);
 
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -197,6 +211,10 @@ public class Application {
       glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
       glActiveTexture(GL_TEXTURE1);
       glBindTexture(GL_TEXTURE_2D, textureColorBuffer2);
+      glActiveTexture(GL_TEXTURE2);
+      glBindTexture(GL_TEXTURE_2D, depthBuffer);
+      glActiveTexture(GL_TEXTURE3);
+      glBindTexture(GL_TEXTURE_2D, depthBuffer2);
 
       glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
@@ -229,6 +247,12 @@ public class Application {
       context.update();
     }
 
+    glDeleteTextures(textureColorBuffer);
+    glDeleteTextures(textureColorBuffer2);
+    glDeleteTextures(depthBuffer);
+    glDeleteTextures(depthBuffer2);
+    glDeleteFramebuffers(fbo);
+    glDeleteFramebuffers(fbo2);
     texture2dArray.cleanup();
     chunkShader.terminate();
     chunkAABBShader.terminate();

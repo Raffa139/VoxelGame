@@ -12,7 +12,6 @@ void main() {
         return;
     }
 
-    vec3 textureCoords = vec3(Texs.xyw);
-    vec3 color = texture(sampler, textureCoords).rgb;
+    vec3 color = vec3(0.1, 0.2, 0.7);
     FragColor = vec4(color, 1.0);
 }
