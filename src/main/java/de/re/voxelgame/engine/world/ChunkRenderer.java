@@ -1,15 +1,10 @@
 package de.re.voxelgame.engine.world;
 
 import de.re.voxelgame.core.*;
-import de.re.voxelgame.engine.voxel.Voxel;
-import de.re.voxelgame.engine.voxel.VoxelFace;
-import de.re.voxelgame.engine.voxel.VoxelType;
-import de.re.voxelgame.engine.voxel.VoxelVertex;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.Collection;
-import java.util.List;
 
 import static de.re.voxelgame.engine.world.Chunk.CHUNK_SIZE;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
@@ -29,21 +24,49 @@ public class ChunkRenderer {
 
   static {
     // Chunk border
-    Voxel border = new Voxel(VoxelType.MISSING, false,
-        VoxelFace.FRONT,
-        VoxelFace.BACK,
-        VoxelFace.LEFT,
-        VoxelFace.RIGHT,
-        VoxelFace.TOP,
-        VoxelFace.BOTTOM);
-    List<VoxelVertex> borderVertices = border.getVertices();
-    borderVertexData = new float[borderVertices.size()*3];
-    for (int i = 0; i < borderVertexData.length; i+=3) {
-      VoxelVertex v = borderVertices.get((int) Math.floor(i/3.0));
-      borderVertexData[i] = v.getPosition().x;
-      borderVertexData[i+1] = v.getPosition().y;
-      borderVertexData[i+2] = v.getPosition().z;
-    }
+    borderVertexData = new float[]{
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+
+        0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+
+        0.0f, 1.0f, 0.0f,
+        1.0f, 1.0f, 0.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        0.0f, 1.0f, 1.0f,
+        0.0f, 1.0f, 0.0f,
+
+        0.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 1.0f
+    };
 
     borderVaoId = MemoryManager
         .allocateVao()
