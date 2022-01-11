@@ -6,6 +6,7 @@ import de.re.voxelgame.engine.voxel.VoxelType;
 import de.re.voxelgame.engine.world.*;
 import de.re.voxelgame.core.util.ResourceLoader;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.lwjgl.Version;
 
@@ -51,11 +52,15 @@ public class Application {
     ResourceLoader.Resource hudFrag = ResourceLoader.locateResource("shader/basicHud.frag", Application.class);
     Shader hudShader = new Shader(hudVert.toPath(), hudFrag.toPath());
 
+    ResourceLoader.Resource skyboxVert = ResourceLoader.locateResource("shader/skybox.vert", Application.class);
+    ResourceLoader.Resource skyboxFrag = ResourceLoader.locateResource("shader/skybox.frag", Application.class);
+    Shader skyboxShader = new Shader(skyboxVert.toPath(), skyboxFrag.toPath());
+
     ResourceLoader.Resource screenVert = ResourceLoader.locateResource("shader/screen.vert", Application.class);
     ResourceLoader.Resource screenFrag = ResourceLoader.locateResource("shader/screen.frag", Application.class);
     Shader screenShader = new Shader(screenVert.toPath(), screenFrag.toPath());
 
-    // Texture
+    // Textures
     String[] textureFiles = {
         "textures/cobblestone.png",
         "textures/dirt.png",
@@ -73,6 +78,9 @@ public class Application {
     };
     Texture2dArray textureArray = new Texture2dArray(16, 16, textureFiles);
 
+    Cubemap skybox = new Cubemap("skybox/right.png", "skybox/left.png", "skybox/top.png",
+                               "skybox/bottom.png", "skybox/back.png", "skybox/front.png");
+
     Texture2d normalMap = new Texture2d("textures/normal_map.png");
 
     OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
@@ -83,6 +91,59 @@ public class Application {
     ChunkRenderer chunkRenderer = new ChunkRenderer(context, chunkShader, waterShader, chunkAABBShader);
     HudRenderer hudRenderer = new HudRenderer(context, hudShader);
 
+    // Skybox geometry
+    float[] skyboxVertices = {
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+        1.0f,  1.0f, -1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+        1.0f, -1.0f,  1.0f
+    };
+
+    int skyboxVao = MemoryManager
+        .allocateVao()
+        .bufferData(skyboxVertices, GL_STATIC_DRAW)
+        .enableAttribArray(0)
+        .attribPointer(0, 3, GL_FLOAT, false, 3 * 4, 0L)
+        .doFinal();
+
+    // Post-processing
     float[] screenQuadVertices = {
       // positions   // texCoords
       -1.0f,  1.0f,  0.0f, 1.0f,
@@ -103,6 +164,7 @@ public class Application {
         .attribPointer(1, 2, GL_FLOAT, false, 4 * 4, 2 * 4L)
         .doFinal();
 
+    // Framebuffer 1
     int fbo = glGenFramebuffers();
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -134,6 +196,7 @@ public class Application {
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    // Framebuffer 2
     int fbo2 = glGenFramebuffers();
     glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
 
@@ -201,10 +264,27 @@ public class Application {
         intersectionPos = interactionManager.calculateMouseCursorIntersection(projection, context.getWindowWidth(), context.getWindowHeight());
       }
 
+      // Render voxels
       waterShader.use();
       waterShader.setVec3("iCameraPos", camera.getPos());
       chunkRenderer.render(chunkManager.getChunks(), view, projection, intersectionPos, fbo, fbo2, textureArray, normalMap);
 
+      // Render skybox
+      glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+      glDepthFunc(GL_LEQUAL);
+
+      Matrix4f skyboxView = camera.getViewMatrix().get3x3(new Matrix3f()).get(new Matrix4f());
+      skyboxShader.use();
+      skyboxShader.setMatrix4("iView", skyboxView);
+      skyboxShader.setMatrix4("iProjection", projection);
+
+      glBindVertexArray(skyboxVao);
+      skybox.bind(0);
+      glDrawArrays(GL_TRIANGLES, 0, skyboxVertices.length);
+      glBindVertexArray(0);
+      glDepthFunc(GL_LESS);
+
+      // Post-processing
       screenShader.use();
       screenShader.setInt("normalVoxelSampler", 0);
       screenShader.setInt("transparentSampler", 1);
@@ -222,7 +302,7 @@ public class Application {
       glActiveTexture(GL_TEXTURE3);
       glBindTexture(GL_TEXTURE_2D, depthBuffer2);
 
-      glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+      glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
       glDisable(GL_CULL_FACE);
       glDisable(GL_DEPTH_TEST);
@@ -231,8 +311,10 @@ public class Application {
       glDrawArrays(GL_TRIANGLES, 0, screenQuadVertices.length);
       glBindVertexArray(0);
 
+      // Render hud
       hudRenderer.render();
 
+      // Keybindings
       if (KeyListener.keyPressed(GLFW_KEY_ESCAPE)) {
         context.requestClose();
       }
@@ -249,7 +331,6 @@ public class Application {
       }
 
       camera.update(context.getDeltaTime(), !context.isMouseCursorToggled());
-
       context.update();
     }
 
@@ -261,6 +342,7 @@ public class Application {
     glDeleteFramebuffers(fbo2);
 
     textureArray.cleanup();
+    skybox.cleanup();
     normalMap.cleanup();
     chunkShader.terminate();
     waterShader.terminate();
