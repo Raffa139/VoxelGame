@@ -1,10 +1,9 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.core.sampler;
 
 import de.matthiasmann.twl.utils.PNGDecoder;
-import de.re.voxelgame.core.util.ResourceLoader;
 
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -15,8 +14,8 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.GL_TEXTURE_2D_ARRAY;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
-public class Texture2dArray extends Texture {
-  public Texture2dArray(int width, int height, String... files) throws IOException, URISyntaxException {
+public class Sampler2DArray extends Sampler {
+  protected Sampler2DArray(int width, int height, FileInputStream... fins) throws IOException {
     super(glGenTextures());
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, id);
@@ -25,12 +24,12 @@ public class Texture2dArray extends Texture {
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    int depth = files.length;
+    int depth = fins.length;
     glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, width, height, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer) null);
 
     for (int layer = 0; layer < depth; layer++) {
-      String file = files[layer];
-      PNGDecoder decoder = new PNGDecoder(ResourceLoader.locateResource(file, Texture2dArray.class).toFileInputStream());
+      FileInputStream fin = fins[layer];
+      PNGDecoder decoder = new PNGDecoder(fin);
       ByteBuffer buffer = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
       decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
       buffer.flip();

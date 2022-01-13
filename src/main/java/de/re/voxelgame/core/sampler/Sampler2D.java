@@ -1,10 +1,9 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.core.sampler;
 
 import de.matthiasmann.twl.utils.PNGDecoder;
-import de.re.voxelgame.core.util.ResourceLoader;
 
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -13,11 +12,11 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
-public class Texture2d extends Texture {
-  public Texture2d(String file) throws IOException, URISyntaxException {
+public class Sampler2D extends Sampler {
+  protected Sampler2D(FileInputStream fin) throws IOException {
     super(glGenTextures());
 
-    PNGDecoder decoder = new PNGDecoder(ResourceLoader.locateResource(file, Texture2d.class).toFileInputStream());
+    PNGDecoder decoder = new PNGDecoder(fin);
     ByteBuffer buffer = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
     decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
     buffer.flip();

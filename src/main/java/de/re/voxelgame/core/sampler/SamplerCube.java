@@ -1,12 +1,10 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.core.sampler;
 
 import de.matthiasmann.twl.utils.PNGDecoder;
-import de.re.voxelgame.core.util.ResourceLoader;
 
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -15,8 +13,8 @@ import static org.lwjgl.opengl.GL12.GL_TEXTURE_WRAP_R;
 import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL30.GL_TEXTURE_2D_ARRAY;
 
-public class Cubemap extends Texture {
-  public Cubemap(String right, String left, String top, String bottom, String back, String front) throws IOException, URISyntaxException {
+public class SamplerCube extends Sampler {
+  protected SamplerCube(List<FileInputStream> fins) throws IOException {
     super(glGenTextures());
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, id);
@@ -26,11 +24,10 @@ public class Cubemap extends Texture {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    List<String> files = Arrays.asList(right, left, top, bottom, back, front);
-    for (int i = 0; i < files.size(); i++) {
-      String file = files.get(i);
+    for (int i = 0; i < fins.size(); i++) {
+      FileInputStream fin = fins.get(i);
 
-      PNGDecoder decoder = new PNGDecoder(ResourceLoader.locateResource(file, Texture2d.class).toFileInputStream());
+      PNGDecoder decoder = new PNGDecoder(fin);
       ByteBuffer buffer = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
       decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
       buffer.flip();

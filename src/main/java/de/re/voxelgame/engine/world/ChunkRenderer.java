@@ -1,6 +1,8 @@
 package de.re.voxelgame.engine.world;
 
 import de.re.voxelgame.core.*;
+import de.re.voxelgame.core.sampler.Sampler2D;
+import de.re.voxelgame.core.sampler.Sampler2DArray;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -85,7 +87,7 @@ public class ChunkRenderer {
 
   public void render(Collection<Chunk> chunks, Matrix4f view, Matrix4f projection,
                      WorldPosition mouseCursorIntersectionPos, int fbo, int fbo2,
-                     Texture2dArray textureArray, Texture2d normalMap) {
+                     Sampler2DArray textureArray, Sampler2D normalMap) {
     float currentTime = (float) glfwGetTime();
 
     // First rendering pass for transparent voxels

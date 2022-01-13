@@ -1,5 +1,6 @@
 package de.re.voxelgame.core;
 
+import de.re.voxelgame.core.sampler.Samplers;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.system.MemoryStack;
@@ -138,6 +139,7 @@ public class GLContext {
   }
 
   public void terminate() {
+    Samplers.terminate();
     MemoryManager.terminate();
 
     glfwFreeCallbacks(window);
