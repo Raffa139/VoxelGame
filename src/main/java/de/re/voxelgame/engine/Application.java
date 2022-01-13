@@ -1,14 +1,16 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
+import de.re.voxelgame.core.MemoryManager;
 import de.re.voxelgame.core.sampler.SamplerCube;
 import de.re.voxelgame.core.sampler.Sampler2D;
 import de.re.voxelgame.core.sampler.Sampler2DArray;
 import de.re.voxelgame.core.sampler.Samplers;
+import de.re.voxelgame.core.shader.Shader;
+import de.re.voxelgame.core.shader.Shaders;
 import de.re.voxelgame.engine.gui.HudRenderer;
 import de.re.voxelgame.engine.voxel.VoxelType;
 import de.re.voxelgame.engine.world.*;
-import de.re.voxelgame.core.util.ResourceLoader;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -39,30 +41,13 @@ public class Application {
   }
 
   private void loop(GLContext context) throws IOException, URISyntaxException {
-    // Shader
-    ResourceLoader.Resource chunkVert = ResourceLoader.locateResource("shader/chunk.vert", Application.class);
-    ResourceLoader.Resource chunkFrag = ResourceLoader.locateResource("shader/chunk.frag", Application.class);
-    Shader chunkShader = new Shader(chunkVert.toPath(), chunkFrag.toPath());
-
-    ResourceLoader.Resource waterVert = ResourceLoader.locateResource("shader/chunk.vert", Application.class);
-    ResourceLoader.Resource waterFrag = ResourceLoader.locateResource("shader/water.frag", Application.class);
-    Shader waterShader = new Shader(waterVert.toPath(), waterFrag.toPath());
-
-    ResourceLoader.Resource aabbVert = ResourceLoader.locateResource("shader/chunkAABB.vert", Application.class);
-    ResourceLoader.Resource aabbFrag = ResourceLoader.locateResource("shader/chunkAABB.frag", Application.class);
-    Shader chunkAABBShader = new Shader(aabbVert.toPath(), aabbFrag.toPath());
-
-    ResourceLoader.Resource hudVert = ResourceLoader.locateResource("shader/basicHud.vert", Application.class);
-    ResourceLoader.Resource hudFrag = ResourceLoader.locateResource("shader/basicHud.frag", Application.class);
-    Shader hudShader = new Shader(hudVert.toPath(), hudFrag.toPath());
-
-    ResourceLoader.Resource skyboxVert = ResourceLoader.locateResource("shader/skybox.vert", Application.class);
-    ResourceLoader.Resource skyboxFrag = ResourceLoader.locateResource("shader/skybox.frag", Application.class);
-    Shader skyboxShader = new Shader(skyboxVert.toPath(), skyboxFrag.toPath());
-
-    ResourceLoader.Resource screenVert = ResourceLoader.locateResource("shader/screen.vert", Application.class);
-    ResourceLoader.Resource screenFrag = ResourceLoader.locateResource("shader/screen.frag", Application.class);
-    Shader screenShader = new Shader(screenVert.toPath(), screenFrag.toPath());
+    // Shaders
+    Shader chunkShader = Shaders.create("shader/chunk.vert", "shader/chunk.frag");
+    Shader waterShader = Shaders.create("shader/chunk.vert", "shader/water.frag");
+    Shader chunkAABBShader = Shaders.create("shader/chunkAABB.vert", "shader/chunkAABB.frag");
+    Shader hudShader = Shaders.create("shader/basicHud.vert", "shader/basicHud.frag");
+    Shader skyboxShader = Shaders.create("shader/skybox.vert", "shader/skybox.frag");
+    Shader screenShader = Shaders.create("shader/screen.vert", "shader/screen.frag");
 
     // Textures
     String[] textureFiles = {
@@ -344,10 +329,5 @@ public class Application {
     glDeleteTextures(depthBuffer2);
     glDeleteFramebuffers(fbo);
     glDeleteFramebuffers(fbo2);
-
-    chunkShader.terminate();
-    waterShader.terminate();
-    chunkAABBShader.terminate();
-    hudShader.terminate();
   }
 }

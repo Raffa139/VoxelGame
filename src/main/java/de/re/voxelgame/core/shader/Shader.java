@@ -1,14 +1,15 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.core.shader;
 
+import de.re.voxelgame.core.util.ResourceLoader;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.FloatBuffer;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -16,11 +17,10 @@ import static org.lwjgl.opengl.GL20.*;
 public class Shader {
   private final int id;
 
-  public Shader(Path vertexPath, Path fragmentPath) throws IOException {
-    this(Files.readString(vertexPath), Files.readString(fragmentPath));
-  }
+  protected Shader(String vertexFile, String fragmentFile) throws IOException, URISyntaxException {
+    String vertexContent = Files.readString(ResourceLoader.locateResource(vertexFile, Shader.class).toPath());
+    String fragmentContent = Files.readString(ResourceLoader.locateResource(fragmentFile, Shader.class).toPath());
 
-  public Shader(String vertexContent, String fragmentContent) {
     int vertShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertShader, vertexContent);
     glCompileShader(vertShader);
@@ -53,12 +53,12 @@ public class Shader {
     glDeleteShader(fragShader);
   }
 
-  public void use() {
-    glUseProgram(id);
+  public int getId() {
+    return id;
   }
 
-  public void terminate() {
-    glDeleteProgram(id);
+  public void use() {
+    glUseProgram(id);
   }
 
   public void setBoolean(String name, boolean value) {
