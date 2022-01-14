@@ -88,12 +88,12 @@ public class ChunkRenderer {
   }
 
   public void render(Collection<Chunk> chunks, Matrix4f view, Matrix4f projection,
-                     WorldPosition mouseCursorIntersectionPos, int fbo, int fbo2,
+                     WorldPosition mouseCursorIntersectionPos, Framebuffer fbo, Framebuffer fbo2,
                      Sampler2DArray textureArray, Sampler2D normalMap) {
     float currentTime = (float) glfwGetTime();
 
     // First rendering pass for transparent voxels
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
+    fbo2.bind();
 
     normalMap.bind(0);
 
@@ -124,7 +124,7 @@ public class ChunkRenderer {
     }
 
     // Second rendering pass for normal voxels
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    fbo.bind();
 
     textureArray.bind(0);
 

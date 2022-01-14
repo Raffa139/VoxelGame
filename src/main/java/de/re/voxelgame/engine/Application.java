@@ -18,7 +18,6 @@ import org.lwjgl.Version;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 
@@ -153,69 +152,9 @@ public class Application {
         .attribPointer(1, 2, GL_FLOAT, false, 4 * 4, 2 * 4L)
         .doFinal();
 
-    // Framebuffer 1
-    int fbo = glGenFramebuffers();
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-    int textureColorBuffer = glGenTextures();
-    glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, context.getWindowWidth(), context.getWindowHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer) null);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
-
-    int depthBuffer = glGenTextures();
-    glBindTexture(GL_TEXTURE_2D, depthBuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, context.getWindowWidth(), context.getWindowHeight(), 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, (ByteBuffer) null);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthBuffer, 0);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-      System.err.println("ERROR::FRAMEBUFFER::NOT::COMPLETE");
-      System.exit(-1);
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    // Framebuffer 2
-    int fbo2 = glGenFramebuffers();
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
-
-    int textureColorBuffer2 = glGenTextures();
-    glBindTexture(GL_TEXTURE_2D, textureColorBuffer2);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, context.getWindowWidth(), context.getWindowHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer) null);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer2, 0);
-
-    int depthBuffer2 = glGenTextures();
-    glBindTexture(GL_TEXTURE_2D, depthBuffer2);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, context.getWindowWidth(), context.getWindowHeight(), 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, (ByteBuffer) null);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthBuffer2, 0);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-      System.err.println("ERROR::FRAMEBUFFER::NOT::COMPLETE");
-      System.exit(-1);
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // Framebuffer
+    Framebuffer fbo = new Framebuffer(context.getWindowWidth(), context.getWindowHeight());
+    Framebuffer fbo2 = new Framebuffer(context.getWindowWidth(), context.getWindowHeight());
 
     float lastPressed = 0.0f;
     while (!context.isCloseRequested()) {
@@ -259,7 +198,7 @@ public class Application {
       chunkRenderer.render(chunkManager.getChunks(), view, projection, intersectionPos, fbo, fbo2, arraySampler, normalMap);
 
       // Render skybox
-      glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+      fbo.bind();
       glDepthFunc(GL_LEQUAL);
 
       Matrix4f skyboxView = camera.getViewMatrix().get3x3(new Matrix3f()).get(new Matrix4f());
@@ -282,14 +221,10 @@ public class Application {
 
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-      glActiveTexture(GL_TEXTURE0);
-      glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-      glActiveTexture(GL_TEXTURE1);
-      glBindTexture(GL_TEXTURE_2D, textureColorBuffer2);
-      glActiveTexture(GL_TEXTURE2);
-      glBindTexture(GL_TEXTURE_2D, depthBuffer);
-      glActiveTexture(GL_TEXTURE3);
-      glBindTexture(GL_TEXTURE_2D, depthBuffer2);
+      fbo.bindColorTexture(0);
+      fbo2.bindColorTexture(1);
+      fbo.bindDepthStencilTexture(2);
+      fbo2.bindDepthStencilTexture(3);
 
       glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
@@ -323,11 +258,7 @@ public class Application {
       context.update();
     }
 
-    glDeleteTextures(textureColorBuffer);
-    glDeleteTextures(textureColorBuffer2);
-    glDeleteTextures(depthBuffer);
-    glDeleteTextures(depthBuffer2);
-    glDeleteFramebuffers(fbo);
-    glDeleteFramebuffers(fbo2);
+    fbo.cleanup();
+    fbo2.cleanup();
   }
 }
