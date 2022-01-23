@@ -22,7 +22,7 @@ public class VoxelCamera extends Camera {
   }
 
   public void setWorldPosition(WorldPosition worldPosition) {
-    this.pos = worldPosition.getVector();
+    pos = worldPosition.getVector();
   }
 
   public CrossHairTarget getCrossHairTarget() {

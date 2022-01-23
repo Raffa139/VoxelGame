@@ -73,11 +73,13 @@ public class Application {
 
     OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
     ChunkManager chunkManager = new ChunkManager(noise);
-    VoxelCamera camera = new VoxelCamera(new WorldPosition(0.0f, 10.0f, 0.0f), new CrossHairTarget(chunkManager));
+    VoxelCamera camera = new VoxelCamera(new WorldPosition(3.0f, 65.0f, 3.0f), new CrossHairTarget(chunkManager));
     ChunkInteractionManager interactionManager = new ChunkInteractionManager(chunkManager, camera);
 
     ChunkRenderer chunkRenderer = new ChunkRenderer(context, chunkShader, waterShader, chunkAABBShader);
     HudRenderer hudRenderer = new HudRenderer(context, hudShader);
+
+    chunkManager.initCamPos(camera);
 
     // Skybox geometry
     float[] skyboxVertices = {
@@ -160,7 +162,9 @@ public class Application {
     while (!context.isCloseRequested()) {
       float currentFrameTime = (float) glfwGetTime();
 
-      chunkManager.generate(currentFrameTime, 0.0001f);
+      //chunkManager.generate(currentFrameTime, 0.0001f);
+      chunkManager.update(camera);
+      chunkManager.cancelChunks(camera);
 
       // Cross-hair voxel intersection
       camera.update(context.getDeltaTime(), !context.isMouseCursorToggled());

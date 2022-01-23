@@ -19,12 +19,21 @@ public class WorldPosition {
     this.vector = vector;
   }
 
+  public WorldPosition copy() {
+    return new WorldPosition(getVector());
+  }
+
   public Vector3f getCurrentChunkPosition() {
     return new Vector3f(
         (float) Math.floor(vector.x / Chunk.CHUNK_SIZE),
         (float) Math.floor(vector.y / Chunk.CHUNK_SIZE),
         (float) Math.floor(vector.z / Chunk.CHUNK_SIZE)
     );
+  }
+
+  public Vector3f getCurrentChunkPositionOffset(int x, int y, int z) {
+    Vector3f chunkPosition = getCurrentChunkPosition();
+    return new Vector3f(chunkPosition.x + x, chunkPosition.y + y, chunkPosition.z + z);
   }
 
   public Vector3f getCurrentAbsoluteChunkPosition() {
@@ -56,7 +65,7 @@ public class WorldPosition {
   }
 
   public Vector3f getVector() {
-    return vector;
+    return new Vector3f(vector);
   }
 
   @Override

@@ -1,5 +1,6 @@
 package de.re.voxelgame.engine.world;
 
+import de.re.voxelgame.engine.VoxelCamera;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
 import org.joml.Vector3f;
 
@@ -23,6 +24,8 @@ public class ChunkManager {
 
   private float lastUpdateTime;
 
+  private WorldPosition lastCamPos;
+
   public ChunkManager(OpenSimplexNoise noise) {
     this.chunks = new HashMap<>();
     this.noise = noise;
@@ -30,6 +33,57 @@ public class ChunkManager {
     this.z = 0;
     this.y = 0;
     this.lastUpdateTime = 0.0f;
+  }
+
+  public void initCamPos(VoxelCamera camera) {
+    lastCamPos = camera.getWorldPosition().copy();
+  }
+
+  public void update(VoxelCamera camera) {
+    if (!lastCamPos.getCurrentChunkPosition().equals(camera.getWorldPosition().getCurrentChunkPosition())) {
+      // load new chunks
+      for (int x = -2; x < 2; x++) {
+        for (int y = -3; y < 3; y++) {
+          for (int z = -2; z < 2; z++) {
+            Vector3f chunkPosition = camera.getWorldPosition().getCurrentChunkPositionOffset(x, y, z);
+            Chunk chunk = chunks.get(chunkPosition);
+            boolean chunkPresent = chunk != null && chunk.hasMesh();
+            if (!chunkPresent && chunkPosition.y >= 0) {
+              Vector3f positionS = chunkPosition.add(0.0f, 0.0f, 1.0f, new Vector3f());
+              Vector3f positionN = chunkPosition.add(0.0f, 0.0f, -1.0f, new Vector3f());
+              Vector3f positionE = chunkPosition.add(1.0f, 0.0f, 0.0f, new Vector3f());
+              Vector3f positionW = chunkPosition.add(-1.0f, 0.0f, 0.0f, new Vector3f());
+              Vector3f positionT = chunkPosition.add(0.0f, 1.0f, 0.0f, new Vector3f());
+              Vector3f positionB = chunkPosition.add(0.0f, -1.0f, 0.0f, new Vector3f());
+
+              preloadOrGetChunk(positionS);
+              preloadOrGetChunk(positionN);
+              preloadOrGetChunk(positionE);
+              preloadOrGetChunk(positionW);
+              preloadOrGetChunk(positionT);
+              preloadOrGetChunk(positionB);
+
+              loadChunk(chunkPosition, null);
+            }
+          }
+        }
+      }
+
+      lastCamPos = camera.getWorldPosition().copy();
+    }
+  }
+
+  public void cancelChunks(VoxelCamera camera) {
+    List<Chunk> loadedChunks = new ArrayList<>(getChunks());
+
+    for (Chunk chunk : loadedChunks) {
+      Vector3f chunkPosition = chunk.getRelativePosition().getVector();
+      float distance = chunkPosition.distance(camera.getWorldPosition().getCurrentChunkPosition());
+
+      if (distance >= 5.0f) {
+        unloadChunk(chunk.getRelativePosition().getVector());
+      }
+    }
   }
 
   public void generate(float currentTime, float timeout) {
@@ -116,5 +170,16 @@ public class ChunkManager {
   private void loadChunk(Vector3f position, Vector3f voxelPosition) {
     Chunk chunk = preloadOrGetChunk(position);
     chunk.setMesh(ChunkLoader.loadChunkMesh(chunk, voxelPosition, chunks));
+  }
+
+  private void unloadChunk(Vector3f position) {
+    if (chunks.containsKey(position)) {
+      Chunk chunk = chunks.get(position);
+      if (chunk != null && chunk.hasMesh()) {
+        ChunkLoader.unloadChunkMesh(chunk.getMesh());
+      }
+
+      chunks.remove(position);
+    }
   }
 }

@@ -21,7 +21,7 @@ public final class MemoryManager {
   }
 
   public static void freeVao(int vaoId) {
-    Set<Integer> vboIds = VAO_IDS.get(vaoId);
+    Set<Integer> vboIds = VAO_IDS.getOrDefault(vaoId, Collections.emptySet());
     for (int vboId : vboIds) {
       glDeleteBuffers(vboId);
     }
@@ -32,7 +32,7 @@ public final class MemoryManager {
 
   public static void terminate() {
     for (int vaoId : VAO_IDS.keySet()) {
-      Set<Integer> vboIds = VAO_IDS.get(vaoId);
+      Set<Integer> vboIds = VAO_IDS.getOrDefault(vaoId, Collections.emptySet());
       for (int vboId : vboIds) {
         glDeleteBuffers(vboId);
       }
