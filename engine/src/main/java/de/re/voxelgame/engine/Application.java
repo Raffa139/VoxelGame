@@ -2,17 +2,16 @@ package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
 import de.re.voxelgame.core.MemoryManager;
-import de.re.voxelgame.core.sampler.SamplerCube;
 import de.re.voxelgame.core.sampler.Sampler2D;
 import de.re.voxelgame.core.sampler.Sampler2DArray;
 import de.re.voxelgame.core.sampler.Samplers;
 import de.re.voxelgame.core.shader.Shader;
 import de.re.voxelgame.core.shader.Shaders;
 import de.re.voxelgame.engine.gui.HudRenderer;
+import de.re.voxelgame.engine.skybox.Skybox;
 import de.re.voxelgame.engine.voxel.VoxelType;
 import de.re.voxelgame.engine.world.*;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.lwjgl.Version;
 
@@ -66,9 +65,6 @@ public class Application {
     };
     Sampler2DArray arraySampler = Samplers.sampler2DArray(16, 16, textureFiles);
 
-    SamplerCube skybox = Samplers.samplerCube("skybox/right.png", "skybox/left.png", "skybox/top.png",
-        "skybox/bottom.png", "skybox/back.png", "skybox/front.png");
-
     Sampler2D normalMap = Samplers.sampler2D("textures/normal_map.png");
 
     OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
@@ -79,59 +75,10 @@ public class Application {
     ChunkRenderer chunkRenderer = new ChunkRenderer(context, chunkShader, waterShader, chunkAABBShader);
     HudRenderer hudRenderer = new HudRenderer(context, hudShader);
 
+    Skybox skybox = new Skybox("skybox/right.png", "skybox/left.png", "skybox/top.png",
+        "skybox/bottom.png", "skybox/back.png", "skybox/front.png");
+
     chunkManager.initCamPos(camera);
-
-    // Skybox geometry
-    float[] skyboxVertices = {
-        -1.0f,  1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-
-        -1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
-
-        1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-
-        -1.0f, -1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
-
-        -1.0f,  1.0f, -1.0f,
-        1.0f,  1.0f, -1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f, -1.0f,
-
-        -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-        1.0f, -1.0f,  1.0f
-    };
-
-    int skyboxVao = MemoryManager
-        .allocateVao()
-        .bufferData(skyboxVertices, GL_STATIC_DRAW)
-        .enableAttribArray(0)
-        .attribPointer(0, 3, GL_FLOAT, false, 3 * 4, 0L)
-        .doFinal();
 
     // Post-processing
     float[] screenQuadVertices = {
@@ -203,18 +150,7 @@ public class Application {
 
       // Render skybox
       fbo.bind();
-      glDepthFunc(GL_LEQUAL);
-
-      Matrix4f skyboxView = camera.getViewMatrix().get3x3(new Matrix3f()).get(new Matrix4f());
-      skyboxShader.use();
-      skyboxShader.setMatrix4("iView", skyboxView);
-      skyboxShader.setMatrix4("iProjection", projection);
-
-      glBindVertexArray(skyboxVao);
-      skybox.bind(0);
-      glDrawArrays(GL_TRIANGLES, 0, skyboxVertices.length);
-      glBindVertexArray(0);
-      glDepthFunc(GL_LESS);
+      skybox.render(skyboxShader, camera, projection);
 
       // Post-processing
       screenShader.use();
