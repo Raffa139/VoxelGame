@@ -1,5 +1,6 @@
 package de.re.voxelgame.core;
 
+import de.re.voxelgame.core.sampler.GLSamplerManager;
 import de.re.voxelgame.core.shader.GLShaderManager;
 import de.re.voxelgame.core.shader.Shader;
 import org.joml.Matrix4f;
@@ -15,6 +16,8 @@ public abstract class GLApplication {
   protected final GLContext context;
 
   protected final GLShaderManager shaderManager;
+  protected final GLSamplerManager samplerManager;
+  protected final GLVertexArrayManager vaoManager;
 
   protected float currentTime;
 
@@ -29,6 +32,8 @@ public abstract class GLApplication {
   public GLApplication(int width, int height, String title) {
     context = GLContext.init(width, height, title);
     shaderManager = GLShaderManager.get();
+    samplerManager = GLSamplerManager.get();
+    vaoManager = GLVertexArrayManager.get();
     shaders = new ArrayList<>();
   }
 
@@ -57,6 +62,8 @@ public abstract class GLApplication {
 
   protected void quit() {
     shaderManager.terminate();
+    samplerManager.terminate();
+    vaoManager.terminate();
     context.terminate();
   }
 

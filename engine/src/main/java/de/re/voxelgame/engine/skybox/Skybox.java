@@ -1,9 +1,9 @@
 package de.re.voxelgame.engine.skybox;
 
 import de.re.voxelgame.core.Camera;
-import de.re.voxelgame.core.MemoryManager;
+import de.re.voxelgame.core.GLVertexArrayManager;
 import de.re.voxelgame.core.sampler.SamplerCube;
-import de.re.voxelgame.core.sampler.Samplers;
+import de.re.voxelgame.core.sampler.GLSamplerManager;
 import de.re.voxelgame.core.shader.Shader;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -67,14 +67,14 @@ public class Skybox {
   private final SamplerCube texture;
 
   public Skybox(String right, String left, String top, String bottom, String back, String front) throws IOException, URISyntaxException {
-    vaoId = MemoryManager
+    vaoId = GLVertexArrayManager.get()
         .allocateVao()
         .bufferData(SKYBOX_VERTICES, GL_STATIC_DRAW)
         .enableAttribArray(0)
         .attribPointer(0, 3, GL_FLOAT, false, 3 * 4, 0L)
         .doFinal();
 
-    texture = Samplers.samplerCube(right, left, top, bottom, back, front);
+    texture = GLSamplerManager.get().samplerCube(right, left, top, bottom, back, front);
   }
 
   public void render(Shader shader, Camera camera) {

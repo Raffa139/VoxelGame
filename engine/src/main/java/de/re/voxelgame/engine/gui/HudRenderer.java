@@ -1,7 +1,7 @@
 package de.re.voxelgame.engine.gui;
 
 import de.re.voxelgame.core.GLContext;
-import de.re.voxelgame.core.MemoryManager;
+import de.re.voxelgame.core.GLVertexArrayManager;
 import de.re.voxelgame.core.shader.Shader;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -28,7 +28,7 @@ public class HudRenderer {
         -0.5f, 0.05f, 0.0f
     };
 
-    crossHairVao = MemoryManager
+    crossHairVao = GLVertexArrayManager.get()
         .allocateVao()
         .bufferData(crossHairVertices, GL_STATIC_DRAW)
         .enableAttribArray(0)

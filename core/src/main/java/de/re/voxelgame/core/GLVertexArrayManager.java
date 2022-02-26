@@ -7,32 +7,43 @@ import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 
-public final class MemoryManager {
-  private static final Map<Integer, Set<Integer>> VAO_IDS = new HashMap<>();
+public class GLVertexArrayManager {
+  private static GLVertexArrayManager instant;
 
-  private MemoryManager() {
+  private final Map<Integer, Set<Integer>> vaoIds;
+
+  private GLVertexArrayManager() {
+    vaoIds = new HashMap<>();
   }
 
-  public static VertexArray allocateVao() {
+  public static GLVertexArrayManager get() {
+    if (instant == null) {
+      instant = new GLVertexArrayManager();
+    }
+
+    return instant;
+  }
+
+  public VertexArray allocateVao() {
     int vaoId = glGenVertexArrays();
-    VAO_IDS.put(vaoId, new HashSet<>());
+    vaoIds.put(vaoId, new HashSet<>());
     glBindVertexArray(vaoId);
     return new VertexArray(vaoId);
   }
 
-  public static void freeVao(int vaoId) {
-    Set<Integer> vboIds = VAO_IDS.getOrDefault(vaoId, Collections.emptySet());
+  public void freeVao(int vaoId) {
+    Set<Integer> vboIds = vaoIds.getOrDefault(vaoId, Collections.emptySet());
     for (int vboId : vboIds) {
       glDeleteBuffers(vboId);
     }
 
     glDeleteVertexArrays(vaoId);
-    VAO_IDS.remove(vaoId);
+    vaoIds.remove(vaoId);
   }
 
-  public static void terminate() {
-    for (int vaoId : VAO_IDS.keySet()) {
-      Set<Integer> vboIds = VAO_IDS.getOrDefault(vaoId, Collections.emptySet());
+  public void terminate() {
+    for (int vaoId : vaoIds.keySet()) {
+      Set<Integer> vboIds = vaoIds.getOrDefault(vaoId, Collections.emptySet());
       for (int vboId : vboIds) {
         glDeleteBuffers(vboId);
       }
@@ -41,13 +52,13 @@ public final class MemoryManager {
     }
   }
 
-  private static void appendVboToVao(int vaoId, int vboId) {
-    Set<Integer> vboIds = VAO_IDS.get(vaoId);
+  private void appendVboToVao(int vaoId, int vboId) {
+    Set<Integer> vboIds = vaoIds.get(vaoId);
     vboIds.add(vboId);
-    VAO_IDS.put(vaoId, vboIds);
+    vaoIds.put(vaoId, vboIds);
   }
 
-  public static class VertexArray {
+  public class VertexArray {
     private final int id;
 
     private VertexArray(int id) {
@@ -82,7 +93,7 @@ public final class MemoryManager {
     }
   }
 
-  public static class ArrayBuffer {
+  public class ArrayBuffer {
     private final VertexArray vao;
 
     private ArrayBuffer(VertexArray vao) {

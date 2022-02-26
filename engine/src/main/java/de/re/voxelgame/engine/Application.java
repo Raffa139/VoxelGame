@@ -1,10 +1,8 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
-import de.re.voxelgame.core.MemoryManager;
 import de.re.voxelgame.core.sampler.Sampler2D;
 import de.re.voxelgame.core.sampler.Sampler2DArray;
-import de.re.voxelgame.core.sampler.Samplers;
 import de.re.voxelgame.core.shader.Shader;
 import de.re.voxelgame.engine.gui.HudRenderer;
 import de.re.voxelgame.engine.skybox.Skybox;
@@ -63,9 +61,9 @@ public class Application extends GLApplication {
         "textures/cactus_bottom.png",
         "textures/gravel.png"
     };
-    Sampler2DArray arraySampler = Samplers.sampler2DArray(16, 16, textureFiles);
+    Sampler2DArray arraySampler = samplerManager.sampler2DArray(16, 16, textureFiles);
 
-    Sampler2D normalMap = Samplers.sampler2D("textures/normal_map.png");
+    Sampler2D normalMap = samplerManager.sampler2D("textures/normal_map.png");
 
     OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
     ChunkManager chunkManager = new ChunkManager(noise);
@@ -94,7 +92,7 @@ public class Application extends GLApplication {
        1.0f,  1.0f,  1.0f, 1.0f
     };
 
-    int screenQuad = MemoryManager
+    int screenQuad = vaoManager
         .allocateVao()
         .bufferData(screenQuadVertices, GL_STATIC_DRAW)
         .enableAttribArray(0)

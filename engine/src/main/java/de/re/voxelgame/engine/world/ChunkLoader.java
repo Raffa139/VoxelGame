@@ -1,6 +1,6 @@
 package de.re.voxelgame.engine.world;
 
-import de.re.voxelgame.core.MemoryManager;
+import de.re.voxelgame.core.GLVertexArrayManager;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
 import de.re.voxelgame.engine.voxel.Voxel;
 import de.re.voxelgame.engine.voxel.VoxelFace;
@@ -149,7 +149,7 @@ public final class ChunkLoader {
 
   public static void unloadChunkMesh(ChunkMesh mesh) {
     if (mesh.containsVertices()) {
-      MemoryManager.freeVao(mesh.getVaoId());
+      GLVertexArrayManager.get().freeVao(mesh.getVaoId());
     }
   }
 
@@ -181,7 +181,7 @@ public final class ChunkLoader {
       vertexData[i] = vertexData[i] | (v.isHighlighted() ? 1 : 0);
     }
 
-    int vaoId = MemoryManager
+    int vaoId = GLVertexArrayManager.get()
         .allocateVao()
         .bufferData(vertexData, GL_STATIC_DRAW)
         .enableAttribArray(0)

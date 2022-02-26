@@ -1,7 +1,7 @@
 package de.re.voxelgame.engine.world;
 
 import de.re.voxelgame.core.*;
-import de.re.voxelgame.core.MemoryManager;
+import de.re.voxelgame.core.GLVertexArrayManager;
 import de.re.voxelgame.core.sampler.Sampler2D;
 import de.re.voxelgame.core.sampler.Sampler2DArray;
 import de.re.voxelgame.core.shader.Shader;
@@ -11,7 +11,6 @@ import org.joml.Vector3f;
 import java.util.Collection;
 
 import static de.re.voxelgame.engine.world.Chunk.CHUNK_SIZE;
-import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL30.*;
@@ -72,7 +71,7 @@ public class ChunkRenderer {
         1.0f, 0.0f, 1.0f
     };
 
-    borderVaoId = MemoryManager
+    borderVaoId = GLVertexArrayManager.get()
         .allocateVao()
         .bufferData(borderVertexData, GL_STATIC_DRAW)
         .enableAttribArray(0)
