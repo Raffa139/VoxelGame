@@ -6,8 +6,8 @@ import de.re.voxelgame.engine.world.WorldPosition;
 public class VoxelCamera extends Camera {
   private final CrossHairTarget crossHairTarget;
 
-  public VoxelCamera(WorldPosition worldPosition, CrossHairTarget crossHairTarget) {
-    super(worldPosition.getVector());
+  public VoxelCamera(WorldPosition worldPosition, float fov, CrossHairTarget crossHairTarget) {
+    super(worldPosition.getVector(), fov);
     this.crossHairTarget = crossHairTarget;
   }
 

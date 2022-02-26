@@ -87,19 +87,15 @@ public class ChunkRenderer {
     this.AABBShader = AABBShader;
   }
 
-  public void render(Collection<Chunk> chunks, Matrix4f view, Matrix4f projection,
-                     WorldPosition mouseCursorIntersectionPos, Framebuffer fbo, Framebuffer fbo2,
+  public void render(Collection<Chunk> chunks, WorldPosition mouseCursorIntersectionPos,
+                     Framebuffer fbo, Framebuffer fbo2,
                      Sampler2DArray textureArray, Sampler2D normalMap) {
-    float currentTime = (float) glfwGetTime();
-
     // First rendering pass for transparent voxels
     fbo2.bind();
 
     normalMap.bind(0);
 
     waterShader.use();
-    waterShader.setMatrix4("iView", view);
-    waterShader.setMatrix4("iProjection", projection);
     waterShader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
     waterShader.setVec3("iLightDirection", new Vector3f(2.0f, 0.6f, -1.0f));
 
@@ -128,13 +124,7 @@ public class ChunkRenderer {
     textureArray.bind(0);
 
     shader.use();
-    shader.setMatrix4("iView", view);
-    shader.setMatrix4("iProjection", projection);
     shader.setVec3("iColor", new Vector3f(0.0f, 0.0f, 0.5f));
-
-    AABBShader.use();
-    AABBShader.setMatrix4("iView", view);
-    AABBShader.setMatrix4("iProjection", projection);
 
     glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

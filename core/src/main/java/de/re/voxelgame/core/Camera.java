@@ -13,16 +13,18 @@ public class Camera {
 
   protected float pitch;
   protected float yaw;
+  protected float fov;
 
   protected float lastPosX;
   protected float lastPosY;
 
-  public Camera(Vector3f pos) {
+  public Camera(Vector3f pos, float fov) {
     this.pos = pos;
     this.up = new Vector3f(0.0f, 1.0f, 0.0f);
     this.front = new Vector3f(0.0f, 0.0f, 0.0f);
     this.pitch = 0.0f;
     this.yaw = 0.0f;
+    this.fov = fov;
   }
 
   public void update(float deltaTime, boolean allowTurn) {
@@ -61,6 +63,10 @@ public class Camera {
 
   public float getYaw() {
     return yaw;
+  }
+
+  public float getFov() {
+    return fov;
   }
 
   private void turn(double xCurrent, double yCurrent) {

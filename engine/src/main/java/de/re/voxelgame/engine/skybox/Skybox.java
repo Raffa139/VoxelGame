@@ -77,13 +77,12 @@ public class Skybox {
     texture = Samplers.samplerCube(right, left, top, bottom, back, front);
   }
 
-  public void render(Shader shader, Camera camera, Matrix4f projection) {
+  public void render(Shader shader, Camera camera) {
     glDepthFunc(GL_LEQUAL);
 
     Matrix4f skyboxView = camera.getViewMatrix().get3x3(new Matrix3f()).get(new Matrix4f());
     shader.use();
     shader.setMatrix4("iView", skyboxView);
-    shader.setMatrix4("iProjection", projection);
 
     glBindVertexArray(vaoId);
     texture.bind(0);

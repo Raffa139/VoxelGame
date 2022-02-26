@@ -7,7 +7,7 @@ in vec3 VertPos;
 
 uniform sampler2D normalMapSampler;
 
-uniform vec3 iCameraPos;
+uniform vec3 iCameraPosition;
 uniform vec3 iLightDirection;
 uniform float iTime;
 
@@ -32,7 +32,7 @@ vec3 calculateSpecular() {
     vec3 reflectDirection = reflect(-normalize(iLightDirection), normal); // Requires direction from light to us (we just have the direction from us to the light)
 
     // Specular
-    vec3 viewDirection = normalize(iCameraPos - VertPos);
+    vec3 viewDirection = normalize(iCameraPosition - VertPos);
     float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), 16.0);
     vec3 specular = vec3(0.5) * spec;
 

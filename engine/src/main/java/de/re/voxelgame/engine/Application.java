@@ -11,7 +11,6 @@ import de.re.voxelgame.engine.skybox.Skybox;
 import de.re.voxelgame.engine.voxel.VoxelType;
 import de.re.voxelgame.engine.world.*;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
-import org.joml.Matrix4f;
 import org.lwjgl.Version;
 
 import java.io.IOException;
@@ -70,8 +69,10 @@ public class Application extends GLApplication {
 
     OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
     ChunkManager chunkManager = new ChunkManager(noise);
-    VoxelCamera camera = new VoxelCamera(new WorldPosition(3.0f, 65.0f, 3.0f), new CrossHairTarget(chunkManager));
+    VoxelCamera camera = new VoxelCamera(new WorldPosition(3.0f, 65.0f, 3.0f), 65.0f, new CrossHairTarget(chunkManager));
     ChunkInteractionManager interactionManager = new ChunkInteractionManager(chunkManager, camera);
+
+    useCamera(camera);
 
     ChunkRenderer chunkRenderer = new ChunkRenderer(context, chunkShader, waterShader, chunkAABBShader);
     HudRenderer hudRenderer = new HudRenderer(context, hudShader);
@@ -134,10 +135,6 @@ public class Application extends GLApplication {
         }
       }
 
-      Matrix4f view = camera.getViewMatrix();
-      Matrix4f projection = new Matrix4f()
-          .perspective((float) Math.toRadians(65.0f), context.getAspectRatio(), 0.01f, 1000.0f);
-
       // Chunk mouse-cursor intersection
       WorldPosition intersectionPos = null;
       if (context.isMouseCursorToggled()) {
@@ -145,13 +142,11 @@ public class Application extends GLApplication {
       }
 
       // Render voxels
-      waterShader.use();
-      waterShader.setVec3("iCameraPos", camera.getPos());
-      chunkRenderer.render(chunkManager.getChunks(), view, projection, intersectionPos, fbo, fbo2, arraySampler, normalMap);
+      chunkRenderer.render(chunkManager.getChunks(), intersectionPos, fbo, fbo2, arraySampler, normalMap);
 
       // Render skybox
       fbo.bind();
-      skybox.render(skyboxShader, camera, projection);
+      skybox.render(skyboxShader, camera);
 
       // Post-processing
       screenShader.use();
@@ -194,8 +189,6 @@ public class Application extends GLApplication {
         lastPressed = currentTime;
         context.toggleMouseCursor();
       }
-
-      camera.update(context.getDeltaTime(), !context.isMouseCursorToggled());
 
       endFrame();
     }
