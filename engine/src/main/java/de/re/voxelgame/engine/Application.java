@@ -6,7 +6,6 @@ import de.re.voxelgame.core.sampler.Sampler2D;
 import de.re.voxelgame.core.sampler.Sampler2DArray;
 import de.re.voxelgame.core.sampler.Samplers;
 import de.re.voxelgame.core.shader.Shader;
-import de.re.voxelgame.core.shader.Shaders;
 import de.re.voxelgame.engine.gui.HudRenderer;
 import de.re.voxelgame.engine.skybox.Skybox;
 import de.re.voxelgame.engine.voxel.VoxelType;
@@ -24,28 +23,30 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 
-public class Application {
+public class Application extends GLApplication {
   public static void main(String[] args) throws IOException, URISyntaxException {
-    new Application().run();
+    new Application(1080, 720, "OpenGL").run();
+  }
+
+  public Application(int width, int height, String title) {
+    super(width, height, title);
   }
 
   public void run() throws IOException, URISyntaxException {
     System.out.println("LWJGL " + Version.getVersion());
 
-    GLContext context = GLContext.init(1080, 720, "OpenGL");
-    loop(context);
-
-    context.terminate();
+    loop();
+    quit();
   }
 
-  private void loop(GLContext context) throws IOException, URISyntaxException {
+  private void loop() throws IOException, URISyntaxException {
     // Shaders
-    Shader chunkShader = Shaders.create("shader/chunk.vert", "shader/chunk.frag");
-    Shader waterShader = Shaders.create("shader/chunk.vert", "shader/water.frag");
-    Shader chunkAABBShader = Shaders.create("shader/chunkAABB.vert", "shader/chunkAABB.frag");
-    Shader hudShader = Shaders.create("shader/basicHud.vert", "shader/basicHud.frag");
-    Shader skyboxShader = Shaders.create("shader/skybox.vert", "shader/skybox.frag");
-    Shader screenShader = Shaders.create("shader/screen.vert", "shader/screen.frag");
+    Shader chunkShader = createShader("shader/chunk.vert", "shader/chunk.frag");
+    Shader waterShader = createShader("shader/chunk.vert", "shader/water.frag");
+    Shader chunkAABBShader = createShader("shader/chunkAABB.vert", "shader/chunkAABB.frag");
+    Shader hudShader = createShader("shader/basicHud.vert", "shader/basicHud.frag");
+    Shader skyboxShader = createShader("shader/skybox.vert", "shader/skybox.frag");
+    Shader screenShader = createShader("shader/screen.vert", "shader/screen.frag");
 
     // Textures
     String[] textureFiles = {
@@ -107,7 +108,7 @@ public class Application {
 
     float lastPressed = 0.0f;
     while (!context.isCloseRequested()) {
-      float currentFrameTime = (float) glfwGetTime();
+      beginFrame();
 
       //chunkManager.generate(currentFrameTime, 0.0001f);
       chunkManager.update(camera);
@@ -122,13 +123,13 @@ public class Application {
 
       // Voxel placement
       if (!context.isMouseCursorToggled()) {
-        if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_2) && currentFrameTime > lastPressed + 0.25f) {
-          lastPressed = currentFrameTime;
+        if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_2) && currentTime > lastPressed + 0.25f) {
+          lastPressed = currentTime;
           interactionManager.placeVoxel(VoxelType.LEAVES);
         }
 
-        if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_1) && currentFrameTime > lastPressed + 0.25f) {
-          lastPressed = currentFrameTime;
+        if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_1) && currentTime > lastPressed + 0.25f) {
+          lastPressed = currentTime;
           interactionManager.removeVoxel();
         }
       }
@@ -189,13 +190,14 @@ public class Application {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       }
 
-      if (KeyListener.keyPressed(GLFW_KEY_E) && currentFrameTime > lastPressed + 0.25f) {
-        lastPressed = currentFrameTime;
+      if (KeyListener.keyPressed(GLFW_KEY_E) && currentTime > lastPressed + 0.25f) {
+        lastPressed = currentTime;
         context.toggleMouseCursor();
       }
 
       camera.update(context.getDeltaTime(), !context.isMouseCursorToggled());
-      context.update();
+
+      endFrame();
     }
 
     fbo.cleanup();

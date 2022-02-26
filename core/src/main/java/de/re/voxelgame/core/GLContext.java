@@ -1,7 +1,6 @@
 package de.re.voxelgame.core;
 
 import de.re.voxelgame.core.sampler.Samplers;
-import de.re.voxelgame.core.shader.Shaders;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.system.MemoryStack;
@@ -37,65 +36,8 @@ public class GLContext {
   }
 
   public static GLContext init(int width, int height, String title) {
-    // Setup error callback. Default implementation will print error messages in System.err
-    glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
-
-    // Init GLFW
-    if (!glfwInit()) {
-      throw new IllegalStateException("Unable to initialize GLFW!");
-    }
-
-    // Configure GLFW
-    glfwDefaultWindowHints(); // Optional, current hints are already the defaults
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-
-    // Create window
-    long window = glfwCreateWindow(width, height, title, NULL, NULL);
-    if (window == NULL) {
-      glfwTerminate();
-      throw new IllegalStateException("Failed to create GLFW window!");
-    }
-
-    // Setup input callback
-    glfwSetKeyCallback(window, KeyListener::keyCallback);
-    glfwSetCursorPosCallback(window, MouseListener::cursorPosCallback);
-    glfwSetMouseButtonCallback(window, MouseListener::mouseButtonCallback);
-    glfwSetScrollCallback(window, MouseListener::scrollCallback);
-
-    glfwSetFramebufferSizeCallback(window, GLContext::framebufferSizeCallback);
-
-    // Get thread stack & push a new frame
-    try (MemoryStack stack = MemoryStack.stackPush()) {
-      IntBuffer pWidth = stack.mallocInt(1); // int pointer
-      IntBuffer pHeight = stack.mallocInt(1); // int pointer
-
-      glfwGetWindowSize(window, pWidth, pHeight);
-      GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor()); // Get resolution of primary monitor
-
-      // Center window
-      glfwSetWindowPos(
-              window,
-              (vidMode.width() - pWidth.get(0)) / 2,
-              (vidMode.height() - pHeight.get(0)) / 2);
-    }
-
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(0); // 1: V-Sync, 0: Remove fps cap
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwShowWindow(window);
-
-    // This line is critical for LWJGL's interoperation with GLFW's
-    // OpenGL context, or any context that is managed externally.
-    // LWJGL detects the context that is current in the current thread,
-    // creates the GLCapabilities instance and makes the OpenGL
-    // bindings available for use.
-    createCapabilities();
-
     if (instant == null) {
+      long window = setup(width, height, title);
       instant = new GLContext(window, width, height);
     }
 
@@ -141,7 +83,6 @@ public class GLContext {
 
   public void terminate() {
     Samplers.terminate();
-    Shaders.terminate();
     MemoryManager.terminate();
 
     glfwFreeCallbacks(window);
@@ -181,6 +122,68 @@ public class GLContext {
 
   private void setWindowHeight(int height) {
     windowHeight = height;
+  }
+
+  private static long setup(int width, int height, String title) {
+    // Setup error callback. Default implementation will print error messages in System.err
+    glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
+
+    // Init GLFW
+    if (!glfwInit()) {
+      throw new IllegalStateException("Unable to initialize GLFW!");
+    }
+
+    // Configure GLFW
+    glfwDefaultWindowHints(); // Optional, current hints are already the defaults
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+
+    // Create window
+    long window = glfwCreateWindow(width, height, title, NULL, NULL);
+    if (window == NULL) {
+      glfwTerminate();
+      throw new IllegalStateException("Failed to create GLFW window!");
+    }
+
+    // Setup input callback
+    glfwSetKeyCallback(window, KeyListener::keyCallback);
+    glfwSetCursorPosCallback(window, MouseListener::cursorPosCallback);
+    glfwSetMouseButtonCallback(window, MouseListener::mouseButtonCallback);
+    glfwSetScrollCallback(window, MouseListener::scrollCallback);
+
+    glfwSetFramebufferSizeCallback(window, GLContext::framebufferSizeCallback);
+
+    // Get thread stack & push a new frame
+    try (MemoryStack stack = MemoryStack.stackPush()) {
+      IntBuffer pWidth = stack.mallocInt(1); // int pointer
+      IntBuffer pHeight = stack.mallocInt(1); // int pointer
+
+      glfwGetWindowSize(window, pWidth, pHeight);
+      GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor()); // Get resolution of primary monitor
+
+      // Center window
+      glfwSetWindowPos(
+          window,
+          (vidMode.width() - pWidth.get(0)) / 2,
+          (vidMode.height() - pHeight.get(0)) / 2);
+    }
+
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(0); // 1: V-Sync, 0: Remove fps cap
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwShowWindow(window);
+
+    // This line is critical for LWJGL's interoperation with GLFW's
+    // OpenGL context, or any context that is managed externally.
+    // LWJGL detects the context that is current in the current thread,
+    // creates the GLCapabilities instance and makes the OpenGL
+    // bindings available for use.
+    createCapabilities();
+
+    return window;
   }
 
   private static void framebufferSizeCallback(long window, int width, int height) {
