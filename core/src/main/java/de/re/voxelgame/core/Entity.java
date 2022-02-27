@@ -1,6 +1,7 @@
 package de.re.voxelgame.core;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class Entity {
@@ -23,9 +24,10 @@ public abstract class Entity {
     }
   }
 
-  public void doLife() {
+  public void doLife(Map<Class<? extends Component>, CSystem> componentSystem) {
     for (Component c : components) {
-      c.execute();
+      CSystem system = componentSystem.get(c.getClass());
+      system.invoke(c, this);
     }
   }
 }

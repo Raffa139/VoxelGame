@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
+import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -44,16 +45,18 @@ public class Application extends GLApplication {
       }
 
       @Override
-      public void doLife() {
-        super.doLife();
+      public void doLife(Map<Class<? extends Component>, CSystem> componentSystem) {
+        super.doLife(componentSystem);
       }
     };
 
+    Map<Class<? extends Component>, CSystem> componentSystem = Map.of(TestComponent.class, new TestSystem());
+
     entity.addComponent(TestComponent.class);
-    entity.doLife();
+    entity.doLife(componentSystem);
 
     entity.removeComponent(TestComponent.class);
-    entity.doLife();
+    entity.doLife(componentSystem);
 
     //loop();
     quit();
