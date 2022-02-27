@@ -1,5 +1,7 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.core.ecs.entity;
 
+import de.re.voxelgame.core.ecs.component.LocationComponent;
+import de.re.voxelgame.core.ecs.component.PositionComponent;
 import org.joml.Vector3f;
 
 import java.lang.reflect.InvocationTargetException;

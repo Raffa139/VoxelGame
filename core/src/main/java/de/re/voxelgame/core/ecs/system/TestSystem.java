@@ -1,4 +1,6 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.core.ecs.system;
+
+import de.re.voxelgame.core.GLApplication;
 
 public class TestSystem extends ApplicationSystem {
   private HelloSystem helloSystem;
@@ -7,7 +9,7 @@ public class TestSystem extends ApplicationSystem {
 
   public TestSystem(GLApplication application) {
     super(application);
-    helloSystem = application.getSystem(HelloSystem.class);
+    helloSystem = application.getEcs().getSystem(HelloSystem.class);
   }
 
   @Override

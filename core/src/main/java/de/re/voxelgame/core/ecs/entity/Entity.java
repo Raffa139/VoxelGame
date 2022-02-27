@@ -1,4 +1,6 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.core.ecs.entity;
+
+import de.re.voxelgame.core.ecs.component.Component;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;

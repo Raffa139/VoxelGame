@@ -1,4 +1,6 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.core.ecs.system;
+
+import de.re.voxelgame.core.GLApplication;
 
 public abstract class ApplicationSystem {
   protected GLApplication application;

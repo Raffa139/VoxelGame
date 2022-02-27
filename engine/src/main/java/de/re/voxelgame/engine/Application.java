@@ -1,6 +1,10 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
+import de.re.voxelgame.core.ecs.component.LocationComponent;
+import de.re.voxelgame.core.ecs.entity.BasicEntity;
+import de.re.voxelgame.core.ecs.system.HelloSystem;
+import de.re.voxelgame.core.ecs.system.TestSystem;
 import de.re.voxelgame.core.objects.Framebuffer;
 import de.re.voxelgame.core.objects.sampler.Sampler2D;
 import de.re.voxelgame.core.objects.sampler.Sampler2DArray;
@@ -35,8 +39,8 @@ public class Application extends GLApplication {
   public void run() throws IOException, URISyntaxException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
     System.out.println("LWJGL " + Version.getVersion());
 
-    addSystem(HelloSystem.class);
-    addSystem(TestSystem.class);
+    ecs.addSystem(HelloSystem.class);
+    ecs.addSystem(TestSystem.class);
 
     BasicEntity entity = new BasicEntity();
 

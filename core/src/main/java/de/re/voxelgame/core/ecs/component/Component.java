@@ -1,4 +1,6 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.core.ecs.component;
+
+import de.re.voxelgame.core.ecs.entity.Entity;
 
 public abstract class Component {
   protected Entity entity;

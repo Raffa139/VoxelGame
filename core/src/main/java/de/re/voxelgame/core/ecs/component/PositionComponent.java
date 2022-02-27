@@ -1,5 +1,6 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.core.ecs.component;
 
+import de.re.voxelgame.core.ecs.entity.Entity;
 import org.joml.Vector3f;
 
 public class PositionComponent extends Component {
