@@ -12,17 +12,17 @@ import de.re.voxelgame.engine.noise.OpenSimplexNoise;
 import org.lwjgl.Version;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
-import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 
 public class Application extends GLApplication {
-  public static void main(String[] args) throws IOException, URISyntaxException {
+  public static void main(String[] args) throws IOException, URISyntaxException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
     new Application(1080, 720, "OpenGL").run();
   }
 
@@ -30,34 +30,13 @@ public class Application extends GLApplication {
     super(width, height, title);
   }
 
-  public void run() throws IOException, URISyntaxException {
+  public void run() throws IOException, URISyntaxException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
     System.out.println("LWJGL " + Version.getVersion());
 
-    Entity entity = new Entity() {
-      @Override
-      public <T extends Component> void addComponent(Class<T> component) {
-        super.addComponent(component);
-      }
+    addSystem(HelloSystem.class);
+    addSystem(TestSystem.class);
 
-      @Override
-      public <T extends Component> void removeComponent(Class<T> component) {
-        super.removeComponent(component);
-      }
-
-      @Override
-      public void doLife(Map<Class<? extends Component>, CSystem> componentSystem) {
-        super.doLife(componentSystem);
-      }
-    };
-
-    Map<Class<? extends Component>, CSystem> componentSystem = Map.of(TestComponent.class, new TestSystem());
-
-    entity.addComponent(TestComponent.class);
-    entity.doLife(componentSystem);
-
-    entity.removeComponent(TestComponent.class);
-    entity.doLife(componentSystem);
-
+    beginFrame();
     //loop();
     quit();
   }

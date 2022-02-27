@@ -6,9 +6,12 @@ import de.re.voxelgame.core.shader.Shader;
 import org.joml.Matrix4f;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
@@ -29,12 +32,15 @@ public abstract class GLApplication {
 
   private final List<Shader> shaders;
 
+  private final Map<Class<? extends ApplicationSystem>, ApplicationSystem> systems;
+
   public GLApplication(int width, int height, String title) {
     context = GLContext.init(width, height, title);
     shaderManager = GLShaderManager.get();
     samplerManager = GLSamplerManager.get();
     vaoManager = GLVertexArrayManager.get();
     shaders = new ArrayList<>();
+    systems = new HashMap<>();
   }
 
   protected Shader createShader(String vertexFile, String fragmentFile) throws IOException, URISyntaxException {
@@ -47,10 +53,37 @@ public abstract class GLApplication {
     this.camera = camera;
   }
 
+  protected <T extends ApplicationSystem> void addSystem(Class<T> system) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    if (!hasSystem(system)) {
+      systems.put(system, system.getConstructor(GLApplication.class).newInstance(this));
+    }
+  }
+
+  protected <T extends ApplicationSystem> void removeSystem(Class<T> system) {
+    systems.remove(system);
+  }
+
+  protected <T extends ApplicationSystem> boolean hasSystem(Class<T> system) {
+    return systems.containsKey(system);
+  }
+
+  protected <T extends ApplicationSystem> T getSystem(Class<T> system) {
+    if (!hasSystem(system)) {
+      throw new IllegalArgumentException(system.getName() + " not found!");
+    }
+
+    return system.cast(systems.get(system));
+  }
+
   protected void beginFrame() {
     currentTime = (float) glfwGetTime();
     setupViewProjection();
     setupShader();
+
+    for (Class<? extends ApplicationSystem> system : systems.keySet()) {
+      ApplicationSystem instance = systems.get(system);
+      instance.invoke();
+    }
   }
 
   protected void endFrame() {

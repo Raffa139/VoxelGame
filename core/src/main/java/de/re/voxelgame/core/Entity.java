@@ -1,33 +1,31 @@
 package de.re.voxelgame.core;
 
-import java.util.HashSet;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public abstract class Entity {
-  private final Set<Component> components = new HashSet<>();
+  private final Map<Class<? extends Component>, Component> components = new HashMap<>();
 
-  public <T extends Component> void addComponent(Class<T> component) {
-    if (component.isAssignableFrom(TestComponent.class)) {
-      components.add(new TestComponent());
+  public <T extends Component> void addComponent(Class<T> component) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    if (!hasComponent(component)) {
+      components.put(component, component.getDeclaredConstructor().newInstance());
     }
   }
 
   public <T extends Component> void removeComponent(Class<T> component) {
-    if (component.isAssignableFrom(TestComponent.class)) {
-      for (Component c : components) {
-        if (c.getClass().isAssignableFrom(TestComponent.class)) {
-          components.remove(c);
-          break;
-        }
-      }
-    }
+    components.remove(component);
   }
 
-  public void doLife(Map<Class<? extends Component>, CSystem> componentSystem) {
-    for (Component c : components) {
-      CSystem system = componentSystem.get(c.getClass());
-      system.invoke(c, this);
+  public <T extends Component> boolean hasComponent(Class<T> component) {
+    return components.containsKey(component);
+  }
+
+  public <T extends Component> T getComponent(Class<T> component) {
+    if (!hasComponent(component)) {
+      throw new IllegalArgumentException(component.getName() + " not found!");
     }
+
+    return component.cast(components.get(component));
   }
 }
