@@ -32,7 +32,30 @@ public class Application extends GLApplication {
   public void run() throws IOException, URISyntaxException {
     System.out.println("LWJGL " + Version.getVersion());
 
-    loop();
+    Entity entity = new Entity() {
+      @Override
+      public <T extends Component> void addComponent(Class<T> component) {
+        super.addComponent(component);
+      }
+
+      @Override
+      public <T extends Component> void removeComponent(Class<T> component) {
+        super.removeComponent(component);
+      }
+
+      @Override
+      public void doLife() {
+        super.doLife();
+      }
+    };
+
+    entity.addComponent(TestComponent.class);
+    entity.doLife();
+
+    entity.removeComponent(TestComponent.class);
+    entity.doLife();
+
+    //loop();
     quit();
   }
 
