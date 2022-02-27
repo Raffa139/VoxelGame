@@ -1,8 +1,8 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
-import de.re.voxelgame.core.ecs.component.LocationComponent;
 import de.re.voxelgame.core.ecs.entity.BasicEntity;
+import de.re.voxelgame.core.ecs.entity.StaticEntity;
 import de.re.voxelgame.core.ecs.system.HelloSystem;
 import de.re.voxelgame.core.ecs.system.TestSystem;
 import de.re.voxelgame.core.objects.Framebuffer;
@@ -42,13 +42,12 @@ public class Application extends GLApplication {
     ecs.addSystem(HelloSystem.class);
     ecs.addSystem(TestSystem.class);
 
-    BasicEntity entity = new BasicEntity();
-
-    System.out.println(entity.getComponent(LocationComponent.class).getNormalizedDirection());
-
-    System.out.println(entity.getPosition());
-    entity.setPosition(new Vector3f(10.0f));
-    System.out.println(entity.getPosition());
+    ecs.addEntity(new BasicEntity());
+    ecs.addEntity(new BasicEntity(new Vector3f(5.0f)));
+    StaticEntity staticEntity = new StaticEntity();
+    ecs.addEntity(new StaticEntity());
+    ecs.addEntity(staticEntity);
+    ecs.removeEntity(staticEntity);
 
     beginFrame();
     //loop();

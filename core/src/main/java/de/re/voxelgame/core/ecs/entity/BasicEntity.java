@@ -7,6 +7,11 @@ import org.joml.Vector3f;
 import java.lang.reflect.InvocationTargetException;
 
 public class BasicEntity extends Entity {
+  public BasicEntity(Vector3f position) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    this();
+    setPosition(position);
+  }
+
   public BasicEntity() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
     addComponent(LocationComponent.class);
     addComponent(PositionComponent.class);
