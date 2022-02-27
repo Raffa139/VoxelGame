@@ -9,6 +9,7 @@ import de.re.voxelgame.engine.skybox.Skybox;
 import de.re.voxelgame.engine.voxel.VoxelType;
 import de.re.voxelgame.engine.world.*;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
+import org.joml.Vector3f;
 import org.lwjgl.Version;
 
 import java.io.IOException;
@@ -35,6 +36,14 @@ public class Application extends GLApplication {
 
     addSystem(HelloSystem.class);
     addSystem(TestSystem.class);
+
+    BasicEntity entity = new BasicEntity();
+
+    System.out.println(entity.getComponent(LocationComponent.class).getNormalizedDirection());
+
+    System.out.println(entity.getPosition());
+    entity.setPosition(new Vector3f(10.0f));
+    System.out.println(entity.getPosition());
 
     beginFrame();
     //loop();

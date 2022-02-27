@@ -9,7 +9,7 @@ public abstract class Entity {
 
   public <T extends Component> void addComponent(Class<T> component) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
     if (!hasComponent(component)) {
-      components.put(component, component.getDeclaredConstructor().newInstance());
+      components.put(component, component.getDeclaredConstructor(Entity.class).newInstance(this));
     }
   }
 

@@ -2,10 +2,11 @@ package de.re.voxelgame.core;
 
 import org.joml.Vector3f;
 
-public class PositionComponent implements Component {
+public class PositionComponent extends Component {
   private Vector3f position;
 
-  public PositionComponent() {
+  public PositionComponent(Entity entity) {
+    super(entity);
     position = new Vector3f(0.0f);
   }
 

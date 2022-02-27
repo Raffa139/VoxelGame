@@ -1,4 +1,9 @@
 package de.re.voxelgame.core;
 
-public interface Component {
+public abstract class Component {
+  protected Entity entity;
+
+  public Component(Entity entity) {
+    this.entity = entity;
+  }
 }
