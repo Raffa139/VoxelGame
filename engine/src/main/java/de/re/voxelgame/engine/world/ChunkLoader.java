@@ -1,6 +1,6 @@
 package de.re.voxelgame.engine.world;
 
-import de.re.voxelgame.core.GLVertexArrayManager;
+import de.re.voxelgame.core.objects.GLVertexArrayManager;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
 import de.re.voxelgame.engine.voxel.Voxel;
 import de.re.voxelgame.engine.voxel.VoxelFace;

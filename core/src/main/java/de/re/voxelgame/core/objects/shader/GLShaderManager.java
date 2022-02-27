@@ -1,4 +1,4 @@
-package de.re.voxelgame.core.shader;
+package de.re.voxelgame.core.objects.shader;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

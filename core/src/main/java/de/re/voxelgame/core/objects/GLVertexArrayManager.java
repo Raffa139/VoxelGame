@@ -1,4 +1,4 @@
-package de.re.voxelgame.core;
+package de.re.voxelgame.core.objects;
 
 import java.util.*;
 

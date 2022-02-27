@@ -1,8 +1,9 @@
 package de.re.voxelgame.core;
 
-import de.re.voxelgame.core.sampler.GLSamplerManager;
-import de.re.voxelgame.core.shader.GLShaderManager;
-import de.re.voxelgame.core.shader.Shader;
+import de.re.voxelgame.core.objects.GLVertexArrayManager;
+import de.re.voxelgame.core.objects.sampler.GLSamplerManager;
+import de.re.voxelgame.core.objects.shader.GLShaderManager;
+import de.re.voxelgame.core.objects.shader.Shader;
 import org.joml.Matrix4f;
 
 import java.io.IOException;

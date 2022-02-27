@@ -1,8 +1,8 @@
 package de.re.voxelgame.engine.gui;
 
 import de.re.voxelgame.core.GLContext;
-import de.re.voxelgame.core.GLVertexArrayManager;
-import de.re.voxelgame.core.shader.Shader;
+import de.re.voxelgame.core.objects.GLVertexArrayManager;
+import de.re.voxelgame.core.objects.shader.Shader;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 

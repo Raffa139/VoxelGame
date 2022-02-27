@@ -1,10 +1,10 @@
 package de.re.voxelgame.engine.skybox;
 
 import de.re.voxelgame.core.Camera;
-import de.re.voxelgame.core.GLVertexArrayManager;
-import de.re.voxelgame.core.sampler.SamplerCube;
-import de.re.voxelgame.core.sampler.GLSamplerManager;
-import de.re.voxelgame.core.shader.Shader;
+import de.re.voxelgame.core.objects.GLVertexArrayManager;
+import de.re.voxelgame.core.objects.sampler.SamplerCube;
+import de.re.voxelgame.core.objects.sampler.GLSamplerManager;
+import de.re.voxelgame.core.objects.shader.Shader;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 

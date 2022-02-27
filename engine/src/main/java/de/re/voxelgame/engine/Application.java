@@ -1,9 +1,10 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
-import de.re.voxelgame.core.sampler.Sampler2D;
-import de.re.voxelgame.core.sampler.Sampler2DArray;
-import de.re.voxelgame.core.shader.Shader;
+import de.re.voxelgame.core.objects.Framebuffer;
+import de.re.voxelgame.core.objects.sampler.Sampler2D;
+import de.re.voxelgame.core.objects.sampler.Sampler2DArray;
+import de.re.voxelgame.core.objects.shader.Shader;
 import de.re.voxelgame.engine.gui.HudRenderer;
 import de.re.voxelgame.engine.skybox.Skybox;
 import de.re.voxelgame.engine.voxel.VoxelType;

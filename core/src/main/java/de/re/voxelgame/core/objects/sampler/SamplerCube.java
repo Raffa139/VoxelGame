@@ -1,4 +1,4 @@
-package de.re.voxelgame.core.sampler;
+package de.re.voxelgame.core.objects.sampler;
 
 import de.matthiasmann.twl.utils.PNGDecoder;
 

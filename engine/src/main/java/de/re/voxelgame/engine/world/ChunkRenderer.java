@@ -1,10 +1,11 @@
 package de.re.voxelgame.engine.world;
 
 import de.re.voxelgame.core.*;
-import de.re.voxelgame.core.GLVertexArrayManager;
-import de.re.voxelgame.core.sampler.Sampler2D;
-import de.re.voxelgame.core.sampler.Sampler2DArray;
-import de.re.voxelgame.core.shader.Shader;
+import de.re.voxelgame.core.objects.Framebuffer;
+import de.re.voxelgame.core.objects.GLVertexArrayManager;
+import de.re.voxelgame.core.objects.sampler.Sampler2D;
+import de.re.voxelgame.core.objects.sampler.Sampler2DArray;
+import de.re.voxelgame.core.objects.shader.Shader;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 

@@ -1,4 +1,4 @@
-package de.re.voxelgame.core.shader;
+package de.re.voxelgame.core.objects.shader;
 
 import de.re.voxelgame.core.util.ResourceLoader;
 import org.joml.Matrix4f;
