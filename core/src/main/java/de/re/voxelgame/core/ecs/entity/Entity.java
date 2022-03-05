@@ -9,10 +9,14 @@ import java.util.Map;
 public abstract class Entity {
   private final Map<Class<? extends Component>, Component> components = new HashMap<>();
 
-  public <T extends Component> void addComponent(Class<T> component) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+  public <T extends Component> T addComponent(Class<T> component) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
     if (!hasComponent(component)) {
-      components.put(component, component.getDeclaredConstructor(Entity.class).newInstance(this));
+      T instance = component.getDeclaredConstructor(Entity.class).newInstance(this);
+      components.put(component, instance);
+      return instance;
     }
+
+    return getComponent(component);
   }
 
   public <T extends Component> void removeComponent(Class<T> component) {

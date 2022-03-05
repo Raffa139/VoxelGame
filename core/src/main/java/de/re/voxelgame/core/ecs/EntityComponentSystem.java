@@ -71,6 +71,20 @@ public class EntityComponentSystem {
         .collect(Collectors.toSet());
   }
 
+  public Set<Entity> getAllEntities() {
+    if (entityGroups.isEmpty()) {
+
+    }
+
+    Set<Entity> result = new HashSet<>();
+    for (Class<? extends Entity> group : entityGroups.keySet()) {
+      Set<Entity> entities = entityGroups.get(group);
+      result.addAll(entities);
+    }
+
+    return result;
+  }
+
   public <T extends ApplicationSystem> void addSystem(Class<T> system) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
     if (!hasSystem(system)) {
       systems.put(system, system.getConstructor(GLApplication.class).newInstance(application));

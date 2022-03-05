@@ -77,6 +77,10 @@ public abstract class GLApplication {
     context.terminate();
   }
 
+  protected boolean glApplicationIsRunning() {
+    return !context.isCloseRequested();
+  }
+
   private void setupShader() {
     for (Shader shader : shaders) {
       shader.use();
