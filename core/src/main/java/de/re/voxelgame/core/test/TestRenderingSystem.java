@@ -19,7 +19,7 @@ public class TestRenderingSystem extends ApplicationSystem {
     try {
       renderer = new ViewableRenderer();
     } catch (IOException | URISyntaxException e) {
-      throw new IllegalStateException("Something went wrong initializing ViewableRenderer!");
+      throw new IllegalStateException("Something went wrong initializing ViewableRenderer!", e);
     }
   }
 

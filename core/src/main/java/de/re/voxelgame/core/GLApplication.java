@@ -8,7 +8,7 @@ import de.re.voxelgame.core.objects.shader.Shader;
 import org.joml.Matrix4f;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +46,7 @@ public abstract class GLApplication {
     return ecs;
   }
 
-  protected Shader createShader(String vertexFile, String fragmentFile) throws IOException, URISyntaxException {
+  protected Shader createShader(Path vertexFile, Path fragmentFile) throws IOException {
     Shader shader = shaderManager.createShader(vertexFile, fragmentFile);
     shaders.add(shader);
     return shader;

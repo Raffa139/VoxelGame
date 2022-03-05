@@ -1,15 +1,14 @@
 package de.re.voxelgame.core.objects.shader;
 
-import de.re.voxelgame.core.util.ResourceLoader;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.FloatBuffer;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -17,10 +16,11 @@ import static org.lwjgl.opengl.GL20.*;
 public class Shader {
   private final int id;
 
-  protected Shader(String vertexFile, String fragmentFile) throws IOException, URISyntaxException {
-    String vertexContent = Files.readString(ResourceLoader.locateResource(vertexFile, Shader.class).toPath());
-    String fragmentContent = Files.readString(ResourceLoader.locateResource(fragmentFile, Shader.class).toPath());
+  public Shader(Path vertexFile, Path fragmentFile) throws IOException {
+    this(Files.readString(vertexFile), Files.readString(fragmentFile));
+  }
 
+  protected Shader(String vertexContent, String fragmentContent) throws IOException {
     int vertShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertShader, vertexContent);
     glCompileShader(vertShader);

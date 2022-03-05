@@ -1,7 +1,7 @@
 package de.re.voxelgame.core.objects.shader;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +24,15 @@ public class GLShaderManager {
     return instant;
   }
 
-  public Shader createShader(String vertexFile, String fragmentFile) throws IOException, URISyntaxException {
+  public Shader createShader(Path vertexFile, Path fragmentFile) throws IOException {
     Shader shader = new Shader(vertexFile, fragmentFile);
+    shaderIds.add(shader.getId());
+
+    return shader;
+  }
+
+  public Shader createShader(String vertexContent, String fragmentContent) throws IOException {
+    Shader shader = new Shader(vertexContent, fragmentContent);
     shaderIds.add(shader.getId());
 
     return shader;

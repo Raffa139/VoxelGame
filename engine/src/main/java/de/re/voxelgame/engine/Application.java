@@ -1,25 +1,22 @@
 package de.re.voxelgame.engine;
 
 import de.re.voxelgame.core.*;
-import de.re.voxelgame.core.ecs.entity.BasicEntity;
-import de.re.voxelgame.core.ecs.entity.StaticEntity;
-import de.re.voxelgame.core.ecs.system.HelloSystem;
-import de.re.voxelgame.core.ecs.system.TestSystem;
 import de.re.voxelgame.core.objects.Framebuffer;
 import de.re.voxelgame.core.objects.sampler.Sampler2D;
 import de.re.voxelgame.core.objects.sampler.Sampler2DArray;
 import de.re.voxelgame.core.objects.shader.Shader;
+import de.re.voxelgame.core.util.ResourceLoader;
 import de.re.voxelgame.engine.gui.HudRenderer;
 import de.re.voxelgame.engine.skybox.Skybox;
 import de.re.voxelgame.engine.voxel.VoxelType;
 import de.re.voxelgame.engine.world.*;
 import de.re.voxelgame.engine.noise.OpenSimplexNoise;
-import org.joml.Vector3f;
 import org.lwjgl.Version;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 
@@ -36,32 +33,20 @@ public class Application extends GLApplication {
     super(width, height, title);
   }
 
-  public void run() throws IOException, URISyntaxException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+  public void run() throws IOException, URISyntaxException {
     System.out.println("LWJGL " + Version.getVersion());
-
-    ecs.addSystem(HelloSystem.class);
-    ecs.addSystem(TestSystem.class);
-
-    ecs.addEntity(new BasicEntity());
-    ecs.addEntity(new BasicEntity(new Vector3f(5.0f)));
-    StaticEntity staticEntity = new StaticEntity();
-    ecs.addEntity(new StaticEntity());
-    ecs.addEntity(staticEntity);
-    ecs.removeEntity(staticEntity);
-
-    beginFrame();
-    //loop();
+    loop();
     quit();
   }
 
   private void loop() throws IOException, URISyntaxException {
     // Shaders
-    Shader chunkShader = createShader("shader/chunk.vert", "shader/chunk.frag");
-    Shader waterShader = createShader("shader/chunk.vert", "shader/water.frag");
-    Shader chunkAABBShader = createShader("shader/chunkAABB.vert", "shader/chunkAABB.frag");
-    Shader hudShader = createShader("shader/basicHud.vert", "shader/basicHud.frag");
-    Shader skyboxShader = createShader("shader/skybox.vert", "shader/skybox.frag");
-    Shader screenShader = createShader("shader/screen.vert", "shader/screen.frag");
+    Shader chunkShader = shaderFromResources("shader/chunk.vert", "shader/chunk.frag");
+    Shader waterShader = shaderFromResources("shader/chunk.vert", "shader/water.frag");
+    Shader chunkAABBShader = shaderFromResources("shader/chunkAABB.vert", "shader/chunkAABB.frag");
+    Shader hudShader = shaderFromResources("shader/basicHud.vert", "shader/basicHud.frag");
+    Shader skyboxShader = shaderFromResources("shader/skybox.vert", "shader/skybox.frag");
+    Shader screenShader = shaderFromResources("shader/screen.vert", "shader/screen.frag");
 
     // Textures
     String[] textureFiles = {
@@ -211,5 +196,11 @@ public class Application extends GLApplication {
 
     fbo.cleanup();
     fbo2.cleanup();
+  }
+
+  private Shader shaderFromResources(String vertex, String fragment) throws IOException, URISyntaxException {
+    Path vertexFile = ResourceLoader.locateResource(vertex, Application.class).toPath();
+    Path fragmentFile = ResourceLoader.locateResource(fragment, Application.class).toPath();
+    return createShader(vertexFile, fragmentFile);
   }
 }
