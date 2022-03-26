@@ -22,7 +22,6 @@ import org.lwjgl.Version;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
@@ -39,7 +38,7 @@ public class VoxelApplication extends GLApplication {
     System.out.println("LWJGL " + Version.getVersion());
   }
 
-  public void run() throws IOException, URISyntaxException {
+  public void run() throws IOException {
     ecs.unregisterEntityListener(ecs.getSystem(LoadingSystem.class));
     ecs.removeSystem(BasicKeyBindings.class);
     ecs.removeSystem(LoadingSystem.class);
@@ -219,7 +218,7 @@ public class VoxelApplication extends GLApplication {
     quit();
   }
 
-  private Shader shaderFromResources(String vertex, String fragment) throws IOException, URISyntaxException {
+  private Shader shaderFromResources(String vertex, String fragment) throws IOException {
     Path vertexFile = ResourceLoader.locateResource(vertex, VoxelApplication.class).toPath();
     Path fragmentFile = ResourceLoader.locateResource(fragment, VoxelApplication.class).toPath();
     return createShader(vertexFile, fragmentFile);
