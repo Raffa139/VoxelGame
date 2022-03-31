@@ -8,6 +8,6 @@ uniform mat4 iProjection;
 out vec3 Texs;
 
 void main() {
-    Texs = iPos;
+    Texs = vec3(iPos.x, -iPos.y, iPos.z);
     gl_Position = (iProjection * iView * vec4(iPos, 1.0)).xyww;
 }
