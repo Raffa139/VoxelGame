@@ -12,6 +12,7 @@ import de.re.voxelgame.camera.CrossHairTarget;
 import de.re.voxelgame.camera.VoxelCamera;
 import de.re.voxelgame.gui.HudRenderer;
 import de.re.voxelgame.skybox.Skybox;
+import de.re.voxelgame.skybox.SkyboxRenderer;
 import de.re.voxelgame.world.voxel.VoxelType;
 import de.re.voxelgame.world.noise.OpenSimplexNoise;
 import de.re.voxelgame.world.chunk.ChunkInteractionManager;
@@ -43,8 +44,6 @@ public class VoxelApplication extends GLApplication {
     ecs.removeSystem(LoadingSystem.class);
 
     // Shaders
-    Shader hudShader = shaderFromResources("shader/basicHud.vert", "shader/basicHud.frag");
-    Shader skyboxShader = shaderFromResources("shader/skybox.vert", "shader/skybox.frag");
     Shader screenShader = shaderFromResources("shader/screen.vert", "shader/screen.frag");
 
     // Textures
@@ -85,8 +84,9 @@ public class VoxelApplication extends GLApplication {
     useCamera(camera);
 
     ChunkRenderer chunkRenderer = new ChunkRenderer(this);
-    HudRenderer hudRenderer = new HudRenderer(context, hudShader);
+    HudRenderer hudRenderer = new HudRenderer(this);
 
+    SkyboxRenderer skyboxRenderer = new SkyboxRenderer(this);
     Skybox skybox = new Skybox(
         ResourceLoader.locateResource("skybox/right.png", VoxelApplication.class).toPath(),
         ResourceLoader.locateResource("skybox/left.png", VoxelApplication.class).toPath(),
@@ -155,7 +155,7 @@ public class VoxelApplication extends GLApplication {
 
       // Render skybox
       normalVoxelBuffer.bind();
-      skybox.render(skyboxShader, camera);
+      skyboxRenderer.render(skybox, camera);
 
       // Post-processing
       screenShader.use();
