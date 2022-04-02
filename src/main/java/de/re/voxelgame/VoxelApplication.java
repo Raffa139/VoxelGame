@@ -1,9 +1,7 @@
 package de.re.voxelgame;
 
 import de.re.engine.GLApplication;
-import de.re.engine.KeyListener;
 import de.re.engine.MouseListener;
-import de.re.engine.ecs.system.BasicKeyBindings;
 import de.re.engine.ecs.system.LoadingSystem;
 import de.re.engine.objects.Framebuffer;
 import de.re.engine.objects.sampler.Sampler2D;
@@ -40,13 +38,9 @@ public class VoxelApplication extends GLApplication {
 
   public void run() throws IOException {
     ecs.unregisterEntityListener(ecs.getSystem(LoadingSystem.class));
-    ecs.removeSystem(BasicKeyBindings.class);
     ecs.removeSystem(LoadingSystem.class);
 
     // Shaders
-    Shader chunkShader = shaderFromResources("shader/chunk.vert", "shader/chunk.frag");
-    Shader waterShader = shaderFromResources("shader/chunk.vert", "shader/water.frag");
-    Shader chunkAABBShader = shaderFromResources("shader/chunkAABB.vert", "shader/chunkAABB.frag");
     Shader hudShader = shaderFromResources("shader/basicHud.vert", "shader/basicHud.frag");
     Shader skyboxShader = shaderFromResources("shader/skybox.vert", "shader/skybox.frag");
     Shader screenShader = shaderFromResources("shader/screen.vert", "shader/screen.frag");
@@ -88,7 +82,7 @@ public class VoxelApplication extends GLApplication {
 
     useCamera(camera);
 
-    ChunkRenderer chunkRenderer = new ChunkRenderer(context, chunkShader, waterShader, chunkAABBShader);
+    ChunkRenderer chunkRenderer = new ChunkRenderer(this);
     HudRenderer hudRenderer = new HudRenderer(context, hudShader);
 
     Skybox skybox = new Skybox(
@@ -123,16 +117,16 @@ public class VoxelApplication extends GLApplication {
         .doFinal();
 
     // Framebuffer
-    Framebuffer fbo = new Framebuffer(context.getWindowWidth(), context.getWindowHeight());
-    Framebuffer fbo2 = new Framebuffer(context.getWindowWidth(), context.getWindowHeight());
+    Framebuffer normalVoxelBuffer = new Framebuffer(context.getWindowWidth(), context.getWindowHeight());
+    Framebuffer transparentVoxelBuffer = new Framebuffer(context.getWindowWidth(), context.getWindowHeight());
 
     float lastPressed = 0.0f;
     while (!context.isCloseRequested()) {
       beginFrame();
 
-      //chunkManager.generate(currentFrameTime, 0.0001f);
-      chunkManager.update(camera);
-      chunkManager.cancelChunks(camera);
+      chunkManager.generate(currentTime, 0.0001f);
+      //chunkManager.update(camera);
+      //chunkManager.cancelChunks(camera);
 
       // Cross-hair voxel intersection
       camera.update(context.getDeltaTime(), !context.isMouseCursorToggled());
@@ -154,17 +148,11 @@ public class VoxelApplication extends GLApplication {
         }
       }
 
-      // Chunk mouse-cursor intersection
-      WorldPosition intersectionPos = null;
-      if (context.isMouseCursorToggled()) {
-        intersectionPos = interactionManager.calculateMouseCursorIntersection(projection, context.getWindowWidth(), context.getWindowHeight());
-      }
-
       // Render voxels
-      chunkRenderer.render(chunkManager.getChunks(), intersectionPos, fbo, fbo2, arraySampler, normalMap);
+      chunkRenderer.render(chunkManager.getChunks(), normalVoxelBuffer, transparentVoxelBuffer, arraySampler, normalMap);
 
       // Render skybox
-      fbo.bind();
+      normalVoxelBuffer.bind();
       skybox.render(skyboxShader, camera);
 
       // Post-processing
@@ -176,10 +164,10 @@ public class VoxelApplication extends GLApplication {
 
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-      fbo.bindColorTexture(0);
-      fbo2.bindColorTexture(1);
-      fbo.bindDepthStencilTexture(2);
-      fbo2.bindDepthStencilTexture(3);
+      normalVoxelBuffer.bindColorTexture(0);
+      transparentVoxelBuffer.bindColorTexture(1);
+      normalVoxelBuffer.bindDepthStencilTexture(2);
+      transparentVoxelBuffer.bindDepthStencilTexture(3);
 
       glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
@@ -193,32 +181,16 @@ public class VoxelApplication extends GLApplication {
       // Render hud
       hudRenderer.render();
 
-      // Keybindings
-      if (KeyListener.keyPressed(GLFW_KEY_ESCAPE)) {
-        context.requestClose();
-      }
-
-      if (KeyListener.keyPressed(GLFW_KEY_P)) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      } else {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      }
-
-      if (KeyListener.keyPressed(GLFW_KEY_E) && currentTime > lastPressed + 0.25f) {
-        lastPressed = currentTime;
-        context.toggleMouseCursor();
-      }
-
       endFrame();
     }
 
-    fbo.cleanup();
-    fbo2.cleanup();
+    normalVoxelBuffer.cleanup();
+    transparentVoxelBuffer.cleanup();
 
     quit();
   }
 
-  private Shader shaderFromResources(String vertex, String fragment) throws IOException {
+  public Shader shaderFromResources(String vertex, String fragment) throws IOException {
     Path vertexFile = ResourceLoader.locateResource(vertex, VoxelApplication.class).toPath();
     Path fragmentFile = ResourceLoader.locateResource(fragment, VoxelApplication.class).toPath();
     return createShader(vertexFile, fragmentFile);
