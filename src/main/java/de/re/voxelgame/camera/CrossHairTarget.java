@@ -1,8 +1,8 @@
-package de.re.voxelgame;
+package de.re.voxelgame.camera;
 
 import de.re.engine.util.Vectors;
-import de.re.voxelgame.world.Chunk;
-import de.re.voxelgame.world.ChunkManager;
+import de.re.voxelgame.world.chunk.Chunk;
+import de.re.voxelgame.world.chunk.ChunkManager;
 import de.re.voxelgame.world.WorldPosition;
 import org.joml.Vector3f;
 

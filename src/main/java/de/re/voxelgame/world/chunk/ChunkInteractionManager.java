@@ -1,11 +1,12 @@
-package de.re.voxelgame.world;
+package de.re.voxelgame.world.chunk;
 
 import de.re.engine.MouseListener;
-import de.re.voxelgame.VoxelCamera;
+import de.re.voxelgame.camera.VoxelCamera;
 import de.re.voxelgame.intersection.AABB;
 import de.re.voxelgame.intersection.Ray;
 import de.re.voxelgame.intersection.RayCaster;
-import de.re.voxelgame.voxel.VoxelType;
+import de.re.voxelgame.world.WorldPosition;
+import de.re.voxelgame.world.voxel.VoxelType;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 

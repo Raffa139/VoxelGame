@@ -1,4 +1,4 @@
-package de.re.voxelgame.noise;
+package de.re.voxelgame.world.noise;
 
 public class OpenSimplexNoise {
   private final OpenSimplex2F noise;

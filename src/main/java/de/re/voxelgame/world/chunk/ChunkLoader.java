@@ -1,18 +1,19 @@
-package de.re.voxelgame.world;
+package de.re.voxelgame.world.chunk;
 
 import de.re.engine.objects.GLVertexArrayManager;
-import de.re.voxelgame.noise.OpenSimplexNoise;
-import de.re.voxelgame.voxel.Voxel;
-import de.re.voxelgame.voxel.VoxelFace;
-import de.re.voxelgame.voxel.VoxelType;
-import de.re.voxelgame.voxel.VoxelVertex;
+import de.re.voxelgame.world.WorldPosition;
+import de.re.voxelgame.world.noise.OpenSimplexNoise;
+import de.re.voxelgame.world.voxel.Voxel;
+import de.re.voxelgame.world.voxel.VoxelFace;
+import de.re.voxelgame.world.voxel.VoxelType;
+import de.re.voxelgame.world.voxel.VoxelVertex;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static de.re.voxelgame.world.Chunk.CHUNK_SIZE;
+import static de.re.voxelgame.world.chunk.Chunk.CHUNK_SIZE;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 

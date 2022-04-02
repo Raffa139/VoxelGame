@@ -1,4 +1,4 @@
-package de.re.voxelgame.noise;
+package de.re.voxelgame.world.noise;
 
 /**
  * K.jpg's OpenSimplex 2, faster variant

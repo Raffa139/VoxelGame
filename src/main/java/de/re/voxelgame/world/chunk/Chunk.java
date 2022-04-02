@@ -1,8 +1,9 @@
-package de.re.voxelgame.world;
+package de.re.voxelgame.world.chunk;
 
 import de.re.engine.util.Vectors;
 import de.re.voxelgame.intersection.AABB;
-import de.re.voxelgame.voxel.VoxelType;
+import de.re.voxelgame.world.WorldPosition;
+import de.re.voxelgame.world.voxel.VoxelType;
 
 public class Chunk {
   public static final int CHUNK_SIZE = 32;

@@ -1,7 +1,8 @@
-package de.re.voxelgame.world;
+package de.re.voxelgame.world.chunk;
 
-import de.re.voxelgame.VoxelCamera;
-import de.re.voxelgame.noise.OpenSimplexNoise;
+import de.re.voxelgame.camera.VoxelCamera;
+import de.re.voxelgame.world.WorldPosition;
+import de.re.voxelgame.world.noise.OpenSimplexNoise;
 import org.joml.Vector3f;
 
 import java.util.*;

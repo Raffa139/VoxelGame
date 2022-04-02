@@ -1,4 +1,4 @@
-package de.re.voxelgame.voxel;
+package de.re.voxelgame.world.voxel;
 
 public final class VoxelGeometry {
   // Visual: https://www.math3d.org/OdaojzOmz

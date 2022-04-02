@@ -1,5 +1,6 @@
 package de.re.voxelgame.world;
 
+import de.re.voxelgame.world.chunk.Chunk;
 import org.joml.Vector3f;
 
 import java.util.Objects;

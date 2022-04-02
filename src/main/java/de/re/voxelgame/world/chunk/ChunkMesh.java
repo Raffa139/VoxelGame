@@ -1,4 +1,4 @@
-package de.re.voxelgame.world;
+package de.re.voxelgame.world.chunk;
 
 public class ChunkMesh {
   private final int vaoId;

@@ -1,4 +1,4 @@
-package de.re.voxelgame;
+package de.re.voxelgame.camera;
 
 import de.re.engine.Camera;
 import de.re.voxelgame.world.WorldPosition;

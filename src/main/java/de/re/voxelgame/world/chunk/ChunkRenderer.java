@@ -1,4 +1,4 @@
-package de.re.voxelgame.world;
+package de.re.voxelgame.world.chunk;
 
 import de.re.engine.GLApplication;
 import de.re.engine.objects.Framebuffer;
