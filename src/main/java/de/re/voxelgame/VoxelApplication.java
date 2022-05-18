@@ -78,8 +78,8 @@ public class VoxelApplication extends GLApplication {
 
     OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
     ChunkManager chunkManager = new ChunkManager(noise);
-    VoxelCamera camera = new VoxelCamera(new WorldPosition(3.0f, 65.0f, 3.0f), 65.0f, new CrossHairTarget(chunkManager));
-    ChunkInteractionManager interactionManager = new ChunkInteractionManager(chunkManager, camera);
+    VoxelCamera camera = new VoxelCamera(new WorldPosition(3.0f, 65.0f, 3.0f), 65.0f);
+    ChunkInteractionManager interactionManager = new ChunkInteractionManager(chunkManager);
 
     useCamera(camera);
 
@@ -132,6 +132,7 @@ public class VoxelApplication extends GLApplication {
 
       // Cross-hair voxel intersection
       camera.update(context.getDeltaTime(), !context.isMouseCursorToggled());
+      interactionManager.update(camera);
 
       if (!context.isMouseCursorToggled()) {
         interactionManager.highlightVoxel();
@@ -141,7 +142,7 @@ public class VoxelApplication extends GLApplication {
       if (!context.isMouseCursorToggled()) {
         if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_2) && currentTime > lastPressed + 0.25f) {
           lastPressed = currentTime;
-          interactionManager.placeVoxel(VoxelType.LEAVES);
+          interactionManager.placeVoxel(VoxelType.WOOD);
         }
 
         if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_1) && currentTime > lastPressed + 0.25f) {
