@@ -13,6 +13,7 @@ public class ChunkSystem extends ApplicationSystem {
   // Keeps track of chunks & their positions
   // Loading chunks as needed (when camera moves)
   // Memory management of chunk data
+  private static final int VIEW_DISTANCE = 8;
 
   private final Map<Vector3f, Chunk> chunks = new HashMap<>();
 
@@ -28,7 +29,7 @@ public class ChunkSystem extends ApplicationSystem {
 
   @Override
   public void invoke() {
-    // Check if loading system has chunks loaded and add them to map
+    // Check if loading system has chunks loaded and add them to map + load mesh
     for (Pair<Vector3f, Chunk> futureChunk : loadingSystem.getFutureChunks()) {
       var chunk = futureChunk.getValue();
       chunks.put(futureChunk.getKey(), chunk);
@@ -36,23 +37,40 @@ public class ChunkSystem extends ApplicationSystem {
       loadingSystem.removeFuture(futureChunk);
     }
 
-    for (int x = 0; x < 1; x++) {
-      for (int z = 0; z < 1; z++) {
-        for (int y = -2; y < 2; y++) {
-          Vector3f chunk = camera.getWorldPosition().getCurrentChunkPositionOffset(x, y, z);
-
-          // Stop if y-pos is below zero
-          if (chunk.y < 0) {
-            break;
-          }
+    // Fill chunk loading queue
+    // TODO: Spiral moving outwards -> to load chunks near camera first
+    for (int x = -VIEW_DISTANCE; x < VIEW_DISTANCE; x++) {
+      for (int z = -VIEW_DISTANCE; z < VIEW_DISTANCE; z++) {
+        for (int y = -VIEW_DISTANCE; y < VIEW_DISTANCE; y++) {
+          Vector3f position = camera.getWorldPosition().getCurrentChunkPositionOffset(x, y, z);
 
           // Stop if chunk is already present in map
-          if (chunks.containsKey(chunk)) {
+          if (chunks.containsKey(position)) {
             break;
           }
 
-          loadingSystem.queue(chunk);
+          float distance = camera.getWorldPosition().getCurrentChunkPosition().distance(position);
+          if (distance < (float) VIEW_DISTANCE) {
+            // Stop if y-pos is below zero
+            if (position.y < 0) {
+              break;
+            }
+
+            loadingSystem.queue(position);
+          }
         }
+      }
+    }
+
+    // Fill chunk unloading queue
+    List<Chunk> loadedChunks = new ArrayList<>(getChunks());
+    for (Chunk chunk : loadedChunks) {
+      Vector3f position = chunk.getRelativePosition().getVector();
+      float distance = position.distance(camera.getWorldPosition().getCurrentChunkPosition());
+
+      if (distance >= (float) VIEW_DISTANCE) {
+        chunks.remove(chunk.getRelativePosition().getVector());
+        loadingSystem.dequeue(chunk);
       }
     }
   }

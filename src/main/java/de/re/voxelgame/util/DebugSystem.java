@@ -29,7 +29,8 @@ public class DebugSystem extends ApplicationSystem {
   }
 
   private void printDebugInformation() {
-    System.out.println("Queued chunks: " + loadingSystem.getLoadingQueue().size());
+    System.out.println("Queued chunks: " + loadingSystem.getQueuedAmount());
+    System.out.println("Dequeued chunks: " + loadingSystem.getDequeuedAmount());
     System.out.println("Future chunks: " + loadingSystem.getFutureChunks().size());
     System.out.println("Loaded chunks: " + chunkSystem.getChunks().size());
     System.out.println("------------------------------------------------");
