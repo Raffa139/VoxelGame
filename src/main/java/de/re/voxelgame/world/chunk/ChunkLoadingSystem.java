@@ -10,6 +10,9 @@ import org.joml.Vector3f;
 import java.util.*;
 
 public class ChunkLoadingSystem extends ApplicationSystem {
+  private static final int CHUNK_LOADING_AMOUNT_PER_FRAME = 2;
+  private static final int CHUNK_UNLOADING_AMOUNT_PER_FRAME = 2;
+
   private final Queue<Vector3f> loadingQueue = new LinkedList<>();
 
   private final Queue<Chunk> unloadingQueue = new LinkedList<>();
@@ -24,17 +27,12 @@ public class ChunkLoadingSystem extends ApplicationSystem {
 
   @Override
   public void invoke() {
-    if (loadingQueue.peek() != null) {
-      var position = loadingQueue.poll();
-      var chunk = ChunkLoader.generateChunk(new WorldPosition(position), noise);
-      futureChunks.add(new Pair<>(position, chunk));
+    for (int i = 0; i < CHUNK_LOADING_AMOUNT_PER_FRAME; i++) {
+      performLoading();
     }
 
-    if (unloadingQueue.peek() != null) {
-      var chunk = unloadingQueue.poll();
-      if (chunk.hasMesh()) {
-        ChunkLoader.unloadChunkMesh(chunk.getMesh());
-      }
+    for (int i = 0; i < CHUNK_UNLOADING_AMOUNT_PER_FRAME; i++) {
+      performUnloading();
     }
   }
 
@@ -63,6 +61,23 @@ public class ChunkLoadingSystem extends ApplicationSystem {
   }
 
   public Set<Pair<Vector3f, Chunk>> getFutureChunks() {
-    return Collections.unmodifiableSet(futureChunks);
+    return Set.copyOf(futureChunks);
+  }
+
+  private void performLoading() {
+    if (loadingQueue.peek() != null) {
+      var position = loadingQueue.poll();
+      var chunk = ChunkLoader.generateChunk(new WorldPosition(position), noise);
+      futureChunks.add(new Pair<>(position, chunk));
+    }
+  }
+
+  private void performUnloading() {
+    if (unloadingQueue.peek() != null) {
+      var chunk = unloadingQueue.poll();
+      if (chunk.hasMesh()) {
+        ChunkLoader.unloadChunkMesh(chunk.getMesh());
+      }
+    }
   }
 }
