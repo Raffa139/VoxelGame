@@ -8,11 +8,6 @@ public class VoxelCamera extends Camera {
     super(worldPosition.getVector(), fov);
   }
 
-  @Override
-  public void update(float deltaTime, boolean allowTurn) {
-    super.update(deltaTime, allowTurn);
-  }
-
   public WorldPosition getWorldPosition() {
     return new WorldPosition(pos);
   }

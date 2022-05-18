@@ -18,7 +18,7 @@ public class ChunkLoadingSystem extends ApplicationSystem {
 
   private final Queue<Vector3f> bufferQueue = new LinkedList<>();
 
-  private final Queue<Chunk> demolishingQueue = new LinkedList<>();
+  private final Queue<ChunkMesh> demolishingQueue = new LinkedList<>();
 
   private final Set<Pair<Vector3f, Chunk>> generatedChunks = new HashSet<>();
 
@@ -57,9 +57,9 @@ public class ChunkLoadingSystem extends ApplicationSystem {
     }
   }
 
-  public void demolish(Chunk chunk) {
-    if (!demolishingQueue.contains(chunk)) {
-      demolishingQueue.add(chunk);
+  public void demolish(ChunkMesh mesh) {
+    if (!demolishingQueue.contains(mesh)) {
+      demolishingQueue.add(mesh);
     }
   }
 
@@ -109,10 +109,8 @@ public class ChunkLoadingSystem extends ApplicationSystem {
 
   private void performDemolishing() {
     if (demolishingQueue.peek() != null) {
-      var chunk = demolishingQueue.poll();
-      if (chunk.hasMesh()) {
-        ChunkLoader.unloadChunkMesh(chunk.getMesh());
-      }
+      var mesh = demolishingQueue.poll();
+      ChunkLoader.unloadChunkMesh(mesh);
     }
   }
 }

@@ -86,7 +86,9 @@ public class ChunkSystem extends ApplicationSystem {
 
         if (distance >= (float) VIEW_DISTANCE) {
           chunks.remove(chunk.getRelativePosition().getVector());
-          loadingSystem.demolish(chunk);
+          if (chunk.hasMesh()) {
+            loadingSystem.demolish(chunk.getMesh());
+          }
         }
       }
 
@@ -102,6 +104,16 @@ public class ChunkSystem extends ApplicationSystem {
       }
 
       lastCameraPosition = camera.getWorldPosition().copy();
+    }
+  }
+
+  public void reloadChunk(Vector3f position, Vector3f voxelPosition) {
+    if (chunks.containsKey(position)) {
+      var chunk = chunks.get(position);
+      if (chunk.hasMesh()) {
+        loadingSystem.demolish(chunk.getMesh());
+      }
+      chunk.setMesh(ChunkLoader.loadChunkMesh(chunk, voxelPosition, chunks));
     }
   }
 

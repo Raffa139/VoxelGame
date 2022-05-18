@@ -70,8 +70,6 @@ public class VoxelApplication extends GLApplication {
     Sampler2D normalMap = samplerManager.sampler2D(ResourceLoader.locateResource("textures/normal_map.png", VoxelApplication.class).toPath());
 
     VoxelCamera camera = new VoxelCamera(new WorldPosition(3.0f, 65.0f, 3.0f), 65.0f);
-    //ChunkInteractionManager interactionManager = new ChunkInteractionManager(chunkManager, camera);
-
     useCamera(camera);
 
     Skybox skybox = new Skybox(
@@ -113,40 +111,15 @@ public class VoxelApplication extends GLApplication {
     ecs.getSystem(VoxelCameraSystem.class).setCamera(camera);
     ecs.addSystem(ChunkLoadingSystem.class);
     ecs.addSystem(ChunkSystem.class);
+    ecs.addSystem(ChunkInteractionSystem.class);
     ecs.addSystem(DebugSystem.class);
 
     ChunkRenderer chunkRenderer = new ChunkRenderer(this);
     HudRenderer hudRenderer = new HudRenderer(this);
     SkyboxRenderer skyboxRenderer = new SkyboxRenderer(this);
 
-    float lastPressed = 0.0f;
     while (!context.isCloseRequested()) {
       beginFrame();
-
-      //chunkManager.generate(currentTime, 0.0001f);
-      //chunkManager.update(camera);
-      //chunkManager.cancelChunks(camera);
-
-      // Cross-hair voxel intersection
-      camera.update(context.getDeltaTime(), !context.isMouseCursorToggled());
-      //interactionManager.update(camera);
-
-      /*if (!context.isMouseCursorToggled()) {
-        interactionManager.highlightVoxel();
-      }
-
-      // Voxel placement
-      if (!context.isMouseCursorToggled()) {
-        if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_2) && currentTime > lastPressed + 0.25f) {
-          lastPressed = currentTime;
-          interactionManager.placeVoxel(VoxelType.WOOD);
-        }
-
-        if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_1) && currentTime > lastPressed + 0.25f) {
-          lastPressed = currentTime;
-          interactionManager.removeVoxel();
-        }
-      }*/
 
       // Render voxels
       chunkRenderer.render(normalVoxelBuffer, transparentVoxelBuffer, arraySampler, normalMap);
