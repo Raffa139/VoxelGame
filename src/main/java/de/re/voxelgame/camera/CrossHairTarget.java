@@ -2,15 +2,15 @@ package de.re.voxelgame.camera;
 
 import de.re.engine.util.Vectors;
 import de.re.voxelgame.world.chunk.Chunk;
-import de.re.voxelgame.world.chunk.ChunkManager;
 import de.re.voxelgame.world.WorldPosition;
+import de.re.voxelgame.world.chunk.ChunkSystem;
 import org.joml.Vector3f;
 
 public class CrossHairTarget {
   private static final float MAX_RANGE = 8.0f;
   private static final float SAMPLE_RATE = 0.1f;
 
-  private final ChunkManager chunkManager;
+  private final ChunkSystem chunkSystem;
 
   private WorldPosition targetedVoxel;
 
@@ -18,8 +18,8 @@ public class CrossHairTarget {
 
   private boolean targetInRange = false;
 
-  public CrossHairTarget(ChunkManager chunkManager) {
-    this.chunkManager = chunkManager;
+  public CrossHairTarget(ChunkSystem chunkSystem) {
+    this.chunkSystem = chunkSystem;
   }
 
   public void update(Vector3f cameraPos, Vector3f cameraDirection) {
@@ -29,7 +29,7 @@ public class CrossHairTarget {
       targetedVoxel = new WorldPosition(Vectors.add(cameraPos, Vectors.mul(cameraDirection.normalize(), t)));
       Vector3f chunkPos = targetedVoxel.getCurrentChunkPosition();
       Vector3f voxelPos = targetedVoxel.getAbsolutePositionInCurrentChunk();
-      Chunk chunk = chunkManager.getChunkPositionMap().get(chunkPos);
+      Chunk chunk = chunkSystem.getChunkMap().get(chunkPos);
 
       byte voxelId = chunk != null ? chunk.getVoxelId((int) voxelPos.x, (int) voxelPos.y, (int) voxelPos.z) : 0;
       if (voxelId != 0) {

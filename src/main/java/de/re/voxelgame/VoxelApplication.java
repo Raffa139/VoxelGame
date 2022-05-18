@@ -1,35 +1,28 @@
 package de.re.voxelgame;
 
 import de.re.engine.GLApplication;
-import de.re.engine.MouseListener;
 import de.re.engine.ecs.system.LoadingSystem;
 import de.re.engine.objects.Framebuffer;
 import de.re.engine.objects.sampler.Sampler2D;
 import de.re.engine.objects.sampler.Sampler2DArray;
 import de.re.engine.objects.shader.Shader;
 import de.re.engine.util.ResourceLoader;
-import de.re.voxelgame.camera.CrossHairTarget;
 import de.re.voxelgame.camera.VoxelCamera;
+import de.re.voxelgame.camera.VoxelCameraSystem;
 import de.re.voxelgame.gui.HudRenderer;
 import de.re.voxelgame.skybox.Skybox;
 import de.re.voxelgame.skybox.SkyboxRenderer;
-import de.re.voxelgame.world.voxel.VoxelType;
-import de.re.voxelgame.world.noise.OpenSimplexNoise;
-import de.re.voxelgame.world.chunk.ChunkInteractionManager;
-import de.re.voxelgame.world.chunk.ChunkManager;
-import de.re.voxelgame.world.chunk.ChunkRenderer;
+import de.re.voxelgame.util.DebugSystem;
+import de.re.voxelgame.world.chunk.*;
 import de.re.voxelgame.world.WorldPosition;
 import org.lwjgl.Version;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoField;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 
@@ -76,17 +69,11 @@ public class VoxelApplication extends GLApplication {
 
     Sampler2D normalMap = samplerManager.sampler2D(ResourceLoader.locateResource("textures/normal_map.png", VoxelApplication.class).toPath());
 
-    OpenSimplexNoise noise = new OpenSimplexNoise(LocalDateTime.now().getLong(ChronoField.NANO_OF_DAY));
-    ChunkManager chunkManager = new ChunkManager(noise);
     VoxelCamera camera = new VoxelCamera(new WorldPosition(3.0f, 65.0f, 3.0f), 65.0f);
-    ChunkInteractionManager interactionManager = new ChunkInteractionManager(chunkManager);
+    //ChunkInteractionManager interactionManager = new ChunkInteractionManager(chunkManager, camera);
 
     useCamera(camera);
 
-    ChunkRenderer chunkRenderer = new ChunkRenderer(this);
-    HudRenderer hudRenderer = new HudRenderer(this);
-
-    SkyboxRenderer skyboxRenderer = new SkyboxRenderer(this);
     Skybox skybox = new Skybox(
         ResourceLoader.locateResource("skybox/right.png", VoxelApplication.class).toPath(),
         ResourceLoader.locateResource("skybox/left.png", VoxelApplication.class).toPath(),
@@ -95,7 +82,7 @@ public class VoxelApplication extends GLApplication {
         ResourceLoader.locateResource("skybox/back.png", VoxelApplication.class).toPath(),
         ResourceLoader.locateResource("skybox/front.png", VoxelApplication.class).toPath());
 
-    chunkManager.initCamPos(camera);
+    //chunkManager.initCamPos(camera);
 
     // Post-processing
     float[] screenQuadVertices = {
@@ -122,19 +109,29 @@ public class VoxelApplication extends GLApplication {
     Framebuffer normalVoxelBuffer = new Framebuffer(context.getWindowWidth(), context.getWindowHeight());
     Framebuffer transparentVoxelBuffer = new Framebuffer(context.getWindowWidth(), context.getWindowHeight());
 
+    ecs.addSystem(VoxelCameraSystem.class);
+    ecs.getSystem(VoxelCameraSystem.class).setCamera(camera);
+    ecs.addSystem(ChunkLoadingSystem.class);
+    ecs.addSystem(ChunkSystem.class);
+    ecs.addSystem(DebugSystem.class);
+
+    ChunkRenderer chunkRenderer = new ChunkRenderer(this);
+    HudRenderer hudRenderer = new HudRenderer(this);
+    SkyboxRenderer skyboxRenderer = new SkyboxRenderer(this);
+
     float lastPressed = 0.0f;
     while (!context.isCloseRequested()) {
       beginFrame();
 
-      chunkManager.generate(currentTime, 0.0001f);
+      //chunkManager.generate(currentTime, 0.0001f);
       //chunkManager.update(camera);
       //chunkManager.cancelChunks(camera);
 
       // Cross-hair voxel intersection
       camera.update(context.getDeltaTime(), !context.isMouseCursorToggled());
-      interactionManager.update(camera);
+      //interactionManager.update(camera);
 
-      if (!context.isMouseCursorToggled()) {
+      /*if (!context.isMouseCursorToggled()) {
         interactionManager.highlightVoxel();
       }
 
@@ -149,10 +146,10 @@ public class VoxelApplication extends GLApplication {
           lastPressed = currentTime;
           interactionManager.removeVoxel();
         }
-      }
+      }*/
 
       // Render voxels
-      chunkRenderer.render(chunkManager.getChunks(), normalVoxelBuffer, transparentVoxelBuffer, arraySampler, normalMap);
+      chunkRenderer.render(normalVoxelBuffer, transparentVoxelBuffer, arraySampler, normalMap);
 
       // Render skybox
       normalVoxelBuffer.bind();

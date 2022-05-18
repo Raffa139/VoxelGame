@@ -20,7 +20,7 @@ public class ChunkInteractionManager {
 
   public ChunkInteractionManager(ChunkManager chunkManager) {
     this.chunkManager = chunkManager;
-    crossHairTarget = new CrossHairTarget(chunkManager);
+    crossHairTarget = new CrossHairTarget(null);
     lastVoxelInCrossHair = new WorldPosition(0.0f);
   }
 

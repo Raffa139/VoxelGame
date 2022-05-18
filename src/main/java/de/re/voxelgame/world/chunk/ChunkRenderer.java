@@ -10,30 +10,32 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 
 public class ChunkRenderer {
+  private final ChunkSystem chunkSystem;
+
   private final Shader shader;
   private final Shader waterShader;
 
   public ChunkRenderer(GLApplication application) throws IOException {
+    chunkSystem = application.getEcs().getSystem(ChunkSystem.class);
     shader = ((VoxelApplication) application).shaderFromResources("shader/chunk.vert", "shader/chunk.frag");
     waterShader = ((VoxelApplication) application).shaderFromResources("shader/chunk.vert", "shader/water.frag");
   }
 
-  public void render(Collection<Chunk> chunks, Framebuffer normalVoxelBuffer, Framebuffer transparentVoxelBuffer,
+  public void render(Framebuffer normalVoxelBuffer, Framebuffer transparentVoxelBuffer,
                      Sampler2DArray textureArray, Sampler2D normalMap) {
     // First rendering pass for transparent voxels
-    renderTransparentVoxels(chunks, transparentVoxelBuffer, normalMap);
+    renderTransparentVoxels(transparentVoxelBuffer, normalMap);
 
     // Second rendering pass for normal voxels
-    renderNormalVoxels(chunks, normalVoxelBuffer, textureArray);
+    renderNormalVoxels(normalVoxelBuffer, textureArray);
   }
 
-  public void renderNormalVoxels(Collection<Chunk> chunks, Framebuffer fbo, Sampler2DArray textureArray) {
+  public void renderNormalVoxels(Framebuffer fbo, Sampler2DArray textureArray) {
     fbo.bind();
 
     textureArray.bind(0);
@@ -46,7 +48,7 @@ public class ChunkRenderer {
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
-    for (Chunk chunk : chunks) {
+    for (Chunk chunk : chunkSystem.getChunks()) {
       if (chunk.hasMesh()) {
         Matrix4f model = new Matrix4f();
         model.translate(chunk.getWorldPosition().getVector());
@@ -61,7 +63,7 @@ public class ChunkRenderer {
     }
   }
 
-  public void renderTransparentVoxels(Collection<Chunk> chunks, Framebuffer fbo, Sampler2D normalMap) {
+  public void renderTransparentVoxels(Framebuffer fbo, Sampler2D normalMap) {
     fbo.bind();
 
     normalMap.bind(0);
@@ -75,7 +77,7 @@ public class ChunkRenderer {
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
-    for (Chunk chunk : chunks) {
+    for (Chunk chunk : chunkSystem.getChunks()) {
       if (chunk.hasMesh()) {
         Matrix4f model = new Matrix4f();
         model.translate(chunk.getWorldPosition().getVector());
