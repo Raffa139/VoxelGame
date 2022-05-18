@@ -10,14 +10,19 @@ import org.joml.Vector3f;
 import java.util.*;
 
 public class ChunkLoadingSystem extends ApplicationSystem {
-  private static final int CHUNK_LOADING_AMOUNT_PER_FRAME = 2;
-  private static final int CHUNK_UNLOADING_AMOUNT_PER_FRAME = 2;
+  private static final int GENERATION_AMOUNT_PER_FRAME = 2;
+  private static final int BUFFERING_AMOUNT_PER_FRAME = 4;
+  private static final int DEMOLISHING_AMOUNT_PER_FRAME = 1;
 
-  private final Queue<Vector3f> loadingQueue = new LinkedList<>();
+  private final Queue<Vector3f> generationQueue = new LinkedList<>();
 
-  private final Queue<Chunk> unloadingQueue = new LinkedList<>();
+  private final Queue<Vector3f> bufferQueue = new LinkedList<>();
 
-  private final Set<Pair<Vector3f, Chunk>> futureChunks = new HashSet<>();
+  private final Queue<Chunk> demolishingQueue = new LinkedList<>();
+
+  private final Set<Pair<Vector3f, Chunk>> generatedChunks = new HashSet<>();
+
+  private final Set<Pair<Vector3f, Chunk>> bufferedChunks = new HashSet<>();
 
   private final OpenSimplexNoise noise = new OpenSimplexNoise(139L);
 
@@ -27,54 +32,84 @@ public class ChunkLoadingSystem extends ApplicationSystem {
 
   @Override
   public void invoke() {
-    for (int i = 0; i < CHUNK_LOADING_AMOUNT_PER_FRAME; i++) {
-      performLoading();
+    for (int i = 0; i < GENERATION_AMOUNT_PER_FRAME; i++) {
+      performGeneration();
     }
 
-    for (int i = 0; i < CHUNK_UNLOADING_AMOUNT_PER_FRAME; i++) {
-      performUnloading();
+    for (int i = 0; i < BUFFERING_AMOUNT_PER_FRAME; i++) {
+      performBuffering();
     }
-  }
 
-  public void queue(Vector3f chunk) {
-    if (!loadingQueue.contains(chunk)) {
-      loadingQueue.add(chunk);
+    for (int i = 0; i < DEMOLISHING_AMOUNT_PER_FRAME; i++) {
+      performDemolishing();
     }
   }
 
-  public void dequeue(Chunk chunk) {
-    if (!unloadingQueue.contains(chunk)) {
-      unloadingQueue.add(chunk);
+  public void generate(Vector3f chunk) {
+    if (!generationQueue.contains(chunk)) {
+      generationQueue.add(chunk);
     }
   }
 
-  public void removeFuture(Pair<Vector3f, Chunk> future) {
-    futureChunks.remove(future);
+  public void buffer(Vector3f position) {
+    if (!bufferQueue.contains(position)) {
+      bufferQueue.add(position);
+    }
   }
 
-  public int getQueuedAmount() {
-    return loadingQueue.size();
+  public void demolish(Chunk chunk) {
+    if (!demolishingQueue.contains(chunk)) {
+      demolishingQueue.add(chunk);
+    }
   }
 
-  public int getDequeuedAmount() {
-    return unloadingQueue.size();
+  public void removeGenerated(Pair<Vector3f, Chunk> generated) {
+    generatedChunks.remove(generated);
   }
 
-  public Set<Pair<Vector3f, Chunk>> getFutureChunks() {
-    return Set.copyOf(futureChunks);
+  public void removeBuffered(Pair<Vector3f, Chunk> buffered) {
+    bufferedChunks.remove(buffered);
   }
 
-  private void performLoading() {
-    if (loadingQueue.peek() != null) {
-      var position = loadingQueue.poll();
+  public int getQueuedAmountToGenerate() {
+    return generationQueue.size();
+  }
+
+  public int getQueuedAmountToBuffer() {
+    return bufferQueue.size();
+  }
+
+  public int getQueuedAmountToDemolish() {
+    return demolishingQueue.size();
+  }
+
+  public Set<Pair<Vector3f, Chunk>> getGeneratedChunks() {
+    return Set.copyOf(generatedChunks);
+  }
+
+  public Set<Pair<Vector3f, Chunk>> getBufferedChunks() {
+    return Set.copyOf(bufferedChunks);
+  }
+
+  private void performGeneration() {
+    if (generationQueue.peek() != null) {
+      var position = generationQueue.poll();
       var chunk = ChunkLoader.generateChunk(new WorldPosition(position), noise);
-      futureChunks.add(new Pair<>(position, chunk));
+      generatedChunks.add(new Pair<>(position, chunk));
     }
   }
 
-  private void performUnloading() {
-    if (unloadingQueue.peek() != null) {
-      var chunk = unloadingQueue.poll();
+  private void performBuffering() {
+    if (bufferQueue.peek() != null) {
+      var position = bufferQueue.poll();
+      var chunk = ChunkLoader.generateChunk(new WorldPosition(position), noise);
+      bufferedChunks.add(new Pair<>(position, chunk));
+    }
+  }
+
+  private void performDemolishing() {
+    if (demolishingQueue.peek() != null) {
+      var chunk = demolishingQueue.poll();
       if (chunk.hasMesh()) {
         ChunkLoader.unloadChunkMesh(chunk.getMesh());
       }

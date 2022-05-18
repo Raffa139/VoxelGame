@@ -29,10 +29,13 @@ public class DebugSystem extends ApplicationSystem {
   }
 
   private void printDebugInformation() {
-    System.out.println("Queued chunks: " + loadingSystem.getQueuedAmount());
-    System.out.println("Dequeued chunks: " + loadingSystem.getDequeuedAmount());
-    System.out.println("Future chunks: " + loadingSystem.getFutureChunks().size());
+    System.out.println("Queued for generation: " + loadingSystem.getQueuedAmountToGenerate());
+    System.out.println("Queued for buffering: " + loadingSystem.getQueuedAmountToBuffer());
+    System.out.println("Queued for demolishing: " + loadingSystem.getQueuedAmountToDemolish());
+    System.out.println("Future meshed: " + loadingSystem.getGeneratedChunks().size());
+    System.out.println("Future buffered: " + loadingSystem.getBufferedChunks().size());
     System.out.println("Loaded chunks: " + chunkSystem.getChunks().size());
+    System.out.println("Buffered chunks: " + chunkSystem.getBufferedChunks().size());
     System.out.println("------------------------------------------------");
   }
 }
