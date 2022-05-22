@@ -36,18 +36,18 @@ public class ChunkSystem extends ApplicationSystem {
 
   @Override
   public void invoke() {
+    // Check if loading system has buffered chunks and add them to map
+    for (Pair<Vector3f, Chunk> buffered : loadingSystem.getBufferedChunks()) {
+      bufferedChunks.put(buffered.getKey(), buffered.getValue());
+      loadingSystem.removeBuffered(buffered);
+    }
+
     // Check if loading system has chunks loaded and add them to map + load mesh
     for (Pair<Vector3f, Chunk> generated : loadingSystem.getGeneratedChunks()) {
       var chunk = generated.getValue();
       chunks.put(generated.getKey(), chunk);
       chunk.setMesh(ChunkLoader.loadChunkMesh(chunk, null, bufferedChunks));
       loadingSystem.removeGenerated(generated);
-    }
-
-    // Check if loading system has buffered chunks and add them to map
-    for (Pair<Vector3f, Chunk> buffered : loadingSystem.getBufferedChunks()) {
-      bufferedChunks.put(buffered.getKey(), buffered.getValue());
-      loadingSystem.removeBuffered(buffered);
     }
 
     if (!lastCameraPosition.getCurrentChunkPosition().equals(camera.getWorldPosition().getCurrentChunkPosition())) {

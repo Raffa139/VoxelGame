@@ -24,7 +24,7 @@ public class ChunkLoadingSystem extends ApplicationSystem {
 
   private final Set<Pair<Vector3f, Chunk>> bufferedChunks = new HashSet<>();
 
-  private final OpenSimplexNoise noise = new OpenSimplexNoise(139L);
+  private final OpenSimplexNoise noise = new OpenSimplexNoise(new Date().getTime());
 
   public ChunkLoadingSystem(GLApplication application) {
     super(application);
