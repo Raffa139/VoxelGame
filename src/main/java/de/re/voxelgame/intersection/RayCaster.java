@@ -1,6 +1,7 @@
 package de.re.voxelgame.intersection;
 
-import de.re.engine.Camera;
+import de.re.engine.camera.Camera;
+import de.re.voxelgame.camera.VoxelCamera;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -9,8 +10,8 @@ public final class RayCaster {
   private RayCaster() {
   }
 
-  public static Ray fromCamera(Camera camera) {
-    return new Ray(camera.getPos(), camera.getFront().normalize());
+  public static Ray fromCamera(VoxelCamera camera) {
+    return new Ray(camera.getPosition(), camera.getFront().normalize());
   }
 
   public static Ray fromMousePosition(double mouseX, double mouseY, Camera camera, Matrix4f projection,
@@ -38,6 +39,6 @@ public final class RayCaster {
     Vector4f rWorld = rView.mul(inverseView, new Vector4f());
     Vector3f ray = new Vector3f(rWorld.x, rWorld.y, rWorld.z).normalize();
 
-    return new Ray(camera.getPos(), ray);
+    return new Ray(camera.getPosition(), ray);
   }
 }

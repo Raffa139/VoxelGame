@@ -42,7 +42,7 @@ public class ChunkInteractionSystem extends ApplicationSystem {
   public void invoke() {
     // Voxel placement & highlighting
     if (!application.getContext().isMouseCursorToggled()) {
-      crossHairTarget.update(camera.getPos(), camera.getFront());
+      crossHairTarget.update(camera.getPosition(), camera.getFront());
 
       float currentTime = application.getCurrentTime();
       highlightVoxel();

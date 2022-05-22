@@ -1,9 +1,9 @@
 package de.re.voxelgame.skybox;
 
-import de.re.engine.Camera;
 import de.re.engine.GLApplication;
 import de.re.engine.objects.shader.Shader;
 import de.re.voxelgame.VoxelApplication;
+import de.re.voxelgame.camera.VoxelCamera;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
@@ -20,7 +20,7 @@ public class SkyboxRenderer {
     shader = ((VoxelApplication) application).shaderFromResources("shader/skybox.vert", "shader/skybox.frag");
   }
 
-  public void render(Skybox skybox, Camera camera) {
+  public void render(Skybox skybox, VoxelCamera camera) {
     glDepthFunc(GL_LEQUAL);
     glDisable(GL_CULL_FACE);
 
