@@ -36,6 +36,8 @@ public class ChunkSystem extends ApplicationSystem {
 
   @Override
   public void invoke() {
+    // TODO: Check if buffered chunks are even used? Seems like they arent utilized at all
+
     // Check if loading system has buffered chunks and add them to map
     for (Pair<Vector3f, Chunk> buffered : loadingSystem.getBufferedChunks()) {
       bufferedChunks.put(buffered.getKey(), buffered.getValue());
@@ -107,7 +109,43 @@ public class ChunkSystem extends ApplicationSystem {
     }
   }
 
-  public void reloadChunk(Vector3f position, Vector3f voxelPosition) {
+  public void reloadChunk(Vector3f position) {
+    reloadChunk(position, null);
+  }
+
+  public void highlightVoxel(Vector3f chunkPosition, Vector3f voxelPosition) {
+    reloadChunk(chunkPosition, voxelPosition);
+  }
+
+  public boolean hasChunkAtPosition(Vector3f position) {
+    return chunks.get(position) != null;
+  }
+
+  public Chunk getChunkAtPosition(Vector3f position) {
+    return chunks.get(position);
+  }
+
+  public Collection<Chunk> getChunks() {
+    return chunks.values();
+  }
+
+  public boolean hasBufferedChunkAtPosition(Vector3f position) {
+    return bufferedChunks.get(position) != null;
+  }
+
+  public Chunk getBufferedChunkAtPosition(Vector3f position) {
+    return bufferedChunks.get(position);
+  }
+
+  public Collection<Chunk> getBufferedChunks() {
+    return bufferedChunks.values();
+  }
+
+  public VoxelCamera getCamera() {
+    return camera;
+  }
+
+  private void reloadChunk(Vector3f position, Vector3f voxelPosition) {
     if (chunks.containsKey(position)) {
       var chunk = chunks.get(position);
       if (chunk.hasMesh()) {
@@ -115,22 +153,6 @@ public class ChunkSystem extends ApplicationSystem {
       }
       chunk.setMesh(ChunkLoader.loadChunkMesh(chunk, voxelPosition, chunks));
     }
-  }
-
-  public Map<Vector3f, Chunk> getChunkMap() {
-    return chunks;
-  }
-
-  public Collection<Chunk> getChunks() {
-    return chunks.values();
-  }
-
-  public Map<Vector3f, Chunk> getBufferedChunkMap() {
-    return bufferedChunks;
-  }
-
-  public Collection<Chunk> getBufferedChunks() {
-    return bufferedChunks.values();
   }
 
   private void buffer(Vector3f position) {

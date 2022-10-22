@@ -80,8 +80,6 @@ public class VoxelApplication extends GLApplication {
         ResourceLoader.locateResource("skybox/back.png", VoxelApplication.class).toPath(),
         ResourceLoader.locateResource("skybox/front.png", VoxelApplication.class).toPath());
 
-    //chunkManager.initCamPos(camera);
-
     // Post-processing
     float[] screenQuadVertices = {
         // positions   // texCoords
@@ -118,7 +116,7 @@ public class VoxelApplication extends GLApplication {
     HudRenderer hudRenderer = new HudRenderer(this);
     SkyboxRenderer skyboxRenderer = new SkyboxRenderer(this);
 
-    while (!context.isCloseRequested()) {
+    while (glApplicationIsRunning()) {
       beginFrame();
 
       // Render voxels

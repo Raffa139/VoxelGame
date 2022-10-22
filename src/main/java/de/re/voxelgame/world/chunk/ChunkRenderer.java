@@ -35,7 +35,7 @@ public class ChunkRenderer {
     renderNormalVoxels(normalVoxelBuffer, textureArray);
   }
 
-  public void renderNormalVoxels(Framebuffer fbo, Sampler2DArray textureArray) {
+  private void renderNormalVoxels(Framebuffer fbo, Sampler2DArray textureArray) {
     fbo.bind();
 
     textureArray.bind(0);
@@ -63,7 +63,7 @@ public class ChunkRenderer {
     }
   }
 
-  public void renderTransparentVoxels(Framebuffer fbo, Sampler2D normalMap) {
+  private void renderTransparentVoxels(Framebuffer fbo, Sampler2D normalMap) {
     fbo.bind();
 
     normalMap.bind(0);

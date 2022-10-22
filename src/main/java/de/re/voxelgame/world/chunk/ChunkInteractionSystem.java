@@ -45,7 +45,7 @@ public class ChunkInteractionSystem extends ApplicationSystem {
       crossHairTarget.update(camera.getPosition(), camera.getFront());
 
       float currentTime = application.getCurrentTime();
-      highlightVoxel();
+      highlightVoxelInCrossHair();
 
       if (MouseListener.buttonPressed(GLFW_MOUSE_BUTTON_2) && currentTime > lastPressed + 0.25f) {
         lastPressed = currentTime;
@@ -59,17 +59,17 @@ public class ChunkInteractionSystem extends ApplicationSystem {
     }
   }
 
-  private void highlightVoxel() {
+  private void highlightVoxelInCrossHair() {
     WorldPosition voxelInCrossHair = crossHairTarget.getTargetedVoxel();
 
     if ((!crossHairTarget.isTargetInRange() && hadTargetInRange) ||
         !voxelInCrossHair.getCurrentChunkPosition().equals(lastVoxelInCrossHair.getCurrentChunkPosition())) {
-      chunkSystem.reloadChunk(voxelInCrossHair.getCurrentChunkPosition(), null);
-      chunkSystem.reloadChunk(lastVoxelInCrossHair.getCurrentChunkPosition(), null);
+      chunkSystem.reloadChunk(voxelInCrossHair.getCurrentChunkPosition());
+      chunkSystem.reloadChunk(lastVoxelInCrossHair.getCurrentChunkPosition());
       lastVoxelInCrossHair = voxelInCrossHair;
       hadTargetInRange = false;
     } else if (crossHairTarget.isTargetInRange()) {
-      chunkSystem.reloadChunk(voxelInCrossHair.getCurrentChunkPosition(), voxelInCrossHair.getAbsolutePositionInCurrentChunk());
+      chunkSystem.highlightVoxel(voxelInCrossHair.getCurrentChunkPosition(), voxelInCrossHair.getAbsolutePositionInCurrentChunk());
       hadTargetInRange = true;
     }
   }
@@ -80,7 +80,7 @@ public class ChunkInteractionSystem extends ApplicationSystem {
     if (crossHairTarget.isTargetInRange()) {
       Vector3f chunkPos = placeableVoxel.getCurrentChunkPosition();
       Vector3f voxelPos = placeableVoxel.getAbsolutePositionInCurrentChunk();
-      Chunk chunk = chunkSystem.getChunkMap().get(chunkPos);
+      Chunk chunk = chunkSystem.getChunkAtPosition(chunkPos);
       if (chunk != null) {
         chunk.placeVoxel((int) voxelPos.x, (int) voxelPos.y, (int) voxelPos.z, type);
       }
@@ -93,7 +93,7 @@ public class ChunkInteractionSystem extends ApplicationSystem {
     if (crossHairTarget.isTargetInRange()) {
       Vector3f chunkPos = voxelInCrossHair.getCurrentChunkPosition();
       Vector3f voxelPos = voxelInCrossHair.getAbsolutePositionInCurrentChunk();
-      Chunk chunk = chunkSystem.getChunkMap().get(chunkPos);
+      Chunk chunk = chunkSystem.getChunkAtPosition(chunkPos);
       if (chunk != null) {
         chunk.removeVoxel((int) voxelPos.x, (int) voxelPos.y, (int) voxelPos.z);
       }

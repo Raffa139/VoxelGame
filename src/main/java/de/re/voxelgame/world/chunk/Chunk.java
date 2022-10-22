@@ -21,7 +21,7 @@ public class Chunk {
     this.voxelIds = voxelIds;
 
     WorldPosition worldPos = getWorldPosition();
-    this.boundingBox = new AABB(worldPos.getVector(), Vectors.add(worldPos.getVector(), CHUNK_SIZE-1));
+    this.boundingBox = new AABB(worldPos.getVector(), Vectors.add(worldPos.getVector(), CHUNK_SIZE - 1));
   }
 
   public WorldPosition getRelativePosition() {

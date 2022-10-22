@@ -12,6 +12,23 @@ public class AABB {
     this.max = max;
   }
 
+  public boolean intersects(AABB other) {
+    if (other == null) {
+      return false;
+    }
+
+    for (int i = 0; i < 3; i++) {
+      if (min.get(i) > other.max.get(i)) {
+        return false;
+      }
+      if (max.get(i) < other.min.get(i)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   public Vector3f getMin() {
     return min;
   }

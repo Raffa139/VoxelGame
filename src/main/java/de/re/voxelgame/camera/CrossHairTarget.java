@@ -29,7 +29,7 @@ public class CrossHairTarget {
       targetedVoxel = new WorldPosition(Vectors.add(cameraPos, Vectors.mul(cameraDirection.normalize(), t)));
       Vector3f chunkPos = targetedVoxel.getCurrentChunkPosition();
       Vector3f voxelPos = targetedVoxel.getAbsolutePositionInCurrentChunk();
-      Chunk chunk = chunkSystem.getChunkMap().get(chunkPos);
+      Chunk chunk = chunkSystem.getChunkAtPosition(chunkPos);
 
       byte voxelId = chunk != null ? chunk.getVoxelId((int) voxelPos.x, (int) voxelPos.y, (int) voxelPos.z) : 0;
       if (voxelId != 0) {
