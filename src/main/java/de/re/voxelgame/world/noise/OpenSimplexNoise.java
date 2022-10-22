@@ -10,9 +10,10 @@ public class OpenSimplexNoise {
   public int voxelNoise2d(float x, float z) {
     double lacunarity = 2.0;
     double persistance = 0.5;
+    int octaves = 4;
 
     double v = 0.0;
-    for (int octave = 0; octave < 4; octave++) {
+    for (int octave = 0; octave < octaves; octave++) {
       double frequency = Math.pow(lacunarity, octave) / 512.0;
       double amplitude = Math.pow(persistance, octave);
 
