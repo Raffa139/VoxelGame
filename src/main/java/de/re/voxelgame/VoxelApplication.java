@@ -9,12 +9,16 @@ import de.re.engine.objects.shader.Shader;
 import de.re.engine.util.ResourceLoader;
 import de.re.voxelgame.camera.VoxelCamera;
 import de.re.voxelgame.camera.VoxelCameraSystem;
+import de.re.voxelgame.font.FontRenderer;
 import de.re.voxelgame.gui.HudRenderer;
 import de.re.voxelgame.skybox.Skybox;
 import de.re.voxelgame.skybox.SkyboxRenderer;
 import de.re.voxelgame.util.DebugSystem;
-import de.re.voxelgame.world.chunk.*;
 import de.re.voxelgame.world.WorldPosition;
+import de.re.voxelgame.world.chunk.ChunkInteractionSystem;
+import de.re.voxelgame.world.chunk.ChunkLoadingSystem;
+import de.re.voxelgame.world.chunk.ChunkRenderer;
+import de.re.voxelgame.world.chunk.ChunkSystem;
 import org.lwjgl.Version;
 
 import java.io.FileNotFoundException;
@@ -83,13 +87,13 @@ public class VoxelApplication extends GLApplication {
     // Post-processing
     float[] screenQuadVertices = {
         // positions   // texCoords
-        -1.0f,  1.0f,  0.0f, 1.0f,
-        -1.0f, -1.0f,  0.0f, 0.0f,
-        1.0f, -1.0f,  1.0f, 0.0f,
+        -1.0f, 1.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f,
+        1.0f, -1.0f, 1.0f, 0.0f,
 
-        -1.0f,  1.0f,  0.0f, 1.0f,
-        1.0f, -1.0f,  1.0f, 0.0f,
-        1.0f,  1.0f,  1.0f, 1.0f
+        -1.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, -1.0f, 1.0f, 0.0f,
+        1.0f, 1.0f, 1.0f, 1.0f
     };
 
     int screenQuad = vaoManager
@@ -115,6 +119,7 @@ public class VoxelApplication extends GLApplication {
     ChunkRenderer chunkRenderer = new ChunkRenderer(this);
     HudRenderer hudRenderer = new HudRenderer(this);
     SkyboxRenderer skyboxRenderer = new SkyboxRenderer(this);
+    FontRenderer fontRenderer = new FontRenderer(this, ResourceLoader.locateResource("fonts/arial.ttf", VoxelApplication.class).toFile());
 
     while (glApplicationIsRunning()) {
       beginFrame();
