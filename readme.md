@@ -19,6 +19,14 @@ I gave the water some animations and reflections just for fun.
 - Multi pass rendering (for water transparency)
 - Data compression of chunk mesh VBO's - documented in [vertex_data_schematic.txt](https://github.com/Raffa139/VoxelGame/blob/master/vertex_data_schematic.txt)
 
+## Roadmap
+- Text rendering
+- Collisions
+- Loading world around player
+- Inventory
+- World generation overhaul
+- World loading overhaul
+
 ## More screenshots
 <div align="center">
     <img src="images/VG_1.gif" width="375" height="250"/>
