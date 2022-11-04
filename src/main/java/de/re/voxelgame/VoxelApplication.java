@@ -9,12 +9,14 @@ import de.re.engine.objects.shader.Shader;
 import de.re.engine.util.ResourceLoader;
 import de.re.voxelgame.camera.VoxelCamera;
 import de.re.voxelgame.camera.VoxelCameraSystem;
+import de.re.voxelgame.font.FontRenderer;
 import de.re.voxelgame.gui.HudRenderer;
 import de.re.voxelgame.skybox.Skybox;
 import de.re.voxelgame.skybox.SkyboxRenderer;
 import de.re.voxelgame.util.DebugSystem;
 import de.re.voxelgame.world.chunk.*;
 import de.re.voxelgame.world.WorldPosition;
+import org.joml.Vector3f;
 import org.lwjgl.Version;
 
 import java.io.FileNotFoundException;
@@ -69,6 +71,8 @@ public class VoxelApplication extends GLApplication {
 
     Sampler2D normalMap = samplerManager.sampler2D(ResourceLoader.locateResource("textures/normal_map.png", VoxelApplication.class).toPath());
 
+    Sampler2D fontAtlas = samplerManager.sampler2D(ResourceLoader.locateResource("font/calibri/calibri.png", VoxelApplication.class).toPath());
+
     VoxelCamera camera = new VoxelCamera(new WorldPosition(3.0f, 65.0f, 3.0f), 65.0f);
     useCamera(camera);
 
@@ -115,16 +119,17 @@ public class VoxelApplication extends GLApplication {
     ChunkRenderer chunkRenderer = new ChunkRenderer(this);
     HudRenderer hudRenderer = new HudRenderer(this);
     SkyboxRenderer skyboxRenderer = new SkyboxRenderer(this);
+    FontRenderer fontRenderer = new FontRenderer(this, ResourceLoader.locateResource("font/calibri/calibri.fnt", VoxelApplication.class).toPath(), fontAtlas);
 
     while (glApplicationIsRunning()) {
       beginFrame();
 
       // Render voxels
-      chunkRenderer.render(normalVoxelBuffer, transparentVoxelBuffer, arraySampler, normalMap);
+      //chunkRenderer.render(normalVoxelBuffer, transparentVoxelBuffer, arraySampler, normalMap);
 
       // Render skybox
-      normalVoxelBuffer.bind();
-      skyboxRenderer.render(skybox, camera);
+      //normalVoxelBuffer.bind();
+      //skyboxRenderer.render(skybox, camera);
 
       // Post-processing
       screenShader.use();
@@ -140,17 +145,20 @@ public class VoxelApplication extends GLApplication {
       normalVoxelBuffer.bindDepthStencilTexture(2);
       transparentVoxelBuffer.bindDepthStencilTexture(3);
 
-      glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+      /*glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
       glDisable(GL_CULL_FACE);
       glDisable(GL_DEPTH_TEST);
 
       glBindVertexArray(screenQuad);
       glDrawArrays(GL_TRIANGLES, 0, screenQuadVertices.length);
-      glBindVertexArray(0);
+      glBindVertexArray(0);*/
 
       // Render hud
       hudRenderer.render();
+
+      // Render text
+      fontRenderer.renderText("H", 0, 0, 1, new Vector3f(1.0f, 1.0f, 1.0f));
 
       endFrame();
     }
