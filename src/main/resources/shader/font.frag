@@ -9,5 +9,4 @@ uniform vec3 iTextColor;
 
 void main() {
     FragColor = vec4(iTextColor, texture(sampler, Texs).a);
-    //FragColor = vec4(Texs.x, Texs.y, 0.0, 1.0);
 }

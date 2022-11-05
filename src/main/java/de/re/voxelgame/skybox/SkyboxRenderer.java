@@ -32,6 +32,7 @@ public class SkyboxRenderer {
     skybox.getTexture().bind(0);
     glDrawArrays(GL_TRIANGLES, 0, skybox.getVertexCount());
     glBindVertexArray(0);
+    glEnable(GL_CULL_FACE);
     glDepthFunc(GL_LESS);
   }
 }
