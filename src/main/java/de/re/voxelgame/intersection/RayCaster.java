@@ -1,6 +1,6 @@
 package de.re.voxelgame.intersection;
 
-import de.re.engine.camera.Camera;
+import de.ren.ecs.engine.camera.Camera;
 import de.re.voxelgame.camera.VoxelCamera;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

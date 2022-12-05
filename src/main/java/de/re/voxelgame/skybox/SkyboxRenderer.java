@@ -1,7 +1,7 @@
 package de.re.voxelgame.skybox;
 
-import de.re.engine.GLApplication;
-import de.re.engine.objects.shader.Shader;
+import de.ren.ecs.engine.GLApplication;
+import de.ren.ecs.engine.objects.shader.Shader;
 import de.re.voxelgame.VoxelApplication;
 import de.re.voxelgame.camera.VoxelCamera;
 import org.joml.Matrix3f;

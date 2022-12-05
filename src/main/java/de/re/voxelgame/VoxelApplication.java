@@ -1,12 +1,12 @@
 package de.re.voxelgame;
 
-import de.re.engine.GLApplication;
-import de.re.engine.ecs.system.LoadingSystem;
-import de.re.engine.objects.Framebuffer;
-import de.re.engine.objects.sampler.Sampler2D;
-import de.re.engine.objects.sampler.Sampler2DArray;
-import de.re.engine.objects.shader.Shader;
-import de.re.engine.util.ResourceLoader;
+import de.ren.ecs.engine.GLApplication;
+import de.ren.ecs.engine.ecs.system.LoadingSystem;
+import de.ren.ecs.engine.objects.Framebuffer;
+import de.ren.ecs.engine.objects.sampler.Sampler2D;
+import de.ren.ecs.engine.objects.sampler.Sampler2DArray;
+import de.ren.ecs.engine.objects.shader.Shader;
+import de.ren.ecs.engine.util.ResourceLoader;
 import de.re.voxelgame.camera.VoxelCamera;
 import de.re.voxelgame.camera.VoxelCameraSystem;
 import de.re.voxelgame.font.FontRenderer;

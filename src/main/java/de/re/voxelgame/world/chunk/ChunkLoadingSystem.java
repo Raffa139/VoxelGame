@@ -1,7 +1,7 @@
 package de.re.voxelgame.world.chunk;
 
-import de.re.engine.GLApplication;
-import de.re.engine.ecs.system.ApplicationSystem;
+import de.ren.ecs.engine.GLApplication;
+import de.ren.ecs.engine.ecs.system.ApplicationSystem;
 import de.re.voxelgame.util.Pair;
 import de.re.voxelgame.world.WorldPosition;
 import de.re.voxelgame.world.noise.OpenSimplexNoise;

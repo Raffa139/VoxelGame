@@ -16,8 +16,8 @@
     <dependencies>
         <!-- Core -->
         <dependency>
-            <groupId>de.re</groupId>
-            <artifactId>ECS-Engine</artifactId>
+            <groupId>de.ren.ecs</groupId>
+            <artifactId>engine</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>

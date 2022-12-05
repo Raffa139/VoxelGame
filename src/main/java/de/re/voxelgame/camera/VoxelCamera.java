@@ -1,6 +1,6 @@
 package de.re.voxelgame.camera;
 
-import de.re.engine.camera.SimpleCamera;
+import de.ren.ecs.engine.camera.SimpleCamera;
 import de.re.voxelgame.world.WorldPosition;
 
 public class VoxelCamera extends SimpleCamera {

@@ -1,10 +1,10 @@
 package de.re.voxelgame.world.chunk;
 
-import de.re.engine.GLApplication;
-import de.re.engine.objects.Framebuffer;
-import de.re.engine.objects.sampler.Sampler2D;
-import de.re.engine.objects.sampler.Sampler2DArray;
-import de.re.engine.objects.shader.Shader;
+import de.ren.ecs.engine.GLApplication;
+import de.ren.ecs.engine.objects.Framebuffer;
+import de.ren.ecs.engine.objects.sampler.Sampler2D;
+import de.ren.ecs.engine.objects.sampler.Sampler2DArray;
+import de.ren.ecs.engine.objects.shader.Shader;
 import de.re.voxelgame.VoxelApplication;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

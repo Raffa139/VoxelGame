@@ -1,8 +1,8 @@
 package de.re.voxelgame.gui;
 
-import de.re.engine.GLApplication;
-import de.re.engine.objects.GLVertexArrayManager;
-import de.re.engine.objects.shader.Shader;
+import de.ren.ecs.engine.GLApplication;
+import de.ren.ecs.engine.objects.GLVertexArrayManager;
+import de.ren.ecs.engine.objects.shader.Shader;
 import de.re.voxelgame.VoxelApplication;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

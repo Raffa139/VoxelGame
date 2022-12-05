@@ -1,6 +1,6 @@
 package de.re.voxelgame.world.chunk;
 
-import de.re.engine.objects.GLVertexArrayManager;
+import de.ren.ecs.engine.objects.GLVertexArrayManager;
 import de.re.voxelgame.world.WorldPosition;
 import de.re.voxelgame.world.noise.OpenSimplexNoise;
 import de.re.voxelgame.world.voxel.Voxel;

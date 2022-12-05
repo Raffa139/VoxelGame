@@ -2,7 +2,7 @@ package de.re.voxelgame.intersection;
 
 import org.joml.Vector3f;
 
-import static de.re.engine.util.Vectors.*;
+import static de.ren.ecs.engine.util.Vectors.*;
 
 public class Ray {
   private final Vector3f origin;

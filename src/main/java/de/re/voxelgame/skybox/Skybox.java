@@ -1,10 +1,10 @@
 package de.re.voxelgame.skybox;
 
-import de.re.engine.geometry.Geometry;
-import de.re.engine.geometry.Polygon;
-import de.re.engine.objects.GLVertexArrayManager;
-import de.re.engine.objects.sampler.GLSamplerManager;
-import de.re.engine.objects.sampler.SamplerCube;
+import de.ren.ecs.engine.geometry.Geometry;
+import de.ren.ecs.engine.geometry.Polygon;
+import de.ren.ecs.engine.objects.GLVertexArrayManager;
+import de.ren.ecs.engine.objects.sampler.GLSamplerManager;
+import de.ren.ecs.engine.objects.sampler.SamplerCube;
 
 import java.io.IOException;
 import java.nio.file.Path;

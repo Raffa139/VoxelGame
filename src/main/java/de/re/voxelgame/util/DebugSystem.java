@@ -1,7 +1,7 @@
 package de.re.voxelgame.util;
 
-import de.re.engine.GLApplication;
-import de.re.engine.ecs.system.ApplicationSystem;
+import de.ren.ecs.engine.GLApplication;
+import de.ren.ecs.engine.ecs.system.ApplicationSystem;
 import de.re.voxelgame.world.chunk.ChunkLoadingSystem;
 import de.re.voxelgame.world.chunk.ChunkSystem;
 

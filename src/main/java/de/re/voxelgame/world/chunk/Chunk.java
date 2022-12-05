@@ -1,6 +1,6 @@
 package de.re.voxelgame.world.chunk;
 
-import de.re.engine.util.Vectors;
+import de.ren.ecs.engine.util.Vectors;
 import de.re.voxelgame.intersection.AABB;
 import de.re.voxelgame.world.WorldPosition;
 import de.re.voxelgame.world.voxel.VoxelType;
