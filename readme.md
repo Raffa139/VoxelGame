@@ -1,4 +1,7 @@
 # VoxelGame
+
+[//]: # (TODO: Look up sparse (voxel) octree)
+
 My approach on a basic Minecraft clone.\
 As of now the most effort went into world generation and loading.
 
