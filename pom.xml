@@ -14,10 +14,10 @@
     </properties>
 
     <dependencies>
-        <!-- Core -->
+        <!-- Core + Starter -->
         <dependency>
             <groupId>de.ren.ecs</groupId>
-            <artifactId>engine</artifactId>
+            <artifactId>starter</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>

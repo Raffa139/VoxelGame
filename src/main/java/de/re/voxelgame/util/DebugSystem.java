@@ -1,9 +1,9 @@
 package de.re.voxelgame.util;
 
 import de.ren.ecs.engine.GLApplication;
-import de.ren.ecs.engine.ecs.system.ApplicationSystem;
 import de.re.voxelgame.world.chunk.ChunkLoadingSystem;
 import de.re.voxelgame.world.chunk.ChunkSystem;
+import de.ren.ecs.engine.ecs.ApplicationSystem;
 
 public class DebugSystem extends ApplicationSystem {
   private final ChunkLoadingSystem loadingSystem;

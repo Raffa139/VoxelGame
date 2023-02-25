@@ -1,9 +1,9 @@
 package de.re.voxelgame.camera;
 
-import de.ren.ecs.engine.camera.SimpleCamera;
+import de.re.ecs.starter.camera.StarterCamera;
 import de.re.voxelgame.world.WorldPosition;
 
-public class VoxelCamera extends SimpleCamera {
+public class VoxelCamera extends StarterCamera {
   public VoxelCamera(WorldPosition worldPosition, float fov) {
     super(worldPosition.getVector(), fov);
   }

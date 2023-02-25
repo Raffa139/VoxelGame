@@ -1,7 +1,7 @@
 package de.re.voxelgame.camera;
 
 import de.ren.ecs.engine.GLApplication;
-import de.ren.ecs.engine.ecs.system.ApplicationSystem;
+import de.ren.ecs.engine.ecs.ApplicationSystem;
 
 public class VoxelCameraSystem extends ApplicationSystem {
   private VoxelCamera camera;

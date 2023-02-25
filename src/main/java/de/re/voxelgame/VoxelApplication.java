@@ -1,7 +1,7 @@
 package de.re.voxelgame;
 
+import de.re.ecs.starter.systems.StarterKeybindings;
 import de.ren.ecs.engine.GLApplication;
-import de.ren.ecs.engine.ecs.system.LoadingSystem;
 import de.ren.ecs.engine.objects.Framebuffer;
 import de.ren.ecs.engine.objects.sampler.Sampler2D;
 import de.ren.ecs.engine.objects.sampler.Sampler2DArray;
@@ -38,8 +38,7 @@ public class VoxelApplication extends GLApplication {
   }
 
   public void run() throws IOException {
-    ecs.unregisterEntityListener(ecs.getSystem(LoadingSystem.class));
-    ecs.removeSystem(LoadingSystem.class);
+    ecs.addSystem(StarterKeybindings.class);
 
     // Shaders
     Shader screenShader = shaderFromResources("shader/screen.vert", "shader/screen.frag");

@@ -1,7 +1,7 @@
 package de.re.voxelgame.skybox;
 
-import de.ren.ecs.engine.geometry.Geometry;
-import de.ren.ecs.engine.geometry.Polygon;
+import de.re.ecs.starter.geometry.Geometry;
+import de.re.ecs.starter.geometry.Polygon;
 import de.ren.ecs.engine.objects.GLVertexArrayManager;
 import de.ren.ecs.engine.objects.sampler.GLSamplerManager;
 import de.ren.ecs.engine.objects.sampler.SamplerCube;
