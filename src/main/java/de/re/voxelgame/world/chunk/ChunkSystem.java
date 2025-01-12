@@ -48,7 +48,9 @@ public class ChunkSystem extends ApplicationSystem {
     for (Pair<Vector3f, Chunk> generated : loadingSystem.getGeneratedChunks()) {
       var chunk = generated.getValue();
       chunks.put(generated.getKey(), chunk);
-      chunk.setMesh(ChunkLoader.loadChunkMesh(chunk, null, bufferedChunks));
+      ChunkMesh[] meshes = ChunkLoader.loadChunkMeshes(chunk, null, bufferedChunks);
+      chunk.setSolidMesh(meshes[0]);
+      chunk.setTransparentMesh(meshes[1]);
       loadingSystem.removeGenerated(generated);
     }
 
@@ -88,9 +90,7 @@ public class ChunkSystem extends ApplicationSystem {
 
         if (distance >= (float) VIEW_DISTANCE) {
           chunks.remove(chunk.getRelativePosition().getVector());
-          if (chunk.hasMesh()) {
-            loadingSystem.demolish(chunk.getMesh());
-          }
+          loadingSystem.demolish(chunk);
         }
       }
 
@@ -148,10 +148,10 @@ public class ChunkSystem extends ApplicationSystem {
   private void reloadChunk(Vector3f position, Vector3f voxelPosition) {
     if (chunks.containsKey(position)) {
       var chunk = chunks.get(position);
-      if (chunk.hasMesh()) {
-        loadingSystem.demolish(chunk.getMesh());
-      }
-      chunk.setMesh(ChunkLoader.loadChunkMesh(chunk, voxelPosition, chunks));
+      loadingSystem.demolish(chunk);
+      ChunkMesh[] meshes = ChunkLoader.loadChunkMeshes(chunk, voxelPosition, chunks);
+      chunk.setSolidMesh(meshes[0]);
+      chunk.setTransparentMesh(meshes[1]);
     }
   }
 

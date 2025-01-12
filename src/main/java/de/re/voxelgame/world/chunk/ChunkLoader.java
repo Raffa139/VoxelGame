@@ -78,8 +78,9 @@ public final class ChunkLoader {
     return new Chunk(position, voxelIds);
   }
 
-  public static ChunkMesh loadChunkMesh(Chunk chunk, Vector3f highlightedVoxelPosition, Map<Vector3f, Chunk> chunks) {
-    List<VoxelVertex> translatedVertices = new ArrayList<>();
+  public static ChunkMesh[] loadChunkMeshes(Chunk chunk, Vector3f highlightedVoxelPosition, Map<Vector3f, Chunk> chunks) {
+    List<VoxelVertex> solidVertices = new ArrayList<>();
+    List<VoxelVertex> transparentVertices = new ArrayList<>();
     Vector3f pos = chunk.getRelativePosition().getVector();
     byte[][][] voxelIds = chunk.getVoxelIds();
 
@@ -87,6 +88,7 @@ public final class ChunkLoader {
       for (int z = 0; z < CHUNK_SIZE; z++) {
         for (int y = 0; y < CHUNK_SIZE; y++) {
           byte currentVoxel = voxelIds[x][y][z];
+
           if (currentVoxel > 0) {
             boolean highlighted = new Vector3f(x, y, z).equals(highlightedVoxelPosition);
 
@@ -138,14 +140,20 @@ public final class ChunkLoader {
             }
 
             if (voxel.hasVertices()) {
-              translatedVertices.addAll(voxel.translate(x, y, z).getVertices());
+              List<VoxelVertex> vertices = voxel.translate(x, y, z).getVertices();
+
+              if (currentVoxel == 6) {
+                transparentVertices.addAll(vertices);
+              } else {
+                solidVertices.addAll(vertices);
+              }
             }
           }
         }
       }
     }
 
-    return storeAndReturnChunkMesh(translatedVertices);
+    return new ChunkMesh[]{storeAndReturnChunkMesh(solidVertices), storeAndReturnChunkMesh(transparentVertices)};
   }
 
   public static void unloadChunkMesh(ChunkMesh mesh) {
@@ -154,14 +162,14 @@ public final class ChunkLoader {
     }
   }
 
-  private static ChunkMesh storeAndReturnChunkMesh(List<VoxelVertex> translatedVertices) {
-    if (translatedVertices.size() == 0) {
+  private static ChunkMesh storeAndReturnChunkMesh(List<VoxelVertex> vertices) {
+    if (vertices.isEmpty()) {
       return null;
     }
 
-    int[] vertexData = new int[translatedVertices.size()];
-    for (int i = 0; i < translatedVertices.size(); i++) {
-      VoxelVertex v = translatedVertices.get(i);
+    int[] vertexData = new int[vertices.size()];
+    for (int i = 0; i < vertices.size(); i++) {
+      VoxelVertex v = vertices.get(i);
 
       // Push position bits according to vertex data schematics
       vertexData[i] = (int) v.getPosition().x << 26;

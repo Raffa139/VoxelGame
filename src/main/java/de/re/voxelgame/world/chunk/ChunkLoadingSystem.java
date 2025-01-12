@@ -57,9 +57,16 @@ public class ChunkLoadingSystem extends ApplicationSystem {
     }
   }
 
-  public void demolish(ChunkMesh mesh) {
-    if (!demolishingQueue.contains(mesh)) {
-      demolishingQueue.add(mesh);
+  public void demolish(Chunk chunk) {
+    ChunkMesh solidMesh = chunk.getSolidMesh();
+    ChunkMesh transparentMesh = chunk.getTransparentMesh();
+
+    if (!demolishingQueue.contains(solidMesh) && chunk.hasSolidMesh()) {
+      demolishingQueue.add(solidMesh);
+    }
+
+    if (!demolishingQueue.contains(transparentMesh) && chunk.hasTransparentMesh()) {
+      demolishingQueue.add(transparentMesh);
     }
   }
 

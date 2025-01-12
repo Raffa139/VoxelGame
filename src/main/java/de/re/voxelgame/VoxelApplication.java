@@ -135,9 +135,9 @@ public class VoxelApplication extends GLApplication {
 
       // Post-processing
       screenShader.use();
-      screenShader.setInt("normalVoxelSampler", 0);
-      screenShader.setInt("transparentSampler", 1);
-      screenShader.setInt("voxelDepthSampler", 2);
+      screenShader.setInt("solidVoxels", 0);
+      screenShader.setInt("transparentVoxels", 1);
+      screenShader.setInt("solidDepthSampler", 2);
       screenShader.setInt("transparentDepthSampler", 3);
 
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -147,7 +147,7 @@ public class VoxelApplication extends GLApplication {
       normalVoxelBuffer.bindDepthStencilTexture(2);
       transparentVoxelBuffer.bindDepthStencilTexture(3);
 
-      glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+      glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
       glDisable(GL_DEPTH_TEST);
 

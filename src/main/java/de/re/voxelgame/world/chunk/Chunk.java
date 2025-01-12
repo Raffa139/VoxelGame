@@ -12,7 +12,9 @@ public class Chunk {
 
   private final AABB boundingBox;
 
-  private ChunkMesh mesh;
+  private ChunkMesh solidMesh;
+
+  private ChunkMesh transparentMesh;
 
   private byte[][][] voxelIds;
 
@@ -36,16 +38,28 @@ public class Chunk {
     return boundingBox;
   }
 
-  public boolean hasMesh() {
-    return mesh != null;
+  public boolean hasSolidMesh() {
+    return solidMesh != null;
   }
 
-  public ChunkMesh getMesh() {
-    return mesh;
+  public ChunkMesh getSolidMesh() {
+    return solidMesh;
   }
 
-  public void setMesh(ChunkMesh mesh) {
-    this.mesh = mesh;
+  public void setSolidMesh(ChunkMesh solidMesh) {
+    this.solidMesh = solidMesh;
+  }
+
+  public boolean hasTransparentMesh() {
+    return transparentMesh != null;
+  }
+
+  public ChunkMesh getTransparentMesh() {
+    return transparentMesh;
+  }
+
+  public void setTransparentMesh(ChunkMesh transparentMesh) {
+    this.transparentMesh = transparentMesh;
   }
 
   public byte[][][] getVoxelIds() {

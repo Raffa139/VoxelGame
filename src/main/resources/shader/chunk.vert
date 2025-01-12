@@ -11,6 +11,7 @@ uniform float iTime;
 out vec4 Texs;
 out vec3 VertPos;
 out float Highlighted;
+out float IsWater;
 
 vec2 texCoords[4] = vec2[4](
     vec2(1.0f, 1.0f),
@@ -31,9 +32,10 @@ void main() {
 
     Texs = vec4(texCoords[texIndex], lightLevel, texLayer);
     Highlighted = highlighted;
+    IsWater = Texs.w == 6 ? 1.0 : 0.0;
 
     VertPos = (iModel * vec4(x, y, z, 1.0)).xyz;
-    if (Texs.w == 6) {
+    if (IsWater == 1.0) {
         VertPos.y += sin((iTime + VertPos.x) * 1.5) / 12.0;
         VertPos.y += cos((iTime + VertPos.z) * 1.5) / 12.0;
         VertPos.y -= 0.2;
