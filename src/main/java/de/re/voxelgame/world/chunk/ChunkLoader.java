@@ -51,8 +51,10 @@ public final class ChunkLoader {
               voxelIds[x][y][z] = (byte) VoxelType.GRASS.ordinal();
             } else if (ty > 85 && ty <= 90) {
               voxelIds[x][y][z] = (byte) VoxelType.DIRT.ordinal();
-            } else if (ty > 90) {
+            } else if (ty > 90 && ty <= 125) {
               voxelIds[x][y][z] = (byte) VoxelType.COBBLESTONE.ordinal();
+            } else if (ty > 125) {
+              voxelIds[x][y][z] = (byte) VoxelType.SNOW.ordinal();
             } else {
               voxelIds[x][y][z] = (byte) VoxelType.GRAVEL.ordinal();
             }

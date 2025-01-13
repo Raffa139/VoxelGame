@@ -58,7 +58,8 @@ public class VoxelApplication extends GLApplication {
         "textures/cactus_side.png",
         "textures/cactus_top.png",
         "textures/cactus_bottom.png",
-        "textures/gravel.png"
+        "textures/gravel.png",
+        "textures/snow.png"
     };
     Path[] texturePaths = Arrays.stream(textureFiles)
         .map(tf -> {
