@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -118,6 +119,8 @@ public class VoxelApplication extends GLApplication {
     ecs.addSystem(ChunkInteractionSystem.class);
     ecs.addSystem(DebugSystem.class);
 
+    DebugSystem debugSystem = ecs.getSystem(DebugSystem.class);
+
     ChunkRenderer chunkRenderer = new ChunkRenderer(this);
     HudRenderer hudRenderer = new HudRenderer(this);
     SkyboxRenderer skyboxRenderer = new SkyboxRenderer(this);
@@ -158,8 +161,12 @@ public class VoxelApplication extends GLApplication {
       // Render hud
       hudRenderer.render();
 
-      // Render text
-      fontRenderer.renderText("Hello World!", 0, context.getWindowHeight() - 35.0f, 0.5f, new Vector3f(0.1f, 0.65f, 0.75f));
+      // Render debug text
+      List<String> debugStrings = debugSystem.getDebugStrings();
+      for (int i = 0; i < debugStrings.size(); i++) {
+        String debugString = debugStrings.get(i);
+        fontRenderer.renderText(debugString, 0, context.getWindowHeight() - 20.0f * (i+1), 0.25f, new Vector3f(0.1f, 0.1f, 0.1f));
+      }
 
       endFrame();
     }
